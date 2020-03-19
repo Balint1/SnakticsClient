@@ -26,16 +26,30 @@ object SocketService {
     }
 
     private fun configSocketEvents() {
-        socket!!.on(Socket.EVENT_CONNECT) { Gdx.app.log("SocketIO", "Connected") }
-                .on(Events.MY_ID) { args ->
+        socket!!.on(Socket.EVENT_CONNECT) {
+            Gdx.app.log("SocketIO", "Connected")
+            socket!!.emit(Events.JOIN_REQUEST, Data.JOIN_REQUEST("my_nickname", "wsahx728y8qwfsg"))
+        }
+                .on(Events.JOIN_SUCCEEDED) { args ->
                     val data: JSONObject = args[0] as JSONObject
                     try {
+                        val message: String = data.getString("message")
                         val id: String = data.getString("id")
-                        Gdx.app.log("SocketIO", "ID: $id")
+                        Gdx.app.log("SocketIO", "$message,  socket id: $id")
                     } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting id: $e")
+                        Gdx.app.log("SocketIO", "Error getting attribute: $e")
                     }
-                }.on(Events.NEW_PLAYER) { args ->
+                }.on(Events.JOIN_FAILED) { args ->
+                    val data: JSONObject = args[0] as JSONObject
+                    try {
+                        val message: String = data.getString("message")
+                        val id: String = data.getString("id")
+                        Gdx.app.log("SocketIO", "$message, socket id: $id")
+                    } catch (e: JSONException) {
+                        Gdx.app.log("SocketIO", "Error getting attribute: $e")
+                    }
+                }
+                .on(Events.NEW_PLAYER) { args ->
                     val data: JSONObject = args[0] as JSONObject
                     try {
                         val id: String = data.getString("id")
@@ -44,10 +58,5 @@ object SocketService {
                         Gdx.app.log("SocketIO", "Error getting New Player id: $e")
                     }
                 }
-    }
-
-    private object Events {
-        const val MY_ID = "socket-id"
-        const val NEW_PLAYER = "new-player"
     }
 }
