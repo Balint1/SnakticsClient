@@ -28,7 +28,7 @@ object SocketService {
     private fun configSocketEvents() {
         socket!!.on(Socket.EVENT_CONNECT) {
             Gdx.app.log("SocketIO", "Connected")
-            socket!!.emit(Events.JOIN_REQUEST, Data.JOIN_REQUEST("my_nickname", "wsahx728y8qwfsg"))
+            socket!!.emit(Events.JOIN_REQUEST, Data.JOIN_REQUEST("my_nickname", "123"))
         }
                 .on(Events.JOIN_SUCCEEDED) { args ->
                     val data: JSONObject = args[0] as JSONObject
@@ -37,7 +37,7 @@ object SocketService {
                         val id: String = data.getString("id")
                         Gdx.app.log("SocketIO", "$message,  socket id: $id")
                     } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting attribute: $e")
+                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
                     }
                 }.on(Events.JOIN_FAILED) { args ->
                     val data: JSONObject = args[0] as JSONObject
@@ -46,17 +46,25 @@ object SocketService {
                         val id: String = data.getString("id")
                         Gdx.app.log("SocketIO", "$message, socket id: $id")
                     } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting attribute: $e")
+                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
                     }
-                }
-                .on(Events.NEW_PLAYER) { args ->
+                }.on(Events.NEW_PLAYER) { args ->
                     val data: JSONObject = args[0] as JSONObject
                     try {
                         val id: String = data.getString("id")
                         Gdx.app.log("SocketIO", "New Player Connected: $id")
                     } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting New Player id: $e")
+                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
+                    }
+                }.on(Events.UPDATE) { args ->
+                    val data: JSONObject = args[0] as JSONObject
+                    try {
+                        val state: JSONObject = data.getJSONObject("state")
+                        Gdx.app.log("SocketIO", "state: $state")
+                    } catch (e: JSONException) {
+                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
                     }
                 }
+
     }
 }

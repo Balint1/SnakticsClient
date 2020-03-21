@@ -16,4 +16,5 @@ object Events {
     const val JOIN_REQUEST = "join-request"
     const val JOIN_SUCCEEDED = "join-succeeded"
     const val JOIN_FAILED = "join-failed"
+    const val UPDATE = "update-state"
 }
