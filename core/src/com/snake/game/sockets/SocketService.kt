@@ -28,7 +28,7 @@ object SocketService {
     private fun configSocketEvents() {
         socket!!.on(Socket.EVENT_CONNECT) {
             Gdx.app.log("SocketIO", "Connected")
-            socket!!.emit(Events.JOIN_REQUEST, Data.JOIN_REQUEST("my_nickname", "123"))
+            socket!!.emit(Events.JOIN_REQUEST, Data.JOIN_REQUEST("my_nickname", "835aee55-3274-9f4f-dac5-87fb41f276f7"))
         }
                 .on(Events.JOIN_SUCCEEDED) { args ->
                     val data: JSONObject = args[0] as JSONObject
