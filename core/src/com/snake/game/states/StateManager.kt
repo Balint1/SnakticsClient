@@ -8,12 +8,27 @@ object StateManager {
     private val states: Stack<IState> by lazy { Stack<IState>() }
 
     fun push(state: IState) {
+        if (!states.empty())
+            states.peek().hide()
         states.push(state)
+        state.show()
+    }
+
+    fun pop() {
+        val old = states.pop()
+        old.hide()
+        old.dispose()
+        states.peek().show()
     }
 
     fun set(state: IState) {
-        states.pop().dispose()
+        while (!states.empty()) {
+            val old = states.pop()
+            old.hide()
+            old.dispose()
+        }
         states.push(state)
+        state.show()
     }
 
     fun update(dt: Float) {

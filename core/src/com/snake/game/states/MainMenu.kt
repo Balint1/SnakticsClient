@@ -1,52 +1,38 @@
 package com.snake.game.states
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.badlogic.gdx.utils.Align
 
 class MainMenu : MenuBaseState() {
 
     init {
-        val title = Label("Snaktics", skin, "title")
-        title.setSize(BUTTON_WIDTH, BUTTON_HEIGHT)
-        title.setAlignment(Align.center)
-        title.setFontScale(2f)
-        addMenuElement(title)
+        setTitle("Snaktics")
 
-        val joinButton = createTextButton("Join Room", skin)
-        joinButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                //StateManager.push(RoomList)
-            }
-        })
-        addMenuElement(joinButton)
+        createTextButton("Join room", skin).apply {
+            addListener(object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    StateManager.push(RoomList())
+                }
+            })
+            addMenuElement(this)
+        }
 
-        val createButton = createTextButton("Create Room", skin)
-        createButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                //StateManager.push(CreateRoom())
-            }
-        })
-        addMenuElement(createButton)
+        createTextButton("Create room", skin).apply {
+            addListener(object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    StateManager.push(CreateRoom())
+                }
+            })
+            addMenuElement(this)
+        }
 
-        val settingsButton = createTextButton("Settings", skin)
-        settingsButton.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                //StateManager.push(Settings())
-            }
-        })
-        addMenuElement(settingsButton)
-    }
-
-    override fun render(sb: SpriteBatch) {
-        stage.act()
-        stage.draw()
-    }
-
-    override fun update(dt: Float) {}
-
-    override fun dispose() {
+        createTextButton("Settings", skin).apply {
+            addListener(object : ClickListener() {
+                override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                    StateManager.push(Settings())
+                }
+            })
+            addMenuElement(this)
+        }
     }
 }

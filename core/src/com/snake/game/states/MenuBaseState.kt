@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 
 
@@ -17,7 +19,6 @@ abstract class MenuBaseState : IState {
     var table = Table()
 
     init {
-        Gdx.input.inputProcessor = stage
         table.setFillParent(true);
         stage.addActor(table);
 
@@ -25,15 +26,40 @@ abstract class MenuBaseState : IState {
         //table.debug()
     }
 
+    override fun show() {
+        Gdx.input.inputProcessor = stage
+    }
+
+    override fun hide() {
+
+    }
+
     override fun render(sb: SpriteBatch) {
         stage.act()
         stage.draw()
+    }
+
+    override fun update(dt: Float) {
+
+    }
+
+    override fun dispose() {
+
     }
 
     protected fun createTextButton(name: String, skin: Skin): TextButton {
         val button = TextButton(name, skin)
         button.setSize(BUTTON_WIDTH, BUTTON_HEIGHT)
         return button
+    }
+
+    protected fun setTitle(title: String) {
+        Label(title, skin, "title").apply {
+            setSize(BUTTON_WIDTH, BUTTON_HEIGHT)
+            setAlignment(Align.center)
+            setFontScale(2f)
+            addMenuElement(this)
+        }
     }
 
     protected fun addMenuElement(actor: Actor) {
