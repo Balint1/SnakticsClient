@@ -25,6 +25,9 @@ object SocketService {
         }
     }
 
+    fun getSocket(): Socket?{
+        return socket
+    }
     private fun configSocketEvents() {
         socket!!.on(Socket.EVENT_CONNECT) {
             Gdx.app.log("SocketIO", "Connected")
@@ -59,8 +62,8 @@ object SocketService {
                 }.on(Events.UPDATE) { args ->
                     val data: JSONObject = args[0] as JSONObject
                     try {
-                        val state: JSONObject = data.getJSONObject("state")
-                        Gdx.app.log("SocketIO", "state: $state")
+                        ///val state: JSONObject = data.getJSONObject("state")
+                        Gdx.app.log("SocketIO", "state: $data")
                     } catch (e: JSONException) {
                         Gdx.app.log("SocketIO", "Error getting attributes: $e")
                     }
