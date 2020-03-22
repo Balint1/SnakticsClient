@@ -1,10 +1,10 @@
 package com.snake.game
 
+import com.badlogic.gdx.Application
 import com.badlogic.gdx.ApplicationAdapter
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.snake.game.sockets.SocketService
 import com.snake.game.states.MainMenu
 import com.snake.game.states.StateManager
@@ -13,6 +13,8 @@ class SnakeGame : ApplicationAdapter() {
     private var batch: SpriteBatch? = null
 
     override fun create() {
+        Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
         batch = SpriteBatch()
         SocketService.start()
         StateManager.push(MainMenu())
