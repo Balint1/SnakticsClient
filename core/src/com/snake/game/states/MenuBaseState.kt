@@ -47,6 +47,10 @@ abstract class MenuBaseState : IState {
 
     }
 
+    override fun resize(width: Int, height: Int) {
+        stage.viewport.update(width, height, true)
+    }
+
     protected fun createTextButton(name: String, skin: Skin): TextButton {
         val button = TextButton(name, skin)
         button.setSize(BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -72,9 +76,6 @@ abstract class MenuBaseState : IState {
     }
 
     companion object {
-        val SCREEN_WIDTH = Gdx.graphics.width
-        val SCREEN_HEIGHT = Gdx.graphics.height
-
         const val MIN_WORLD_WIDTH = 1600f
         const val MIN_WORLD_HEIGHT = 900f
 

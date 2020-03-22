@@ -38,4 +38,10 @@ object StateManager {
     fun render(sb: SpriteBatch) {
         states.peek().render(sb)
     }
+
+    fun resize(width: Int, height: Int) {
+        for (s in states) {
+            s.resize(width, height)
+        }
+    }
 }

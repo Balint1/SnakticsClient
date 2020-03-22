@@ -32,4 +32,9 @@ class SnakeGame : ApplicationAdapter() {
         super.dispose()
         batch?.dispose()
     }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        StateManager.resize(width, height)
+    }
 }

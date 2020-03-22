@@ -8,4 +8,5 @@ interface IState {
     fun render(sb: SpriteBatch)
     fun update(dt: Float)
     fun dispose()
+    fun resize(width: Int, height: Int)
 }
