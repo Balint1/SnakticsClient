@@ -9,26 +9,26 @@ object StateManager {
 
     fun push(state: IState) {
         if (!states.empty())
-            states.peek().hide()
+            states.peek().deactivated()
         states.push(state)
-        state.show()
+        state.activated()
     }
 
     fun pop() {
         val old = states.pop()
-        old.hide()
+        old.deactivated()
         old.dispose()
-        states.peek().show()
+        states.peek().activated()
     }
 
     fun set(state: IState) {
         while (!states.empty()) {
             val old = states.pop()
-            old.hide()
+            old.deactivated()
             old.dispose()
         }
         states.push(state)
-        state.show()
+        state.activated()
     }
 
     fun update(dt: Float) {

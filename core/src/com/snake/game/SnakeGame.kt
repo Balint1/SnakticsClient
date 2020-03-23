@@ -13,7 +13,7 @@ class SnakeGame : ApplicationAdapter() {
     private var batch: SpriteBatch? = null
 
     override fun create() {
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        Gdx.app.setLogLevel(Application.LOG_DEBUG)
 
         batch = SpriteBatch()
         SocketService.start()
