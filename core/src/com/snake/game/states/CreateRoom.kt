@@ -1,13 +1,10 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 
 class CreateRoom : MenuBaseState() {
     private var nameField: TextField? = null
-    private var waitDialog: Dialog? = null
 
     init {
         setTitle("Create room")
@@ -36,18 +33,7 @@ class CreateRoom : MenuBaseState() {
      */
     private fun createRoom(roomName: String) {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
-
-        waitDialog = (object : Dialog("", skin, "default") {
-        }).apply {
-            addElement(Label("Getting rooms...", skin, "big"), parent = contentTable)
-            pad(SPACING / 5f)
-            isMovable = false;
-            isResizable = false;
-            if (DEBUG_LAYOUT)
-                contentTable.debug()
-            show(super.stage)
-        }
-
+        showWaitDialog("Creating room...")
         // TODO: Create room async
         // backend.createRoom(roomName, ::onRoomCreated)
         onRoomCreated(false) // Remove this
@@ -60,26 +46,11 @@ class CreateRoom : MenuBaseState() {
      */
     private fun onRoomCreated(success: Boolean) {
         Gdx.app.debug("UI", "CreateRoom::onRoomCreated(%b)".format(success))
-
-        waitDialog?.hide(null)
-        if(success) {
+        hideDialog()
+        if (success) {
             StateManager.push(Lobby())
-        }
-        else {
-            (object : Dialog("", skin, "default") {
-                override fun result(result: Any) {
-
-                }
-            }).apply {
-                addElement(Label("Failed to create room", skin, "big"), parent = contentTable)
-                button("Ok", true)
-                pad(SPACING / 5f)
-                isMovable = false;
-                isResizable = false;
-                if (DEBUG_LAYOUT)
-                    contentTable.debug()
-                show(super.stage)
-            }
+        } else {
+            showMessageDialog("Failed to create room")
         }
     }
 }

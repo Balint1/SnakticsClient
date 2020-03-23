@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -22,6 +23,7 @@ abstract class MenuBaseState : IState {
     protected val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
 
     var rootTable = Table()
+    var dialog: Dialog? = null
 
     init {
         rootTable.setFillParent(true)
@@ -126,6 +128,52 @@ abstract class MenuBaseState : IState {
         }
         table.setSize(width, height)
         addElement(table, padTop, parent)
+    }
+
+    /**
+     * Shows a dialog
+     *
+     * @param text The text in the dialog
+     */
+    protected fun showWaitDialog(text: String) {
+        dialog = (object : Dialog("", skin, "default") {
+        }).apply {
+            addElement(Label(text, skin, "big"), parent = contentTable)
+            pad(SPACING / 5f)
+            isMovable = false
+            isResizable = false
+            if (DEBUG_LAYOUT)
+                contentTable.debug()
+            show(this@MenuBaseState.stage)
+        }
+    }
+
+    /**
+     * Shows a dialog with a button
+     *
+     * @param text The text in the dialog
+     * @param buttonText The text on the button
+     * @param onResult Function called when the button is clicked
+     */
+    protected fun showMessageDialog(text: String, buttonText: String = "Ok", onResult: () -> Unit = {}) {
+        dialog = (object : Dialog("", skin, "default") {
+            override fun result(result: Any) {
+                onResult()
+            }
+        }).apply {
+            addElement(Label(text, skin, "big"), parent = contentTable)
+            button(buttonText, true)
+            pad(SPACING / 5f)
+            isMovable = false
+            isResizable = false
+            if (DEBUG_LAYOUT)
+                contentTable.debug()
+            show(this@MenuBaseState.stage)
+        }
+    }
+
+    protected fun hideDialog() {
+        dialog?.hide(null)
     }
 
     companion object {

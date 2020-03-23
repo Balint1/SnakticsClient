@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField
 
 class RoomList : MenuBaseState() {
     private val roomList = Table()
-    private var waitDialog: Dialog? = null
 
     init {
         setTitle("Join room")
@@ -34,18 +33,10 @@ class RoomList : MenuBaseState() {
      */
     private fun updateRooms() {
         Gdx.app.debug("UI", "RoomList::updateRooms")
-
-        waitDialog = (object : Dialog("", skin, "default") {
-        }).apply {
-            addElement(Label("Getting rooms...", skin, "big"), parent = contentTable)
-            pad(SPACING / 5f)
-            isMovable = false;
-            isResizable = false;
-            if (DEBUG_LAYOUT)
-                contentTable.debug()
-            show(super.stage)
+        showMessageDialog("Getting rooms...", "Cancel") {
+            // backend.cancelGetRooms()
+            StateManager.pop()
         }
-
         // TODO: Get rooms async
         // backend.getRooms(::onReceivedRoomList)
         onReceivedRoomList(MockRoom.rooms) // Remove this
@@ -58,8 +49,7 @@ class RoomList : MenuBaseState() {
      */
     private fun onReceivedRoomList(rooms: Array<MockRoom>) {
         Gdx.app.debug("UI", "RoomList::onReceivedRoomList(%d)".format(rooms.size))
-
-        waitDialog?.hide(null)
+        hideDialog()
         roomList.clear()
         for (room in rooms) {
             val nameLabel = Label(room.name, skin, "title").apply {
@@ -82,20 +72,7 @@ class RoomList : MenuBaseState() {
      */
     private fun joinRoom(room: MockRoom, password: String) {
         Gdx.app.debug("UI", "RoomList::joinRoom(%s, %s)".format(room.name, password))
-
-        waitDialog = (object : Dialog("", skin, "default") {
-        }).apply {
-            addElement(Label("Joining room...", skin, "big").apply {
-                width = ELEMENT_WIDTH / 2f
-            }, parent = contentTable)
-            pad(SPACING / 5f)
-            isMovable = false;
-            isResizable = false;
-            if (DEBUG_LAYOUT)
-                contentTable.debug()
-            show(super.stage)
-        }
-
+        showWaitDialog("Joining room...")
         // TODO: Join room async
         // backend.joinRoom(::onRoomJoined)
         onRoomJoined(false) // Remove this
@@ -108,26 +85,11 @@ class RoomList : MenuBaseState() {
      */
     private fun onRoomJoined(success: Boolean) {
         Gdx.app.debug("UI", "RoomList::onRoomJoined(%b)".format(success))
-
-        waitDialog?.hide(null)
-        if(success) {
+        hideDialog()
+        if (success) {
             StateManager.push(Lobby())
-        }
-        else {
-            (object : Dialog("", skin, "default") {
-                override fun result(result: Any) {
-
-                }
-            }).apply {
-                addElement(Label("Failed to join room", skin, "big"), parent = contentTable)
-                button("Ok", true)
-                pad(SPACING / 5f)
-                isMovable = false;
-                isResizable = false;
-                if (DEBUG_LAYOUT)
-                    contentTable.debug()
-                show(super.stage)
-            }
+        } else {
+            showMessageDialog("Failed to join room")
         }
     }
 
@@ -158,8 +120,8 @@ class RoomList : MenuBaseState() {
                 addElement(label, parent = contentTable)
                 addElement(passwordField, parent = contentTable, padTop = 10f)
                 pad(SPACING / 5f)
-                isMovable = false;
-                isResizable = false;
+                isMovable = false
+                isResizable = false
                 if (DEBUG_LAYOUT)
                     contentTable.debug()
                 show(super.stage)
