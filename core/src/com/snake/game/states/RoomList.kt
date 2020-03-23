@@ -34,21 +34,25 @@ class RoomList : MenuBaseState() {
 
     private fun joinRoom(room: MockRoom) {
         if(room.hasPassword) {
-            val passwordField = TextField("", skin).apply {
+            val passwordField = TextField("", skin, "big").apply {
                 messageText = "password";
+                width = ELEMENT_WIDTH / 2f
             }
-
-            (object : Dialog("", skin) {
+            val label = Label("Enter password", skin, "big").apply {
+                width = ELEMENT_WIDTH / 2f
+            }
+            (object : Dialog("", skin, "default") {
                 override fun result(result: Any) {
                     if (result is Boolean && result) {
                         joinRoom(room, passwordField.text)
                     }
                 }
             }).apply {
-                text("Enter password")
                 button("Cancel", false)
-                button("Join", true)
-                contentTable.add(passwordField)
+                button("Join", true).buttonTable.cells[0].padRight(SPACING / 2f)
+                addElement(label, parent = contentTable)
+                addElement(passwordField, parent = contentTable , padTop = 10f)
+                pad(SPACING / 5f)
                 if(DEBUG_LAYOUT)
                     contentTable.debug()
                 show(super.stage)

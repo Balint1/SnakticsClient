@@ -9,7 +9,7 @@ class CreateRoom : MenuBaseState() {
     init {
         setTitle("Create room")
 
-        nameField = TextField("", skin).apply {
+        nameField = TextField("", skin, "big").apply {
             messageText = "room name";
             setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT)
             addElement(this)

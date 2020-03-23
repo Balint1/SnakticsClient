@@ -180,6 +180,14 @@ com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
 }
 com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
 	default: {
+		font: font
+		fontColor: black
+		background: text-field
+		cursor: cursor
+		selection: cyan
+		messageFontColor: gray
+	}
+	big: {
 		font: button
 		fontColor: black
 		background: text-field

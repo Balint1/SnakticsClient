@@ -83,18 +83,20 @@ abstract class MenuBaseState : IState {
 
         var pad = spacing
         var height = 0f
+        var width = 0f
         for (a in actors) {
             if (a == actors.last())
                 pad = 0f
             table.add(a).width(a.width).height(a.height).padRight(pad)
+            width += a.width + pad
             height = height.coerceAtLeast(a.height)
         }
-        table.setSize(ELEMENT_WIDTH, height)
+        table.setSize(width, height)
         addElement(table, padTop, parent)
     }
 
     companion object {
-        const val DEBUG_LAYOUT = true
+        const val DEBUG_LAYOUT = false
 
         const val MIN_WORLD_WIDTH = 1600f
         const val MIN_WORLD_HEIGHT = 900f
