@@ -17,13 +17,9 @@ class SnakeGame : ApplicationAdapter() {
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
-
         batch = SpriteBatch()
-
         SocketService.start()
-
         slider = Slider()
-
 
         var ecs = SnakeECSEngine
     }
