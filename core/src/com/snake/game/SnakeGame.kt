@@ -9,9 +9,10 @@ import com.snake.game.sockets.Slider
 
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.sockets.SocketService
+import com.snake.game.states.MainMenu
+import com.snake.game.states.StateManager
 
 class SnakeGame : ApplicationAdapter() {
-
     private var batch: SpriteBatch? = null
     private var slider: Slider? = null
 
@@ -22,13 +23,28 @@ class SnakeGame : ApplicationAdapter() {
         slider = Slider()
 
         var ecs = SnakeECSEngine
+
+        StateManager.push(MainMenu())
     }
 
     override fun render() {
         Gdx.gl.glClearColor(1f, 1f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
         batch!!.begin()
         slider!!.render()
+        StateManager.update(Gdx.graphics.deltaTime)
+        StateManager.render(batch!!)
         batch!!.end()
+    }
+
+    override fun dispose() {
+        super.dispose()
+        batch?.dispose()
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        StateManager.resize(width, height)
     }
 }
