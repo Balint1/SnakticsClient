@@ -1,4 +1,4 @@
-package com.snake.game.sockets
+package com.snake.game.singletons.sockets
 
 import com.badlogic.gdx.Gdx
 import org.json.JSONException
@@ -9,7 +9,7 @@ import io.socket.client.Socket
 
 object SocketService {
 
-    private var socket: Socket? = null
+    var socket: Socket? = null
 
     fun start() {
         connectSocket()
@@ -25,9 +25,6 @@ object SocketService {
         }
     }
 
-    fun getSocket(): Socket?{
-        return socket
-    }
     private fun configSocketEvents() {
         socket!!.on(Socket.EVENT_CONNECT) {
             Gdx.app.log("SocketIO", "Connected")

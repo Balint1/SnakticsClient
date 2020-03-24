@@ -1,4 +1,4 @@
-package com.snake.game.sockets
+package com.snake.game.singletons.sockets
 
 import org.json.JSONObject
 
