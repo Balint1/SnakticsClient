@@ -14,13 +14,11 @@ import com.snake.game.states.StateManager
 
 class SnakeGame : ApplicationAdapter() {
     private var batch: SpriteBatch? = null
-    private var slider: Slider? = null
 
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
         batch = SpriteBatch()
         SocketService.start()
-        slider = Slider()
 
         var ecs = SnakeECSEngine
 
