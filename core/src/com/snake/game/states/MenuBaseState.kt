@@ -1,26 +1,19 @@
 package com.snake.game.states
 
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.viewport.ExtendViewport
 
 /**
  * Base class for menu states providing common functionality for creating menus
  *
  */
-abstract class MenuBaseState : IState {
-    protected val stage: Stage = Stage(ExtendViewport(MIN_WORLD_WIDTH, MIN_WORLD_HEIGHT))
-    protected val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
+abstract class MenuBaseState : BaseState() {
 
     var rootTable = Table()
     var dialog: Dialog? = null
@@ -32,25 +25,6 @@ abstract class MenuBaseState : IState {
 
         if (DEBUG_LAYOUT)
             rootTable.debug()
-    }
-
-    override fun activated() {
-        Gdx.input.inputProcessor = stage
-    }
-
-    override fun deactivated() {}
-
-    override fun render(sb: SpriteBatch) {
-        stage.act()
-        stage.draw()
-    }
-
-    override fun update(dt: Float) {}
-
-    override fun dispose() {}
-
-    override fun resize(width: Int, height: Int) {
-        stage.viewport.update(width, height, true)
     }
 
     /**

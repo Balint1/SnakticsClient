@@ -23,8 +23,6 @@ class SnakeGame : ApplicationAdapter() {
         var ecs = SnakeECSEngine
 
         StateManager.push(MainMenu())
-
-        HttpService().getRooms()
     }
 
     override fun render() {

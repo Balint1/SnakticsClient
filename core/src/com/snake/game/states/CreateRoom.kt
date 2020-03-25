@@ -2,6 +2,8 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.snake.game.singletons.http.CreateRoomResponse
+import com.snake.game.singletons.http.HttpService
 
 class CreateRoom : MenuBaseState() {
     private var nameField: TextField? = null
@@ -35,22 +37,22 @@ class CreateRoom : MenuBaseState() {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
         showWaitDialog("Creating room...")
         // TODO: Create room async
-        // backend.createRoom(roomName, ::onRoomCreated)
-        onRoomCreated(false) // Remove this
+        val response = HttpService.createRoom(roomName, 4)
+        onRoomCreated(response) // Remove this
     }
 
     /**
      * Called when the room is created or failed to create the room
      *
-     * @param success True if the room was created
+     * @param response response fom create room http request
      */
-    private fun onRoomCreated(success: Boolean) {
-        Gdx.app.debug("UI", "CreateRoom::onRoomCreated(%b)".format(success))
+    private fun onRoomCreated(response: CreateRoomResponse) {
+        Gdx.app.debug("UI", "CreateRoom::onRoomCreated(%b)".format(response.success))
         hideDialog()
-        if (success) {
+        if (response.success) {
             StateManager.push(Lobby())
         } else {
-            showMessageDialog("Failed to create room")
+            showMessageDialog("Failed to create room: ${response.message}")
         }
     }
 }
