@@ -6,7 +6,7 @@ class Lobby : MenuBaseState() {
         setTitle("Lobby")
 
         createTextButton("Play") {
-            StateManager.push(BaseGameState())
+            StateManager.push(GameState())
         }.apply {
             addElement(this)
         }

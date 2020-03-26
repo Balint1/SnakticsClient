@@ -36,9 +36,7 @@ class CreateRoom : MenuBaseState() {
     private fun createRoom(roomName: String) {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
         showWaitDialog("Creating room...")
-        // TODO: Create room async
-        val response = HttpService.createRoom(roomName, 4)
-        onRoomCreated(response) // Remove this
+        HttpService.createRoom(roomName, 4, ::onRoomCreated)
     }
 
     /**

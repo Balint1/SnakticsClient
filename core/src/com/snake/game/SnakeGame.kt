@@ -6,8 +6,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
-import com.snake.game.ecs.SnakeECSEngine
-import com.snake.game.singletons.http.HttpService
 import com.snake.game.singletons.sockets.SocketService
 import com.snake.game.states.MainMenu
 import com.snake.game.states.StateManager
@@ -18,11 +16,8 @@ class SnakeGame : ApplicationAdapter() {
     override fun create() {
         Gdx.app.logLevel = Application.LOG_DEBUG
         batch = SpriteBatch()
-        SocketService.start()
-
-        var ecs = SnakeECSEngine
-
         StateManager.push(MainMenu())
+        SocketService.start()
     }
 
     override fun render() {
@@ -38,6 +33,7 @@ class SnakeGame : ApplicationAdapter() {
     override fun dispose() {
         super.dispose()
         batch?.dispose()
+        SocketService.socket.disconnect()
     }
 
     override fun resize(width: Int, height: Int) {

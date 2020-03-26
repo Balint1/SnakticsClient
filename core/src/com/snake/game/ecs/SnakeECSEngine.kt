@@ -5,15 +5,13 @@ import com.snake.game.ecs.component.PositionComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.system.DynamicsSystem
 
-object SnakeECSEngine: ECSEngine(
-        DynamicsSystem
-) {
+object SnakeECSEngine : ECSEngine(DynamicsSystem) {
     init {
 
         // Testing
-        var test = Entity(entityManager);
-        test.addComponent(PositionComponent());
-        Gdx.app.debug("test", "testing update");
-        update(30f);
+        val test = Entity(entityManager)
+        test.addComponent(PositionComponent())
+        Gdx.app.debug("test", "testing update")
+        update(30f)
     }
 }

@@ -1,7 +1,7 @@
 package com.snake.game.ecs.entity
 
 import com.snake.game.ecs.component.ComponentType
-import java.util.*
+import java.util.EnumMap
 import kotlin.collections.HashSet
 
 /**
@@ -14,13 +14,13 @@ class EntityManager {
 
     init {
         // For each component type, create an empty set that will store references to all entities with that component type
-        for(componentType in ComponentType.values())
+        for (componentType in ComponentType.values())
             entityMap[componentType] = HashSet()
     }
 
     internal fun addEntity(entity: Entity) {
         entities.add(entity)
-        for(c in entity.getComponents())
+        for (c in entity.getComponents())
             mapEntityComponent(c.type, entity)
     }
 
@@ -42,6 +42,4 @@ class EntityManager {
                     .intersect(getEntities(componentTypes.subList(1, componentTypes.size)))
         }
     }
-
-
 }

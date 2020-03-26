@@ -2,7 +2,7 @@ package com.snake.game.ecs.entity
 
 import com.snake.game.ecs.component.Component
 import com.snake.game.ecs.component.ComponentType
-import java.util.*
+import java.util.EnumMap
 
 /**
  * Represents an Entity in our ECS architecture.
@@ -22,7 +22,7 @@ class Entity(private val entityManager: EntityManager) {
      * already has a Component of the same type).
      */
     fun addComponent(component: Component): Boolean {
-        if(componentMap.containsKey(component.type))
+        if (componentMap.containsKey(component.type))
             return false
         this.componentMap[component.type] = component
 
@@ -44,7 +44,7 @@ class Entity(private val entityManager: EntityManager) {
      * @return this entity's components
      */
     fun getComponents(): Set<Component> {
-        return HashSet<Component>(this.componentMap.values);
+        return HashSet<Component>(this.componentMap.values)
     }
 
     /**

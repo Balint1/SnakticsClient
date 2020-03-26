@@ -6,6 +6,4 @@ package com.snake.game.ecs.component
  * @property type the type of this component.
  * @constructor Creates a Component of the given [type].
  */
-open class Component(val type: ComponentType) {
-
-}
+open class Component(val type: ComponentType)
