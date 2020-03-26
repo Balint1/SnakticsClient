@@ -16,6 +16,7 @@ object HttpService {
 
     private const val BASE_URL = "http://localhost:5000/api/rooms"
     private val client: OkHttpClient = OkHttpClient()
+    var roomId: String = ""
 
     /**
      * Gets a list of all available rooms from the server using http request
@@ -27,7 +28,9 @@ object HttpService {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val failureResponse = GetRoomsResponse(mutableListOf())
-                action(failureResponse)
+                Gdx.app.postRunnable {
+                    action(failureResponse)
+                }
                 e.printStackTrace()
             }
 
@@ -66,13 +69,16 @@ object HttpService {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val failureResponse = CreateRoomResponse(false, e.message!!, "", "")
-                action(failureResponse)
+                Gdx.app.postRunnable {
+                    action(failureResponse)
+                }
                 e.printStackTrace()
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     responseObject = Gson().fromJson(response.body?.string(), CreateRoomResponse::class.java)
+                    roomId = responseObject.id //will be changed to something better
                     Gdx.app.postRunnable {
                         action(responseObject)
                     }
@@ -103,7 +109,9 @@ object HttpService {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val failureResponse = StartGameResponse(false)
-                action(failureResponse)
+                Gdx.app.postRunnable {
+                    action(failureResponse)
+                }
                 e.printStackTrace()
             }
 
@@ -140,7 +148,9 @@ object HttpService {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val failureResponse = EndGameResponse(false)
-                action(failureResponse)
+                Gdx.app.postRunnable {
+                    action(failureResponse)
+                }
                 e.printStackTrace()
             }
 
@@ -177,7 +187,9 @@ object HttpService {
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 val failureResponse = RemoveRoomResponse(false)
-                action(failureResponse)
+                Gdx.app.postRunnable {
+                    action(failureResponse)
+                }
                 e.printStackTrace()
             }
 
