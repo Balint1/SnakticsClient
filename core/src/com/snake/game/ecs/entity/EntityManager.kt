@@ -1,6 +1,8 @@
 package com.snake.game.ecs.entity
 
 import com.snake.game.ecs.component.ComponentType
+import com.snake.game.ecs.component.ComponentTypeOperator
+import com.snake.game.ecs.component.ComponentTypeTree
 import java.util.*
 import kotlin.collections.HashSet
 
@@ -29,17 +31,37 @@ class EntityManager {
     }
 
     /**
-     * Get all entities that match a given list of component types
+     * Get all entities that match at least a component in a given list of component types
      * @param componentTypes a list of component types
-     * @return a set of entities that have all of the components listed in [componentTypes]
+     * @return a set of entities that have at least one of the components listed in [componentTypes]
      */
-    fun getEntities(componentTypes: List<ComponentType>): Set<Entity> {
+    /*fun getEntities(componentTypes: List<ComponentType>): Set<Entity> {
         return when {
             componentTypes.isEmpty() -> HashSet()
             componentTypes.size == 1 -> entityMap[componentTypes[0]]!!
             // Recursion case
             else -> getEntities(componentTypes.subList(0, 1))
-                    .intersect(getEntities(componentTypes.subList(1, componentTypes.size)))
+                    .union(getEntities(componentTypes.subList(1, componentTypes.size)))
+        }
+    }*/
+
+    /**
+     * Get all entities that match the component type tree.
+     * @param componentTree a component type tree (i.e. (Position and Movement) or (Collision and Position and Movement))
+     * @return a set of entities that match the given [componentTree]
+     */
+    fun getEntities(componentTree: ComponentTypeTree): Set<Entity> {
+        return when {
+            // Leaf node
+            componentTree.leftChild == null -> entityMap[componentTree.node.type]!!
+            // AND
+            componentTree.node.operator == ComponentTypeOperator.AND ->
+                getEntities(componentTree.leftChild!!).intersect(getEntities(componentTree.rightChild!!))
+            // OR
+            componentTree.node.operator == ComponentTypeOperator.OR ->
+                getEntities(componentTree.leftChild!!).union(getEntities(componentTree.rightChild!!))
+            // Should never happen
+            else -> HashSet()
         }
     }
 
