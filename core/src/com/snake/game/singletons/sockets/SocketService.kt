@@ -43,6 +43,7 @@ object SocketService {
         socket
                 .on(Socket.EVENT_CONNECT) {
                     Gdx.app.log("SocketIO", "Connected with id ${socket.id()}")
+                    timeCount = 0
                     timerTask?.cancel()
                     Gdx.app.postRunnable {
                         onSocketConnect(true, "Connected")
