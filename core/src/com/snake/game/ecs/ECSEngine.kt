@@ -17,9 +17,8 @@ open class ECSEngine(vararg systems: System) {
      */
     fun update(dt: Float) {
         for (system in systems) {
-            Gdx.app.debug("test", "updating a system (" + entityManager.getEntities(system.requiredComponents).size + " entities)")
-            // Update all entities that have the required components for the current system
-            for (entity in entityManager.getEntities(system.requiredComponents))
+            // Update all entities that match the component tree for the this system
+            for (entity in entityManager.getEntities(system.componentTypes))
                 system.update(dt, entity)
         }
     }
