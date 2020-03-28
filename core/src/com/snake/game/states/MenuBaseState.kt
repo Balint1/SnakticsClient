@@ -2,12 +2,14 @@ package com.snake.game.states
 
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.Cell
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+
 
 /**
  * Base class for menu states providing common functionality for creating menus
@@ -39,6 +41,7 @@ abstract class MenuBaseState : BaseState() {
     protected fun createTextButton(text: String, width: Float = ELEMENT_WIDTH, height: Float = ELEMENT_HEIGHT, onClick: () -> Unit): TextButton {
         val button = TextButton(text, skin)
         button.setSize(width, height)
+        button.name = text
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 onClick()
@@ -75,6 +78,19 @@ abstract class MenuBaseState : BaseState() {
             parent.add(actor).width(actor.width).height(actor.height).expandX()
 
         parent.row()
+    }
+
+    /**
+     * Removes text button from the layout table of the menu
+     *
+     * @param name name of the text button to be removed
+     * @param parent The table the element is added to, defaults to the root table of the menu
+     */
+    protected fun removeButton (name: String, parent: Table = rootTable) {
+        //TODO. not the best solution, would be nice to make it generic for all actor types
+        val cells = parent.cells
+        parent.removeActor(parent.findActor<TextButton>(name))
+        cells.removeIndex(cells.size - 1);
     }
 
     /**

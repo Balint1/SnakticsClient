@@ -48,9 +48,9 @@ class CreateRoom : MenuBaseState() {
         Gdx.app.debug("UI", "CreateRoom::onRoomCreated(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            StateManager.push(Lobby())
+            StateManager.push(Lobby(response.id, response.ownerId))
         } else {
-            showMessageDialog("Failed to create room: ${response.message}")
+            showMessageDialog(response.message)
         }
     }
 }

@@ -2,6 +2,7 @@ package com.snake.game.singletons.http
 
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson
+import com.snake.game.Config.API_URL
 import com.snake.game.singletons.sockets.SocketService
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -14,20 +15,18 @@ import java.io.IOException
 
 object HttpService {
 
-    private const val BASE_URL = "http://localhost:5000/api/rooms"
     private val client: OkHttpClient = OkHttpClient()
-    var roomId: String = ""
 
     /**
      * Gets a list of all available rooms from the server using http request
      * @param action a function that will execute when http response is received
      */
     fun getRooms(action: (GetRoomsResponse) -> Unit) {
-        val request: Request = Request.Builder().url(BASE_URL).build()
+        val request: Request = Request.Builder().url(API_URL).build()
         var responseObject: GetRoomsResponse
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = GetRoomsResponse(mutableListOf())
+                val failureResponse = GetRoomsResponse(false, e.message!!, mutableListOf())
                 Gdx.app.postRunnable {
                     action(failureResponse)
                 }
@@ -52,15 +51,14 @@ object HttpService {
      * @param action a function that will execute when http response is received
      */
     fun createRoom(name: String, capacity: Int, action: (CreateRoomResponse) -> Unit) {
-        val id: String = SocketService.socket.id()
         val requestBody: RequestBody = FormBody.Builder()
                 .add("name", name)
                 .add("capacity", capacity.toString())
-                .add("ownerId", id)
+                .add("ownerId", SocketService.socket.id())
                 .build()
 
         val request: Request = Request.Builder()
-                .url("$BASE_URL/create")
+                .url("$API_URL/create")
                 .post(requestBody)
                 .build()
 
@@ -68,7 +66,7 @@ object HttpService {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = CreateRoomResponse(false, e.message!!, "", "")
+                val failureResponse = CreateRoomResponse(false, e.message!!, "", "", "")
                 Gdx.app.postRunnable {
                     action(failureResponse)
                 }
@@ -78,7 +76,6 @@ object HttpService {
             override fun onResponse(call: Call, response: Response) {
                 if (response.isSuccessful) {
                     responseObject = Gson().fromJson(response.body?.string(), CreateRoomResponse::class.java)
-                    roomId = responseObject.id //will be changed to something better
                     Gdx.app.postRunnable {
                         action(responseObject)
                     }
@@ -100,7 +97,7 @@ object HttpService {
                 .build()
 
         val request: Request = Request.Builder()
-                .url("$BASE_URL/start")
+                .url("$API_URL/start")
                 .post(requestBody)
                 .build()
 
@@ -108,7 +105,7 @@ object HttpService {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = StartGameResponse(false)
+                val failureResponse = StartGameResponse(false, e.message!!)
                 Gdx.app.postRunnable {
                     action(failureResponse)
                 }
@@ -139,7 +136,7 @@ object HttpService {
                 .build()
 
         val request: Request = Request.Builder()
-                .url("$BASE_URL/end")
+                .url("$API_URL/end")
                 .post(requestBody)
                 .build()
 
@@ -147,7 +144,7 @@ object HttpService {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = EndGameResponse(false)
+                val failureResponse = EndGameResponse(false, e.message!!)
                 Gdx.app.postRunnable {
                     action(failureResponse)
                 }
@@ -178,7 +175,7 @@ object HttpService {
                 .build()
 
         val request: Request = Request.Builder()
-                .url("$BASE_URL/remove")
+                .url("$API_URL/remove")
                 .post(requestBody)
                 .build()
 
@@ -186,7 +183,7 @@ object HttpService {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = RemoveRoomResponse(false)
+                val failureResponse = RemoveRoomResponse(false, e.message!!)
                 Gdx.app.postRunnable {
                     action(failureResponse)
                 }

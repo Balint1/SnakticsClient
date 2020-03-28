@@ -17,7 +17,6 @@ class SnakeGame : ApplicationAdapter() {
         Gdx.app.logLevel = Application.LOG_DEBUG
         batch = SpriteBatch()
         StateManager.push(MainMenu())
-        SocketService.start()
     }
 
     override fun render() {

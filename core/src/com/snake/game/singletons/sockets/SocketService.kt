@@ -1,66 +1,49 @@
 package com.snake.game.singletons.sockets
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.utils.Timer
+import com.snake.game.Config.BASE_URL
 import io.socket.client.IO
 import io.socket.client.Socket
-import org.json.JSONException
-import org.json.JSONObject
+
 
 object SocketService {
 
-    var socket: Socket = IO.socket("http://localhost:5000")
+    var socket: Socket = IO.socket(BASE_URL)
+    private var timeCount: Int = 0
+    private const val timeout: Int = 10
+    private var timerTask: Timer.Task? = null
 
-    fun start() {
-        connectSocket()
-        configSocketEvents()
-    }
+    fun tryConnect( onTryingConnect: (Boolean, Int) -> Unit) {
+        socket.connect()
+        timerTask = object : Timer.Task() {
+            override fun run() {
+                Gdx.app.postRunnable {
+                    onTryingConnect(true, timeout - timeCount)
+                }
+                if (timeCount >= timeout - 1) {
+                    socket.disconnect()
+                    timeCount = 0
+                    cancel()
+                    Gdx.app.postRunnable {
+                        onTryingConnect(false, 0)
+                    }
+                }else{
+                    timeCount++
+                }
 
-    private fun connectSocket() {
-        try {
-            socket.connect()
-        } catch (e: Exception) {
-            e.printStackTrace()
+            }
         }
+        Timer.schedule(timerTask, 1f, 1f)
     }
 
-    private fun configSocketEvents() {
+    fun addConnectListener(onSocketConnect: (Boolean, String) -> Unit){
         socket.on(Socket.EVENT_CONNECT) {
             Gdx.app.log("SocketIO", "Connected with id ${socket.id()}")
+            timerTask?.cancel()
+            Gdx.app.postRunnable {
+                onSocketConnect(true, "Connected")
+            }
         }
-                .on(Events.JOIN_SUCCEEDED) { args ->
-                    val data: JSONObject = args[0] as JSONObject
-                    try {
-                        val message: String = data.getString("message")
-                        val id: String = data.getString("id")
-                        Gdx.app.log("SocketIO", "$message,  socket id: $id")
-                    } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
-                    }
-                }.on(Events.JOIN_FAILED) { args ->
-                    val data: JSONObject = args[0] as JSONObject
-                    try {
-                        val message: String = data.getString("message")
-                        val id: String = data.getString("id")
-                        Gdx.app.log("SocketIO", "$message, socket id: $id")
-                    } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
-                    }
-                }.on(Events.NEW_PLAYER) { args ->
-                    val data: JSONObject = args[0] as JSONObject
-                    try {
-                        val id: String = data.getString("id")
-                        Gdx.app.log("SocketIO", "New Player Connected: $id")
-                    } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
-                    }
-                }.on(Events.UPDATE) { args ->
-                    val data: JSONObject = args[0] as JSONObject
-                    try {
-                        // /val state: JSONObject = data.getJSONObject("state")
-                        Gdx.app.log("SocketIO", "state: $data")
-                    } catch (e: JSONException) {
-                        Gdx.app.log("SocketIO", "Error getting attributes: $e")
-                    }
-                }
     }
 }

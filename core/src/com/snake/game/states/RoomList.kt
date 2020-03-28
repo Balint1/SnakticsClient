@@ -87,7 +87,8 @@ class RoomList : MenuBaseState() {
         Gdx.app.debug("UI", "RoomList::onRoomJoined(%b)".format(success))
         hideDialog()
         if (success) {
-            StateManager.push(Lobby())
+            // TODO. change to real ids
+            StateManager.push(Lobby("", ""))
         } else {
             showMessageDialog("Failed to join room")
         }
