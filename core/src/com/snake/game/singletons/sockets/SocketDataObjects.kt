@@ -3,11 +3,11 @@ package com.snake.game.singletons.sockets
 import org.json.JSONObject
 
 object Data {
-    fun JOIN_REQUEST(nickname: String, room_id: String): JSONObject {
-        return JSONObject("""{"nickname":"$nickname", "room_id":"$room_id"}""")
+    val JOIN_REQUEST: (String, String) -> JSONObject = { nickname: String, roomId: String ->
+        JSONObject("""{"nickname":"$nickname", "room_id":"$roomId"}""")
     }
-    fun SLIDER_CHANGE(value: Int): JSONObject {
-        return JSONObject("""{"value":"$value"}""")
+    val SLIDER_CHANGE: (Int) -> JSONObject = { value: Int ->
+        JSONObject("""{"value":"$value"}""")
     }
 }
 

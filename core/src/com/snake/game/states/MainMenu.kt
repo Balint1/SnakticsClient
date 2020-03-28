@@ -6,11 +6,15 @@ import com.snake.game.singletons.sockets.SocketService
 class MainMenu : MenuBaseState() {
 
     private var retryCreated: Boolean = false
+    private var mainMenuCreated: Boolean = false
 
     init {
         setTitle("Snaktics")
-        SocketService.addConnectListener(::onSocketConnect)
         SocketService.tryConnect(::onTryingConnect)
+        if (!mainMenuCreated) {
+            SocketService.addConnectListener(::onSocketConnect)
+        }
+
     }
 
     /**
@@ -22,6 +26,7 @@ class MainMenu : MenuBaseState() {
         Gdx.app.debug("UI", "ConnectSocket::onSocketConnect(%b)".format(success))
         hideDialog()
         if (success) {
+            mainMenuCreated = true
             if (retryCreated) {
                 retryCreated = false
                 popButton("Retry")
