@@ -24,7 +24,7 @@ class MainMenu : MenuBaseState() {
         if (success) {
             if (retryCreated) {
                 retryCreated = false
-                removeButton("Retry")
+                popButton("Retry")
             }
             createTextButton("Create room") {
                 StateManager.push(CreateRoom())

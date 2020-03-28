@@ -86,7 +86,7 @@ abstract class MenuBaseState : BaseState() {
      * @param name name of the text button to be removed
      * @param parent The table the element is added to, defaults to the root table of the menu
      */
-    protected fun removeButton (name: String, parent: Table = rootTable) {
+    protected fun popButton (name: String, parent: Table = rootTable) {
         //TODO. not the best solution, would be nice to make it generic for all actor types
         val cells = parent.cells
         parent.removeActor(parent.findActor<TextButton>(name))
