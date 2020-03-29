@@ -37,3 +37,8 @@ data class RemoveRoomResponse(
         var success: Boolean,
         var message: String
 )
+
+data class LeaveRoomResponse(
+        var success: Boolean,
+        var message: String
+)

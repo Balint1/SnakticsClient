@@ -2,11 +2,9 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.snake.game.singletons.http.HttpService
+import com.snake.game.singletons.http.LeaveRoomResponse
 import com.snake.game.singletons.http.StartGameResponse
-import com.snake.game.singletons.sockets.Events
 import com.snake.game.singletons.sockets.SocketService
-import org.json.JSONException
-import org.json.JSONObject
 
 class Lobby(
         private val roomId: String,
@@ -28,32 +26,12 @@ class Lobby(
         }
 
         createTextButton("Leave") {
-            StateManager.set(MainMenu())
+            HttpService.leaveRoom(roomId, playerId, ::onLeaveRoom)
         }.apply {
             addElement(this)
         }
     }
 
-//    private fun addListeners() {
-//        if (!SocketService.listeners.getValue(Events.NEW_PLAYER)) {
-//            SocketService.listeners[Events.NEW_PLAYER] = true
-//            SocketService.socket.on(Events.NEW_PLAYER) { args ->
-//                newPlayerJoined(args)
-//            }
-//        }
-//    }
-//
-//
-//    private fun newPlayerJoined(args: Array<Any>) {
-//        val data: JSONObject = args[0] as JSONObject
-//        try {
-//            val id: String = data.getString("id")
-//            val nickname = data.getString("nickname")
-//            Gdx.app.log("SocketIO", "New Player Connected: $id")
-//        } catch (e: JSONException) {
-//            Gdx.app.log("SocketIO", "Error getting attributes: $e")
-//        }
-//    }
 
     /**
      * Called when the player success or fails to to start the game
@@ -61,10 +39,25 @@ class Lobby(
      * @param response response fom create room http request
      */
     private fun onStartGame(response: StartGameResponse) {
-        Gdx.app.debug("UI", "StartGame::onStartGame(%b)".format(response.success))
+        Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
             StateManager.push(GameState())
+        } else {
+            showMessageDialog(response.message)
+        }
+    }
+
+    /**
+     * Called when the player success or fails to to leave the room
+     *
+     * @param response response fom create room http request
+     */
+    private fun onLeaveRoom(response: LeaveRoomResponse) {
+        Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
+        hideDialog()
+        if (response.success) {
+            StateManager.set(MainMenu())
         } else {
             showMessageDialog(response.message)
         }

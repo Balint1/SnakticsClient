@@ -51,7 +51,7 @@ class JoinRoomState(
         Gdx.app.debug("UI", "JoinRoomState::onRoomJoined(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            StateManager.push(Lobby(response.id, nickname, response.isOwner))
+            StateManager.push(Lobby(response.roomId, nickname, response.isOwner))
         } else {
             showMessageDialog(response.message, onResult = {
                 StateManager.pop()

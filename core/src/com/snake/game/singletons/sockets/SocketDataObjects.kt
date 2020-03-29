@@ -15,7 +15,7 @@ object Data {
 data class JoinResponse(
         var success: Boolean,
         var isOwner: Boolean,
-        var id: String,
+        var roomId: String,
         var message: String
 )
 

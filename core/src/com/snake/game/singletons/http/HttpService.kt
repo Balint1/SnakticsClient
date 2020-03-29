@@ -176,6 +176,45 @@ object HttpService {
     }
 
     /**
+     * Player Attempts to leave the room a room
+     * @param roomId id of the room which player want to leave
+     * @param playerId id of the player who wants to leave a room
+     * @param action a function that will execute when http response is received
+     */
+    fun leaveRoom(roomId: String, playerId: String, action: (LeaveRoomResponse) -> Unit) {
+        val requestBody: RequestBody = FormBody.Builder()
+                .add("roomId", roomId)
+                .add("playerId", playerId)
+                .build()
+
+        val request: Request = Request.Builder()
+                .url("$API_URL/leave")
+                .post(requestBody)
+                .build()
+
+        var responseObject: LeaveRoomResponse
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                val failureResponse = LeaveRoomResponse(false, e.message!!)
+                Gdx.app.postRunnable {
+                    action(failureResponse)
+                }
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    responseObject = Gson().fromJson(response.body?.string(), LeaveRoomResponse::class.java)
+                    Gdx.app.postRunnable {
+                        action(responseObject)
+                    }
+                }
+            }
+        })
+    }
+
+    /**
      * Attempts to remove a room
      * @param roomId id of the room that is supposed to be deleted
      * @param playerId id of the player who wants to delete a room
