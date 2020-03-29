@@ -6,6 +6,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.snake.game.singletons.PlayerInfo
+import com.snake.game.singletons.http.GetRoomsResponse
+import com.snake.game.singletons.http.HttpService
+import com.snake.game.singletons.http.Room
 
 class RoomList : MenuBaseState() {
     private val roomList = Table()
@@ -34,24 +38,23 @@ class RoomList : MenuBaseState() {
     private fun updateRooms() {
         Gdx.app.debug("UI", "RoomList::updateRooms")
         showMessageDialog("Getting rooms...", "Cancel") {
-            // backend.cancelGetRooms()
+            HttpService.cancelGetRooms()
             StateManager.pop()
         }
-        // TODO: Get rooms async
-        // backend.getRooms(::onReceivedRoomList)
-        onReceivedRoomList(MockRoom.rooms) // Remove this
+
+        HttpService.getRooms(::onReceivedRoomList)
     }
 
     /**
      * Called when the list of rooms is received from the server
      *
-     * @param rooms The list of rooms
+     * @param response http response with the list of rooms
      */
-    private fun onReceivedRoomList(rooms: Array<MockRoom>) {
-        Gdx.app.debug("UI", "RoomList::onReceivedRoomList(%d)".format(rooms.size))
+    private fun onReceivedRoomList(response: GetRoomsResponse) {
+        Gdx.app.debug("UI", "RoomList::onReceivedRoomList(%d)".format(response.rooms.size))
         hideDialog()
         roomList.clear()
-        for (room in rooms) {
+        for (room in response.rooms) {
             val nameLabel = Label(room.name, skin, "title").apply {
                 setSize(ELEMENT_WIDTH * 2 / 3, ELEMENT_HEIGHT / 2)
             }
@@ -68,31 +71,14 @@ class RoomList : MenuBaseState() {
      * Attempts to join a room
      *
      * @param room The room to join
+     * @param nickname The potential nickname in game
      * @param password The password to the room
      */
-    private fun joinRoom(room: MockRoom, password: String) {
+    private fun joinRoom(room: Room, nickname: String, password: String) {
         Gdx.app.debug("UI", "RoomList::joinRoom(%s, %s)".format(room.name, password))
-        showWaitDialog("Joining room...")
-        // TODO: Join room async
-        // backend.joinRoom(::onRoomJoined)
-        onRoomJoined(false) // Remove this
+        StateManager.push(JoinRoomState(room.id, room.name, nickname, password))
     }
 
-    /**
-     * Called when the room is joined or failed to join the room
-     *
-     * @param success True is the room was successfully joined
-     */
-    private fun onRoomJoined(success: Boolean) {
-        Gdx.app.debug("UI", "RoomList::onRoomJoined(%b)".format(success))
-        hideDialog()
-        if (success) {
-            // TODO. change to real ids
-            StateManager.push(Lobby("", ""))
-        } else {
-            showMessageDialog("Failed to join room")
-        }
-    }
 
     /**
      * Attempts to join a room
@@ -100,25 +86,32 @@ class RoomList : MenuBaseState() {
      *
      * @param room The room to join
      */
-    private fun joinRoom(room: MockRoom) {
+    private fun joinRoom(room: Room) {
         if (room.hasPassword) {
             val passwordField = TextField("", skin, "big").apply {
                 messageText = "password"
                 width = ELEMENT_WIDTH / 2f
             }
-            val label = Label("Enter password", skin, "big").apply {
+            val nicknameField = TextField("", skin, "big").apply {
+                messageText = "nickname"
+                width = ELEMENT_WIDTH / 2f
+            }
+            val label = Label("Enter password and nickname", skin, "big").apply {
                 width = ELEMENT_WIDTH / 2f
             }
             (object : Dialog("", skin, "default") {
                 override fun result(result: Any) {
                     if (result is Boolean && result) {
-                        joinRoom(room, passwordField.text)
+                        PlayerInfo.nickname = nicknameField.text
+                        PlayerInfo.password = passwordField.text
+                        joinRoom(room, PlayerInfo.nickname!!, PlayerInfo.password!!)
                     }
                 }
             }).apply {
                 button("Cancel", false)
                 button("Join", true).buttonTable.cells[0].padRight(SPACING / 2f)
                 addElement(label, parent = contentTable)
+                addElement(nicknameField, parent = contentTable, padTop = 10f)
                 addElement(passwordField, parent = contentTable, padTop = 10f)
                 pad(SPACING / 5f)
                 isMovable = false
@@ -128,23 +121,33 @@ class RoomList : MenuBaseState() {
                 show(super.stage)
             }
         } else {
-            joinRoom(room, "")
+            val nicknameField = TextField("", skin, "big").apply {
+                messageText = "nickname"
+                width = ELEMENT_WIDTH / 2f
+            }
+            val label = Label("Enter nickname", skin, "big").apply {
+                width = ELEMENT_WIDTH / 2f
+            }
+            (object : Dialog("", skin, "default") {
+                override fun result(result: Any) {
+                    if (result is Boolean && result) {
+                        PlayerInfo.nickname = nicknameField.text
+                        PlayerInfo.password = ""
+                        joinRoom(room, PlayerInfo.nickname!!, PlayerInfo.password!!)
+                    }
+                }
+            }).apply {
+                button("Cancel", false)
+                button("Join", true).buttonTable.cells[0].padRight(SPACING / 2f)
+                addElement(label, parent = contentTable)
+                addElement(nicknameField, parent = contentTable, padTop = 10f)
+                pad(SPACING / 5f)
+                isMovable = false
+                isResizable = false
+                if (DEBUG_LAYOUT)
+                    contentTable.debug()
+                show(super.stage)
+            }
         }
-    }
-}
-
-class MockRoom(var name: String, var hasPassword: Boolean = false) {
-    companion object {
-        val rooms: Array<MockRoom> = arrayOf(
-                MockRoom("A room"),
-                MockRoom("Another room"),
-                MockRoom("Password room", true),
-                MockRoom("Password room 2", true),
-                MockRoom("A longer room name"),
-                MockRoom("Room"),
-                MockRoom("Room"),
-                MockRoom("Room"),
-                MockRoom("Room")
-        )
     }
 }

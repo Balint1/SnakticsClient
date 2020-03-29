@@ -2,6 +2,8 @@ package com.snake.game.singletons.http
 
 data class Room(
         var id: String,
+        var name: String,
+        var hasPassword: Boolean,
         var capacity: Int,
         var players: Int
 )
@@ -16,6 +18,7 @@ data class CreateRoomResponse(
         var success: Boolean,
         var message: String,
         var name: String,
+        var password: String,
         var id: String,
         var ownerId: String
 )

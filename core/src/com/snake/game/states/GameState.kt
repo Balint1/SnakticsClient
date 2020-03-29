@@ -21,7 +21,7 @@ class GameState : BaseGameState() {
         slider.setPosition(20f, 300f)
         slider.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
-                    emitSliderValue(slider.value.toInt())
+                emitSliderValue(slider.value.toInt())
             }
         })
         stage.addActor(slider)
@@ -32,8 +32,11 @@ class GameState : BaseGameState() {
     }
 
     private fun addListeners() {
-        SocketService.socket.on(Events.UPDATE) { args ->
-            onStateUpdate(args)
+        if (!SocketService.listeners.getValue(Events.UPDATE)) {
+            SocketService.listeners[Events.UPDATE] = true
+            SocketService.socket.on(Events.UPDATE) { args ->
+                onStateUpdate(args)
+            }
         }
     }
 

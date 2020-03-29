@@ -16,43 +16,56 @@ import java.io.IOException
 object HttpService {
 
     private val client: OkHttpClient = OkHttpClient()
+    private var canceled: Boolean = false
 
     /**
      * Gets a list of all available rooms from the server using http request
      * @param action a function that will execute when http response is received
      */
     fun getRooms(action: (GetRoomsResponse) -> Unit) {
+        canceled = false
         val request: Request = Request.Builder().url(API_URL).build()
         var responseObject: GetRoomsResponse
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = GetRoomsResponse(false, e.message!!, mutableListOf())
-                Gdx.app.postRunnable {
-                    action(failureResponse)
+                if (!canceled) {
+                    val failureResponse = GetRoomsResponse(false, e.message!!, mutableListOf())
+                    Gdx.app.postRunnable {
+                        action(failureResponse)
+                    }
+                    e.printStackTrace()
                 }
-                e.printStackTrace()
             }
 
             override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    responseObject = Gson().fromJson(response.body?.string(), GetRoomsResponse::class.java)
-                    Gdx.app.postRunnable {
-                        action(responseObject)
+                if (!canceled) {
+                    if (response.isSuccessful) {
+                        responseObject = Gson().fromJson(response.body?.string(), GetRoomsResponse::class.java)
+                        Gdx.app.postRunnable {
+                            action(responseObject)
+                        }
                     }
                 }
+
             }
         })
+    }
+
+    fun cancelGetRooms() {
+        canceled = true
     }
 
     /**
      * Attempts to create a new room
      * @param name name of the room
+     * @param password optional password for the room
      * @param capacity maximum allowed players in room
      * @param action a function that will execute when http response is received
      */
-    fun createRoom(name: String, capacity: Int, action: (CreateRoomResponse) -> Unit) {
+    fun createRoom(name: String, password: String, capacity: Int, action: (CreateRoomResponse) -> Unit) {
         val requestBody: RequestBody = FormBody.Builder()
                 .add("name", name)
+                .add("password", password)
                 .add("capacity", capacity.toString())
                 .add("ownerId", SocketService.socket.id())
                 .build()
@@ -66,7 +79,7 @@ object HttpService {
 
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
-                val failureResponse = CreateRoomResponse(false, e.message!!, "", "", "")
+                val failureResponse = CreateRoomResponse(false, e.message!!, "", "", "", "")
                 Gdx.app.postRunnable {
                     action(failureResponse)
                 }

@@ -5,14 +5,29 @@ import com.snake.game.singletons.sockets.SocketService
 
 class MainMenu : MenuBaseState() {
 
-    private var retryCreated: Boolean = false
-    private var mainMenuCreated: Boolean = false
-
     init {
-        setTitle("Snaktics")
-        SocketService.tryConnect(::onTryingConnect)
-        if (!mainMenuCreated) {
-            SocketService.addConnectListener(::onSocketConnect)
+        if (!SocketService.socket.connected()) {
+            SocketService.tryConnect(::onTryingConnect)
+            SocketService.addListeners(::onSocketConnect)
+        } else {
+            setTitle("Snaktics")
+            createTextButton("Create room") {
+                StateManager.push(CreateRoom())
+            }.apply {
+                addElement(this)
+            }
+
+            createTextButton("Join room") {
+                StateManager.push(RoomList())
+            }.apply {
+                addElement(this)
+            }
+
+            createTextButton("Settings") {
+                StateManager.push(Settings())
+            }.apply {
+                addElement(this)
+            }
         }
 
     }
@@ -26,11 +41,7 @@ class MainMenu : MenuBaseState() {
         Gdx.app.debug("UI", "ConnectSocket::onSocketConnect(%b)".format(success))
         hideDialog()
         if (success) {
-            mainMenuCreated = true
-            if (retryCreated) {
-                retryCreated = false
-                popButton("Retry")
-            }
+            setTitle("Snaktics")
             createTextButton("Create room") {
                 StateManager.push(CreateRoom())
             }.apply {
@@ -64,16 +75,9 @@ class MainMenu : MenuBaseState() {
         if (trying) {
             showWaitDialog("Connecting...${seconds}")
         } else {
-            if (!retryCreated) {
-                retryCreated = true
-                createTextButton("Retry") {
-                    SocketService.tryConnect(::onTryingConnect)
-                }.apply {
-                    addElement(this)
-                }
-            }
+            showMessageDialog("Couldn't connect", buttonText = "retry", onResult = {
+                SocketService.tryConnect(::onTryingConnect)
+            })
         }
-
     }
-
 }

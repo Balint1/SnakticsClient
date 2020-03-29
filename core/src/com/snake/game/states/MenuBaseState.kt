@@ -81,19 +81,6 @@ abstract class MenuBaseState : BaseState() {
     }
 
     /**
-     * Removes text button from the layout table of the menu
-     *
-     * @param name name of the text button to be removed
-     * @param parent The table the element is added to, defaults to the root table of the menu
-     */
-    protected fun popButton (name: String, parent: Table = rootTable) {
-        //TODO. not the best solution, would be nice to make it generic for all actor types
-        val cells = parent.cells
-        parent.removeActor(parent.findActor<TextButton>(name))
-        cells.removeIndex(cells.size - 1);
-    }
-
-    /**
      * Adds a number of elements on the same row to the layout table of the menu
      *
      * @param actors The actors to be added
