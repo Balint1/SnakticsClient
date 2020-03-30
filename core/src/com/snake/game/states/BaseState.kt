@@ -7,7 +7,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 
 abstract class BaseState : IState {
+
     protected val stage: Stage = Stage(ExtendViewport(MenuBaseState.MIN_WORLD_WIDTH, MenuBaseState.MIN_WORLD_HEIGHT))
+
     protected val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
 
     override fun activated() {

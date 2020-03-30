@@ -6,10 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
-import com.snake.game.singletons.PlayerInfo
-import com.snake.game.singletons.http.GetRoomsResponse
-import com.snake.game.singletons.http.HttpService
-import com.snake.game.singletons.http.Room
+import com.snake.game.http.GetRoomsResponse
+import com.snake.game.http.HttpService
+import com.snake.game.http.Room
 
 class RoomList : MenuBaseState() {
     private val roomList = Table()
@@ -56,14 +55,20 @@ class RoomList : MenuBaseState() {
         roomList.clear()
         for (room in response.rooms) {
             val nameLabel = Label(room.name, skin, "title").apply {
-                setSize(ELEMENT_WIDTH * 2 / 3, ELEMENT_HEIGHT / 2)
+                setSize(ELEMENT_WIDTH * 3 / 7, ELEMENT_HEIGHT / 2)
             }
-            val joinButton = createTextButton("Join") {
+            val capacityLabel = Label("(${room.players}/${room.capacity})", skin, "title").apply {
+                setSize(ELEMENT_WIDTH * 1 / 7, ELEMENT_HEIGHT / 2)
+            }
+            val inProgressLabel = Label(if(room.inProgress) "Started" else "", skin, "title").apply {
+                setSize(ELEMENT_WIDTH * 2 / 7, ELEMENT_HEIGHT / 2)
+            }
+            val joinButton = createTextButton("Join", isDisabled = room.inProgress) {
                 joinRoom(room)
             }.apply {
-                setSize(ELEMENT_WIDTH * 1 / 3, ELEMENT_HEIGHT / 2)
+                setSize(ELEMENT_WIDTH * 1 / 7, ELEMENT_HEIGHT / 2)
             }
-            addElements(nameLabel, joinButton, parent = roomList, padTop = nameLabel.height / 2f)
+            addElements(capacityLabel, nameLabel, inProgressLabel, joinButton, parent = roomList, padTop = nameLabel.height / 2f)
         }
     }
 
@@ -102,9 +107,7 @@ class RoomList : MenuBaseState() {
             (object : Dialog("", skin, "default") {
                 override fun result(result: Any) {
                     if (result is Boolean && result) {
-                        PlayerInfo.nickname = nicknameField.text
-                        PlayerInfo.password = passwordField.text
-                        joinRoom(room, PlayerInfo.nickname!!, PlayerInfo.password!!)
+                        joinRoom(room, nicknameField.text, passwordField.text)
                     }
                 }
             }).apply {
@@ -131,9 +134,7 @@ class RoomList : MenuBaseState() {
             (object : Dialog("", skin, "default") {
                 override fun result(result: Any) {
                     if (result is Boolean && result) {
-                        PlayerInfo.nickname = nicknameField.text
-                        PlayerInfo.password = ""
-                        joinRoom(room, PlayerInfo.nickname!!, PlayerInfo.password!!)
+                        joinRoom(room, nicknameField.text, "")
                     }
                 }
             }).apply {

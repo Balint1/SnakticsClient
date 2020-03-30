@@ -2,6 +2,7 @@ package com.snake.game.states
 
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
@@ -38,10 +39,12 @@ abstract class MenuBaseState : BaseState() {
      * @param onClick The function called when the button is clicked
      * @return The created button
      */
-    protected fun createTextButton(text: String, width: Float = ELEMENT_WIDTH, height: Float = ELEMENT_HEIGHT, onClick: () -> Unit): TextButton {
+    protected fun createTextButton(text: String, width: Float = ELEMENT_WIDTH, height: Float = ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): TextButton {
         val button = TextButton(text, skin)
         button.setSize(width, height)
         button.name = text
+        button.touchable = if( isDisabled ) Touchable.disabled else Touchable.enabled
+        button.isDisabled = isDisabled
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 onClick()

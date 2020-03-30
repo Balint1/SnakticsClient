@@ -5,13 +5,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.snake.game.singletons.sockets.Data
-import com.snake.game.singletons.sockets.Events
-import com.snake.game.singletons.sockets.SocketService
+import com.snake.game.sockets.Data
+import com.snake.game.sockets.Events
+import com.snake.game.sockets.SocketService
 import org.json.JSONException
 import org.json.JSONObject
 
-class GameState : BaseGameState() {
+class GameState : BaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
 
     init {
@@ -28,13 +28,13 @@ class GameState : BaseGameState() {
     }
 
     private fun emitSliderValue(value: Int) {
-        SocketService.socket.emit(Events.SLIDER_CHANGE, Data.SLIDER_CHANGE(value))
+        SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
     }
 
     private fun addListeners() {
-        if (!SocketService.listeners.getValue(Events.UPDATE)) {
-            SocketService.listeners[Events.UPDATE] = true
-            SocketService.socket.on(Events.UPDATE) { args ->
+        if (!SocketService.listeners.getValue(Events.UPDATE.value)) {
+            SocketService.listeners[Events.UPDATE.value] = true
+            SocketService.socket.on(Events.UPDATE.value) { args ->
                 onStateUpdate(args)
             }
         }

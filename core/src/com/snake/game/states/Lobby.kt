@@ -1,28 +1,21 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.snake.game.singletons.http.HttpService
-import com.snake.game.singletons.http.LeaveRoomResponse
-import com.snake.game.singletons.http.StartGameResponse
-import com.snake.game.singletons.sockets.SocketService
+import com.snake.game.http.HttpService
+import com.snake.game.http.SimpleResponse
+import com.snake.game.sockets.SocketService
 
-class Lobby(
-        private val roomId: String,
-        private val nickname: String,
-        isOwner: Boolean) : MenuBaseState() {
+class Lobby(private val roomId: String) : MenuBaseState() {
 
     private val playerId: String = SocketService.socket.id()
 
     init {
         setTitle("Lobby")
-
-        if (isOwner) {
-            createTextButton("Play") {
-                showWaitDialog("Starting game...")
-                HttpService.startGame(roomId, playerId, ::onStartGame)
-            }.apply {
-                addElement(this)
-            }
+        createTextButton("Play") {
+            showWaitDialog("Starting game...")
+            HttpService.startGame(roomId, playerId, ::onStartGame)
+        }.apply {
+            addElement(this)
         }
 
         createTextButton("Leave") {
@@ -38,7 +31,7 @@ class Lobby(
      *
      * @param response response fom create room http request
      */
-    private fun onStartGame(response: StartGameResponse) {
+    private fun onStartGame(response: SimpleResponse) {
         Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
@@ -53,7 +46,7 @@ class Lobby(
      *
      * @param response response fom create room http request
      */
-    private fun onLeaveRoom(response: LeaveRoomResponse) {
+    private fun onLeaveRoom(response: SimpleResponse) {
         Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {

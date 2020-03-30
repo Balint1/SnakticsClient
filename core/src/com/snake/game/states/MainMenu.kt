@@ -1,7 +1,7 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.snake.game.singletons.sockets.SocketService
+import com.snake.game.sockets.SocketService
 
 class MainMenu : MenuBaseState() {
 

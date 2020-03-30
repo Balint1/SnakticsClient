@@ -2,13 +2,15 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
-import com.snake.game.singletons.PlayerInfo
-import com.snake.game.singletons.http.CreateRoomResponse
-import com.snake.game.singletons.http.HttpService
+import com.snake.game.http.CreateRoomResponse
+import com.snake.game.http.HttpService
 
 class CreateRoom : MenuBaseState() {
+
     private var nameField: TextField? = null
+
     private var passwordField: TextField? = null
+
     private var nicknameField: TextField? = null
 
     init {
@@ -61,9 +63,7 @@ class CreateRoom : MenuBaseState() {
         Gdx.app.debug("UI", "CreateRoom::onRoomCreated(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            PlayerInfo.nickname = nicknameField!!.text
-            PlayerInfo.password = passwordField!!.text
-            StateManager.push(JoinRoomState(response.id, response.name, PlayerInfo.nickname!!, PlayerInfo.password!!))
+            StateManager.push(JoinRoomState(response.id, response.name,nicknameField!!.text, passwordField!!.text))
         } else {
             showMessageDialog(response.message)
         }

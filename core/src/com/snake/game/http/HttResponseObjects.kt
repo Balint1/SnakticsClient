@@ -1,11 +1,12 @@
-package com.snake.game.singletons.http
+package com.snake.game.http
 
 data class Room(
         var id: String,
         var name: String,
         var hasPassword: Boolean,
         var capacity: Int,
-        var players: Int
+        var players: Int,
+        var inProgress: Boolean
 )
 
 data class GetRoomsResponse(
@@ -23,22 +24,8 @@ data class CreateRoomResponse(
         var ownerId: String
 )
 
-data class StartGameResponse(
-        var success: Boolean,
-        var message: String
-)
 
-data class EndGameResponse(
-        var success: Boolean,
-        var message: String
-)
-
-data class RemoveRoomResponse(
-        var success: Boolean,
-        var message: String
-)
-
-data class LeaveRoomResponse(
+data class SimpleResponse(
         var success: Boolean,
         var message: String
 )

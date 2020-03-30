@@ -1,4 +1,4 @@
-package com.snake.game.singletons.sockets
+package com.snake.game.sockets
 
 import org.json.JSONObject
 
@@ -14,15 +14,14 @@ object Data {
 
 data class JoinResponse(
         var success: Boolean,
-        var isOwner: Boolean,
         var roomId: String,
         var message: String
 )
 
-object Events {
-    const val NEW_PLAYER = "new-player"
-    const val JOIN_REQUEST = "join-request"
-    const val JOIN_RESPONSE = "join-response"
-    const val UPDATE = "update-state"
-    const val SLIDER_CHANGE = "slider-change"
+enum class Events(val value: String) {
+    NEW_PLAYER("new-player"),
+    JOIN_REQUEST("join-request"),
+    JOIN_RESPONSE("join-response"),
+    UPDATE("update-state"),
+    SLIDER_CHANGE("slider-change")
 }
