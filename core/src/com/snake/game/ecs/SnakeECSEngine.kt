@@ -4,14 +4,16 @@ import com.badlogic.gdx.Gdx
 import com.snake.game.ecs.component.PositionComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.system.AnimationSystem
+import com.snake.game.ecs.system.ComponentSyncSystem
 import com.snake.game.ecs.system.RenderingSystem
+import java.util.*
 
 object SnakeECSEngine: ECSEngine(
-        AnimationSystem, RenderingSystem) {
+        ComponentSyncSystem, AnimationSystem, RenderingSystem) {
     init {
 
         // Testing
-        var test = Entity(entityManager);
+        var test = Entity(UUID.randomUUID().toString(), entityManager);
         test.addComponent(PositionComponent());
         Gdx.app.debug("test", "testing update");
         update(30f);
