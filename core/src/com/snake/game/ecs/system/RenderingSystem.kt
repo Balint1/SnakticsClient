@@ -9,6 +9,9 @@ import com.snake.game.ecs.component.PositionComponent
 import com.snake.game.ecs.component.SpriteComponent
 import com.snake.game.ecs.entity.Entity
 
+/**
+ * Handles rendering entities that have a position and a sprite component.
+ */
 object RenderingSystem: System(ComponentType.Position and (ComponentType.AnimatedSprite or ComponentType.Sprite)) {
     private val spriteBatch = SpriteBatch()
 

@@ -19,6 +19,8 @@ class SnakeGame : ApplicationAdapter() {
         batch = SpriteBatch()
 
         SocketService.start()
+
+        // Testing ECS
         var ecs = SnakeECSEngine
 
         StateManager.push(MainMenu())
