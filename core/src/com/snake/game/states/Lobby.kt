@@ -3,6 +3,7 @@ package com.snake.game.states
 import com.badlogic.gdx.Gdx
 import com.snake.game.http.HttpService
 import com.snake.game.http.SimpleResponse
+import com.snake.game.sockets.Events
 import com.snake.game.sockets.SocketService
 
 class Lobby(private val roomId: String) : MenuBaseState() {
@@ -10,6 +11,7 @@ class Lobby(private val roomId: String) : MenuBaseState() {
     private val playerId: String = SocketService.socket.id()
 
     init {
+        addListeners()
         setTitle("Lobby")
         createTextButton("Play") {
             showWaitDialog("Starting game...")
@@ -53,6 +55,17 @@ class Lobby(private val roomId: String) : MenuBaseState() {
             StateManager.set(MainMenu())
         } else {
             showMessageDialog(response.message)
+        }
+    }
+
+    /**
+     * Start listening to responses on owner change events
+     */
+    private fun addListeners() {
+        SocketService.socket.on(Events.OWNER_CHANGED.value) {
+            Gdx.app.postRunnable {
+                showMessageDialog("Now you are the room owner ")
+            }
         }
     }
 }

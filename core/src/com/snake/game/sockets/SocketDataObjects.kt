@@ -18,10 +18,16 @@ data class JoinResponse(
         var message: String
 )
 
+data class OwnerChangeResponse(
+        var success: Boolean,
+        var roomId: String
+)
+
 enum class Events(val value: String) {
     NEW_PLAYER("new-player"),
     JOIN_REQUEST("join-request"),
     JOIN_RESPONSE("join-response"),
     UPDATE("update-state"),
-    SLIDER_CHANGE("slider-change")
+    SLIDER_CHANGE("slider-change"),
+    OWNER_CHANGED("owner-changed")
 }
