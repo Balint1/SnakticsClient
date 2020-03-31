@@ -37,7 +37,7 @@ class Lobby(private val roomId: String) : MenuBaseState() {
         Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            StateManager.push(GameState())
+            StateManager.push(GameState(roomId, playerId))
         } else {
             showMessageDialog(response.message)
         }

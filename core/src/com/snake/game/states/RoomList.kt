@@ -1,11 +1,8 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.snake.game.http.GetRoomsResponse
 import com.snake.game.http.HttpService
 import com.snake.game.http.Room
@@ -54,21 +51,48 @@ class RoomList : MenuBaseState() {
         hideDialog()
         roomList.clear()
         for (room in response.rooms) {
-            val nameLabel = Label(room.name, skin, "title").apply {
-                setSize(ELEMENT_WIDTH * 3 / 7, ELEMENT_HEIGHT / 2)
-            }
             val capacityLabel = Label("(${room.players}/${room.capacity})", skin, "title").apply {
-                setSize(ELEMENT_WIDTH * 1 / 7, ELEMENT_HEIGHT / 2)
+                setSize(ELEMENT_WIDTH * 3 / 25, ELEMENT_HEIGHT / 2)
             }
-            val inProgressLabel = Label(if(room.inProgress) "Started" else "", skin, "title").apply {
-                setSize(ELEMENT_WIDTH * 2 / 7, ELEMENT_HEIGHT / 2)
+
+            val nameLabel = Label(room.name, skin, "title").apply {
+                setSize(ELEMENT_WIDTH * 12 / 25, ELEMENT_HEIGHT / 2)
             }
+
+            val indicatorWidth = ELEMENT_WIDTH / 25
+            val inProgressIndicator = if (room.inProgress)
+                Image(Texture("indicators/in_progress.png")).apply {
+                    width = indicatorWidth
+                    height = width
+
+                } else Image().apply {
+                width = indicatorWidth
+                height = width
+            }
+
+            val passwordIndicator = if (room.hasPassword)
+                Image(Texture("indicators/with_pw.png")).apply {
+                    width = indicatorWidth
+                    height = width * 1.4345f
+                } else Image().apply {
+                width = indicatorWidth
+                height = width * 1.4345f
+            }
+
             val joinButton = createTextButton("Join", isDisabled = room.inProgress) {
                 joinRoom(room)
             }.apply {
-                setSize(ELEMENT_WIDTH * 1 / 7, ELEMENT_HEIGHT / 2)
+                setSize(ELEMENT_WIDTH * 4 / 25, ELEMENT_HEIGHT / 2)
             }
-            addElements(capacityLabel, nameLabel, inProgressLabel, joinButton, parent = roomList, padTop = nameLabel.height / 2f)
+            addElements(
+                    capacityLabel,
+                    nameLabel,
+                    inProgressIndicator,
+                    joinButton,
+                    passwordIndicator,
+                    spacing = ELEMENT_WIDTH / 25,
+                    parent = roomList,
+                    padTop = nameLabel.height / 2f)
         }
     }
 
