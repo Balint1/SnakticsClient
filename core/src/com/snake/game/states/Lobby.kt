@@ -1,10 +1,12 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.google.gson.Gson
 import com.snake.game.http.HttpService
 import com.snake.game.http.SimpleResponse
 import com.snake.game.sockets.Events
 import com.snake.game.sockets.SocketService
+import org.json.JSONObject
 
 class Lobby(private val roomId: String) : MenuBaseState() {
 
@@ -62,10 +64,32 @@ class Lobby(private val roomId: String) : MenuBaseState() {
      * Start listening to responses on owner change events
      */
     private fun addListeners() {
-        SocketService.socket.on(Events.OWNER_CHANGED.value) {
+        SocketService.socket.on(Events.OWNER_CHANGED.value) { args ->
             Gdx.app.postRunnable {
-                showMessageDialog("Now you are the room owner ")
+                assignOwner(args)
             }
+        }.on(Events.LEAVE_RESPONSE.value) { args ->
+            Gdx.app.postRunnable {
+                leaveSocketRoom(args)
+            }
+        }
+    }
+
+    private fun assignOwner(args: Array<Any>) {
+        val data: JSONObject = args[0] as JSONObject
+        val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
+        Gdx.app.debug("UI", "Lobby::assignOwner(%b)".format(response.success))
+        if (response.success) {
+            showMessageDialog("Now you are the room owner ")
+        }
+
+    }
+
+    private fun leaveSocketRoom(args: Array<Any>) {
+        val data: JSONObject = args[0] as JSONObject
+        val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
+        if (!response.success) {
+            Gdx.app.debug("UI", "Lobby::leaveSocketRoom(%b)".format(response.success))
         }
     }
 }
