@@ -2,16 +2,16 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson
-import com.snake.game.sockets.Events
-import com.snake.game.sockets.JoinResponse
-import com.snake.game.sockets.SocketService
+import com.snake.game.backend.Events
+import com.snake.game.backend.JoinResponse
+import com.snake.game.backend.SocketService
 import org.json.JSONObject
 
 class JoinRoomState(
-        private val roomId: String,
-        private val roomName: String,
-        private val nickname: String,
-        private val password: String
+    private val roomId: String,
+    private val roomName: String,
+    private val nickname: String,
+    private val password: String
 ) : MenuBaseState() {
 
     init {

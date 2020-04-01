@@ -4,13 +4,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.Cell
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-
 
 /**
  * Base class for menu states providing common functionality for creating menus
@@ -43,7 +41,7 @@ abstract class MenuBaseState : BaseState() {
         val button = TextButton(text, skin)
         button.setSize(width, height)
         button.name = text
-        button.touchable = if( isDisabled ) Touchable.disabled else Touchable.enabled
+        button.touchable = if (isDisabled) Touchable.disabled else Touchable.enabled
         button.isDisabled = isDisabled
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {

@@ -5,7 +5,7 @@ import com.snake.game.ecs.component.ComponentTypeTree
 import com.snake.game.ecs.entity.Entity
 
 abstract class System(var componentTypes: ComponentTypeTree) {
-    constructor(componentType: ComponentType): this(ComponentTypeTree(componentType))
+    constructor(componentType: ComponentType) : this(ComponentTypeTree(componentType))
 
     abstract fun update(dt: Float, entity: Entity)
 }

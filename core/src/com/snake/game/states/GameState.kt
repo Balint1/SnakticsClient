@@ -2,19 +2,13 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
-import com.snake.game.http.HttpService
-import com.snake.game.http.SimpleResponse
-import com.snake.game.sockets.Data
-import com.snake.game.sockets.Events
-import com.snake.game.sockets.SocketService
+import com.snake.game.backend.HttpService
+import com.snake.game.backend.SimpleResponse
+import com.snake.game.backend.Data
+import com.snake.game.backend.Events
+import com.snake.game.backend.SocketService
 import org.json.JSONException
 import org.json.JSONObject
 
@@ -30,7 +24,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
             }
         })
         addElement(slider)
-        createTextButton("back"){
+        createTextButton("back") {
             HttpService.leaveRoom(roomId, playerId, ::onGameLeft)
             StateManager.pop()
         }.apply {

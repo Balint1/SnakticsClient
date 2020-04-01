@@ -1,4 +1,4 @@
-package com.snake.game.sockets
+package com.snake.game.backend
 
 import org.json.JSONObject
 
@@ -11,12 +11,6 @@ object Data {
         JSONObject("""{"value":"$value"}""")
     }
 }
-
-data class JoinResponse(
-        var success: Boolean,
-        var roomId: String,
-        var message: String
-)
 
 enum class Events(val value: String) {
     NEW_PLAYER("new-player"),

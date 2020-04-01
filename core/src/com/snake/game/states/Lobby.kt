@@ -2,10 +2,10 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson
-import com.snake.game.http.HttpService
-import com.snake.game.http.SimpleResponse
-import com.snake.game.sockets.Events
-import com.snake.game.sockets.SocketService
+import com.snake.game.backend.HttpService
+import com.snake.game.backend.SimpleResponse
+import com.snake.game.backend.Events
+import com.snake.game.backend.SocketService
 import org.json.JSONObject
 
 class Lobby(private val roomId: String) : MenuBaseState() {
@@ -28,7 +28,6 @@ class Lobby(private val roomId: String) : MenuBaseState() {
             addElement(this)
         }
     }
-
 
     /**
      * Called when the player success or fails to to start the game
@@ -82,7 +81,6 @@ class Lobby(private val roomId: String) : MenuBaseState() {
         if (response.success) {
             showMessageDialog("Now you are the room owner ")
         }
-
     }
 
     private fun leaveSocketRoom(args: Array<Any>) {

@@ -1,4 +1,4 @@
-package com.snake.game.sockets
+package com.snake.game.backend
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.utils.Timer
@@ -43,7 +43,6 @@ object SocketService {
                     } else {
                         timeCount++
                     }
-
                 }
             }
             Timer.schedule(timerTask, 1f, 1f)

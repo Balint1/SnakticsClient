@@ -44,8 +44,8 @@ class Entity(private val entityManager: EntityManager) {
      * @return true if this entity has all given component types, else false.
      */
     fun hasComponents(vararg types: ComponentType): Boolean {
-        for(type in types) {
-            if(!hasComponent(type))
+        for (type in types) {
+            if (!hasComponent(type))
                 return false
         }
         return true

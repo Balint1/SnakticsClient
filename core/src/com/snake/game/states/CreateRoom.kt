@@ -2,45 +2,46 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
-import com.snake.game.http.CreateRoomResponse
-import com.snake.game.http.HttpService
+import com.snake.game.backend.CreateRoomResponse
+import com.snake.game.backend.HttpService
 
-class CreateRoom : MenuBaseState() {
+open class CreateRoom : MenuBaseState() {
 
-    private var nameField: TextField? = null
+    protected var nameField: TextField = TextField("", skin, "big")
+            .apply {
+                messageText = "room name"
+                setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT)
+            }
 
-    private var passwordField: TextField? = null
+    protected var nicknameField: TextField = TextField("", skin, "big")
+            .apply {
+                messageText = "Your nickname"
+                setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT)
+            }
 
-    private var nicknameField: TextField? = null
+    protected var password = ""
 
     init {
+        rootTable.clear()
         setTitle("Create room")
 
-        nameField = TextField("", skin, "big").apply {
-            messageText = "room name"
-            setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT)
-            addElement(this)
-        }
-        passwordField = TextField("", skin, "big").apply {
-            messageText = "password (optional)"
-            setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT)
-            addElement(this)
-        }
-        nicknameField = TextField("", skin, "big").apply {
-            messageText = "Your nickname"
-            setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT)
-            addElement(this)
+        addElement(nameField)
+        addElement(nicknameField)
+
+        val create = createTextButton("Create", (ELEMENT_WIDTH - SPACING) / 3f) {
+
+            createRoom(nameField.text, password, 4)
         }
 
-        val create = createTextButton("Create", (ELEMENT_WIDTH - SPACING) / 2f) {
-            createRoom(nameField!!.text, passwordField!!.text)
-        }
-
-        val back = createTextButton("Back", (ELEMENT_WIDTH - SPACING) / 2f) {
+        val back = createTextButton("Back", (ELEMENT_WIDTH - SPACING) / 3f) {
             StateManager.pop()
         }
 
-        addElements(back, create, spacing = SPACING)
+        val advancedRoom = createTextButton("advanced", (ELEMENT_WIDTH - SPACING) / 3f) {
+            StateManager.push(CreateAdvancedRoom())
+        }
+
+        addElements(back, create, advancedRoom, spacing = SPACING)
     }
 
     /**
@@ -48,10 +49,10 @@ class CreateRoom : MenuBaseState() {
      *
      * @param roomName The name of the room
      */
-    private fun createRoom(roomName: String, password: String) {
+    protected fun createRoom(roomName: String, password: String, capacity: Int) {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
         showWaitDialog("Creating room...")
-        HttpService.createRoom(roomName, password, 4, ::onRoomCreated)
+        HttpService.createRoom(roomName, password, capacity, ::onRoomCreated)
     }
 
     /**
@@ -63,10 +64,9 @@ class CreateRoom : MenuBaseState() {
         Gdx.app.debug("UI", "CreateRoom::onRoomCreated(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            StateManager.push(JoinRoomState(response.id, response.name,nicknameField!!.text, passwordField!!.text))
+            StateManager.push(JoinRoomState(response.id, response.name, nicknameField.text, password))
         } else {
             showMessageDialog(response.message)
         }
     }
-
 }

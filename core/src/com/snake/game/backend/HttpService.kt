@@ -1,9 +1,8 @@
-package com.snake.game.http
+package com.snake.game.backend
 
 import com.badlogic.gdx.Gdx
 import com.google.gson.Gson
 import com.snake.game.Config.API_URL
-import com.snake.game.sockets.SocketService
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Callback
@@ -50,7 +49,6 @@ object HttpService {
                         }
                     }
                 }
-
             }
         })
     }
@@ -154,7 +152,7 @@ object HttpService {
         simpleRequest(roomId, playerId, "remove", action)
     }
 
-    private fun simpleRequest(roomId: String, playerId: String, path: String, action: (SimpleResponse) -> Unit){
+    private fun simpleRequest(roomId: String, playerId: String, path: String, action: (SimpleResponse) -> Unit) {
         val requestBody: RequestBody = FormBody.Builder()
                 .add("roomId", roomId)
                 .add("playerId", playerId)

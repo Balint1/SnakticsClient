@@ -9,7 +9,7 @@ import com.snake.game.ecs.component.PositionComponent
 import com.snake.game.ecs.component.SpriteComponent
 import com.snake.game.ecs.entity.Entity
 
-object RenderingSystem: System(ComponentType.Position and (ComponentType.AnimatedSprite or ComponentType.Sprite)) {
+object RenderingSystem : System(ComponentType.Position and (ComponentType.AnimatedSprite or ComponentType.Sprite)) {
     private val spriteBatch = SpriteBatch()
 
     override fun update(dt: Float, entity: Entity) {
@@ -20,9 +20,9 @@ object RenderingSystem: System(ComponentType.Position and (ComponentType.Animate
 
         spriteBatch.begin()
 
-        if(entity.hasComponent(ComponentType.Sprite))
+        if (entity.hasComponent(ComponentType.Sprite))
             render(entity.getComponent(ComponentType.Sprite) as SpriteComponent, pos.x, pos.y)
-        if(entity.hasComponent(ComponentType.AnimatedSprite))
+        if (entity.hasComponent(ComponentType.AnimatedSprite))
             render(entity.getComponent(ComponentType.AnimatedSprite) as AnimatedSpriteComponent, pos.x, pos.y)
 
         spriteBatch.end()

@@ -1,12 +1,12 @@
 package com.snake.game.ecs.component
 
-enum class ComponentTypeOperator {AND, OR}
+enum class ComponentTypeOperator { AND, OR }
 
 class ComponentTypeTree(var node: Node, var leftChild: ComponentTypeTree?, var rightChild: ComponentTypeTree?) {
-    constructor(value: ComponentType):
+    constructor(value: ComponentType) :
             this(Node(value), null, null)
 
-    constructor(operator: ComponentTypeOperator, left: ComponentType, right: ComponentType):
+    constructor(operator: ComponentTypeOperator, left: ComponentType, right: ComponentType) :
             this(Node(operator), ComponentTypeTree(left), ComponentTypeTree(right))
 
     infix fun and(componentTypeTree: ComponentTypeTree): ComponentTypeTree {
@@ -24,9 +24,10 @@ class ComponentTypeTree(var node: Node, var leftChild: ComponentTypeTree?, var r
 }
 
 class Node(
-        var operator: ComponentTypeOperator?,
-        var type: ComponentType?) {
+    var operator: ComponentTypeOperator?,
+    var type: ComponentType?
+) {
 
-    constructor(operator: ComponentTypeOperator?): this(operator, null)
-    constructor(type: ComponentType?): this(null, type)
+    constructor(operator: ComponentTypeOperator?) : this(operator, null)
+    constructor(type: ComponentType?) : this(null, type)
 }

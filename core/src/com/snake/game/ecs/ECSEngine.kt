@@ -1,6 +1,5 @@
 package com.snake.game.ecs
 
-import com.badlogic.gdx.Gdx
 import com.snake.game.ecs.entity.EntityManager
 import com.snake.game.ecs.system.System
 

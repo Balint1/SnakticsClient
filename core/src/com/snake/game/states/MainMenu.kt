@@ -1,7 +1,7 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.snake.game.sockets.SocketService
+import com.snake.game.backend.SocketService
 
 class MainMenu : MenuBaseState() {
 
@@ -29,7 +29,6 @@ class MainMenu : MenuBaseState() {
                 addElement(this)
             }
         }
-
     }
 
     /**
@@ -73,7 +72,7 @@ class MainMenu : MenuBaseState() {
     private fun onTryingConnect(trying: Boolean, seconds: Int) {
         hideDialog()
         if (trying) {
-            showWaitDialog("Connecting...${seconds}")
+            showWaitDialog("Connecting...$seconds")
         } else {
             showMessageDialog("Couldn't connect", buttonText = "retry", onResult = {
                 SocketService.tryConnect(::onTryingConnect)

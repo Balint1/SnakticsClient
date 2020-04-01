@@ -2,10 +2,15 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.snake.game.http.GetRoomsResponse
-import com.snake.game.http.HttpService
-import com.snake.game.http.Room
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
+import com.snake.game.backend.GetRoomsResponse
+import com.snake.game.backend.HttpService
+import com.snake.game.backend.Room
 
 class RoomList : MenuBaseState() {
     private val roomList = Table()
@@ -64,7 +69,6 @@ class RoomList : MenuBaseState() {
                 Image(Texture("indicators/in_progress.png")).apply {
                     width = indicatorWidth
                     height = width
-
                 } else Image().apply {
                 width = indicatorWidth
                 height = width
@@ -107,7 +111,6 @@ class RoomList : MenuBaseState() {
         Gdx.app.debug("UI", "RoomList::joinRoom(%s, %s)".format(room.name, password))
         StateManager.push(JoinRoomState(room.id, room.name, nickname, password))
     }
-
 
     /**
      * Attempts to join a room
