@@ -9,7 +9,7 @@ import java.util.EnumMap
  *
  * @constructor Creates an Entity with no components.
  */
-class Entity(private val entityManager: EntityManager) {
+class Entity(val id: String, private val entityManager: EntityManager) {
     private var componentMap: EnumMap<ComponentType, Component> = EnumMap(ComponentType::class.java)
 
     init {
