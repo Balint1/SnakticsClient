@@ -41,7 +41,7 @@ open class CreateRoom : MenuBaseState() {
             StateManager.push(CreateAdvancedRoom())
         }
 
-        addElements(back, create, advancedRoom, spacing = SPACING)
+        addElements(back, advancedRoom, create, spacing = SPACING)
     }
 
     /**
