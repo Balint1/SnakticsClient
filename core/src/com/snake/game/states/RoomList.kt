@@ -18,10 +18,9 @@ class RoomList : MenuBaseState() {
     init {
         setTitle("Join room")
 
-        val scrollPane = ScrollPane(roomList)
-        scrollPane.setSize(ELEMENT_WIDTH, ELEMENT_HEIGHT * 4)
-        scrollPane.setScrollBarPositions(true, true)
-        addElement(scrollPane)
+        createScrollPane(roomList).apply {
+            addElement(this)
+        }
 
         createTextButton("Back") {
             StateManager.pop()
@@ -64,22 +63,21 @@ class RoomList : MenuBaseState() {
                 setSize(ELEMENT_WIDTH * 12 / 25, ELEMENT_HEIGHT / 2)
             }
 
-            val indicatorWidth = ELEMENT_WIDTH / 25
             val inProgressIndicator = if (room.inProgress)
                 Image(Texture("indicators/in_progress.png")).apply {
-                    width = indicatorWidth
+                    width = ICON_WIDTH
                     height = width
                 } else Image().apply {
-                width = indicatorWidth
+                width = ICON_WIDTH
                 height = width
             }
 
             val passwordIndicator = if (room.hasPassword)
                 Image(Texture("indicators/with_pw.png")).apply {
-                    width = indicatorWidth
+                    width = ICON_WIDTH
                     height = width * 1.4345f
                 } else Image().apply {
-                width = indicatorWidth
+                width = ICON_WIDTH
                 height = width * 1.4345f
             }
 
@@ -96,7 +94,8 @@ class RoomList : MenuBaseState() {
                     passwordIndicator,
                     spacing = ELEMENT_WIDTH / 25,
                     parent = roomList,
-                    padTop = nameLabel.height / 2f)
+                    padTop = nameLabel.height / 2f
+            )
         }
     }
 

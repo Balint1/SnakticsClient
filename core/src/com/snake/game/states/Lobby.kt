@@ -1,32 +1,40 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.google.gson.Gson
-import com.snake.game.backend.HttpService
-import com.snake.game.backend.SimpleResponse
-import com.snake.game.backend.Events
-import com.snake.game.backend.SocketService
+import com.snake.game.backend.*
 import org.json.JSONObject
 
-class Lobby(private val roomId: String) : MenuBaseState() {
-
+class Lobby(private val roomId: String,
+            players: MutableList<Player>
+) : MenuBaseState() {
     private val playerId: String = SocketService.socket.id()
+    private val playersList = Table()
 
     init {
         addListeners()
         setTitle("Lobby")
-        createTextButton("Play") {
-            showWaitDialog("Starting game...")
-            HttpService.startGame(roomId, playerId, ::onStartGame)
-        }.apply {
+
+        createScrollPane(playersList, ELEMENT_WIDTH * 2 / 3).apply {
             addElement(this)
         }
 
-        createTextButton("Leave") {
-            HttpService.leaveRoom(roomId, playerId, ::onLeaveRoom)
-        }.apply {
-            addElement(this)
+        initializePlayersList(players)
+
+        val playBtn = createTextButton("Play", (ELEMENT_WIDTH - SPACING) / 3f) {
+            showWaitDialog("Starting game...")
+            HttpService.startGame(roomId, playerId, ::onStartGame)
         }
+
+        val leaveBtn = createTextButton("Leave", (ELEMENT_WIDTH - SPACING) / 3f) {
+            HttpService.leaveRoom(roomId, playerId, ::onLeaveRoom)
+        }
+
+        addElements(playBtn, leaveBtn, spacing = SPACING)
     }
 
     /**
@@ -53,6 +61,7 @@ class Lobby(private val roomId: String) : MenuBaseState() {
         Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
+            cancelListeners()
             StateManager.set(MainMenu())
         } else {
             showMessageDialog(response.message)
@@ -71,7 +80,30 @@ class Lobby(private val roomId: String) : MenuBaseState() {
             Gdx.app.postRunnable {
                 leaveSocketRoom(args)
             }
+        }.on(Events.NEW_PLAYER.value) { args ->
+            val data: JSONObject = args[0] as JSONObject
+            val player: Player = Gson().fromJson(data.toString(), Player::class.java)
+            Gdx.app.postRunnable {
+                insertPlayer(player)
+            }
+        }.on(Events.PLAYER_LEFT.value) { args ->
+            val data: JSONObject = args[0] as JSONObject
+            val updatedList: UpdatedList = Gson().fromJson(data.toString(), UpdatedList::class.java)
+            Gdx.app.postRunnable {
+                initializePlayersList(updatedList.players)
+            }
         }
+    }
+
+    /**
+     * cancels all extra listeners
+     */
+    private fun cancelListeners() {
+        SocketService.socket.off(Events.OWNER_CHANGED.value)
+        SocketService.socket.off(Events.LEAVE_RESPONSE.value)
+        SocketService.socket.off(Events.JOIN_RESPONSE.value)
+        SocketService.socket.off(Events.UPDATE.value)
+        SocketService.socket.off(Events.PLAYER_LEFT.value)
     }
 
     private fun assignOwner(args: Array<Any>) {
@@ -89,5 +121,33 @@ class Lobby(private val roomId: String) : MenuBaseState() {
         if (!response.success) {
             Gdx.app.debug("UI", "Lobby::leaveSocketRoom(%b)".format(response.success))
         }
+    }
+
+    private fun initializePlayersList(players: MutableList<Player>) {
+        playersList.clear()
+        for (player: Player in players) {
+            insertPlayer(player)
+        }
+    }
+
+    private fun insertPlayer(player: Player) {
+        val nicknameLabel = Label(player.nickname, skin, "title").apply {
+            setSize(ELEMENT_WIDTH * 14 / 25, ELEMENT_HEIGHT / 2)
+        }
+        val ownerIndicator = if (player.owner)
+            Image(Texture("indicators/owner.png")).apply {
+                width = ICON_WIDTH
+                height = width
+            } else Image().apply {
+            width = ICON_WIDTH
+            height = width
+        }
+        addElements(
+                nicknameLabel,
+                ownerIndicator,
+                spacing = ELEMENT_WIDTH / 25,
+                parent = this.playersList,
+                padTop = nicknameLabel.height / 2f
+        )
     }
 }

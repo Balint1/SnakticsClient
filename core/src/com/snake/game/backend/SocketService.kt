@@ -14,11 +14,6 @@ object SocketService {
     private var timeCount: Int = 0
     private var timerTask: Timer.Task? = null
     var socket: Socket = IO.socket(BASE_URL)
-    var listeners: MutableMap<String, Boolean> = mutableMapOf(
-            Events.JOIN_RESPONSE.value to false,
-            Events.UPDATE.value to false,
-            Events.NEW_PLAYER.value to false
-    )
 
     /**
      * Tries to connect socket to the server within TIMEOUT seconds
@@ -64,9 +59,6 @@ object SocketService {
             }
         }.on(Socket.EVENT_DISCONNECT) {
             Gdx.app.log("SocketIO", "Disconnected")
-            for (k in listeners.keys) {
-                listeners[k] = false
-            }
             Gdx.app.postRunnable {
                 StateManager.set(MainMenu())
             }

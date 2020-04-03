@@ -16,6 +16,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
 
     init {
+        cancelListeners()
         addListeners()
         slider.value = 0f
         slider.addListener(object : ChangeListener() {
@@ -37,12 +38,14 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     }
 
     private fun addListeners() {
-        if (!SocketService.listeners.getValue(Events.UPDATE.value)) {
-            SocketService.listeners[Events.UPDATE.value] = true
-            SocketService.socket.on(Events.UPDATE.value) { args ->
-                onStateUpdate(args)
-            }
+        SocketService.socket.on(Events.UPDATE.value) { args ->
+            onStateUpdate(args)
         }
+    }
+
+    private fun cancelListeners() {
+        SocketService.socket.off(Events.OWNER_CHANGED.value)
+        SocketService.socket.off(Events.PLAYER_LEFT.value)
     }
 
     private fun onStateUpdate(args: Array<Any>) {

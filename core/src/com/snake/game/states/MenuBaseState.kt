@@ -3,10 +3,7 @@ package com.snake.game.states
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 
@@ -49,6 +46,23 @@ abstract class MenuBaseState : BaseState() {
             }
         })
         return button
+    }
+
+    /**
+     * Creates a scroll pane with the provided list, size and scrollbar options
+     *
+     * @param list A list to be displayed in pane
+     * @param width The width of the button
+     * @param height The height of the button
+     * @param bottom parameter for setScrollBarPositions
+     * @param right parameter for setScrollBarPositions
+     * @return The scroll pane
+     */
+    protected fun createScrollPane(list: Table, width: Float = ELEMENT_WIDTH, height: Float = ELEMENT_HEIGHT * 4, bottom: Boolean = true, right: Boolean = true): ScrollPane {
+        val scrollPane = ScrollPane(list)
+        scrollPane.setSize(width, height)
+        scrollPane.setScrollBarPositions(bottom, right)
+        return scrollPane
     }
 
     /**
@@ -163,5 +177,7 @@ abstract class MenuBaseState : BaseState() {
         const val ELEMENT_WIDTH = MIN_WORLD_WIDTH / 2f
         const val ELEMENT_HEIGHT = ELEMENT_WIDTH / 7f
         const val SPACING = ELEMENT_WIDTH / 10f
+
+        const val ICON_WIDTH = ELEMENT_WIDTH / 25
     }
 }
