@@ -9,11 +9,14 @@ import com.snake.game.backend.SimpleResponse
 import com.snake.game.backend.Data
 import com.snake.game.backend.Events
 import com.snake.game.backend.SocketService
+import com.snake.game.ecs.SnakeECSEngine
 import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(private val roomId: String, private val playerId: String) : MenuBaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
+
+    private val ecs = SnakeECSEngine
 
     init {
         cancelListeners()

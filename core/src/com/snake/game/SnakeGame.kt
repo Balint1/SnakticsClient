@@ -18,9 +18,6 @@ class SnakeGame : ApplicationAdapter() {
         Gdx.app.logLevel = Application.LOG_DEBUG
         batch = SpriteBatch()
 
-        // Testing ECS
-        var ecs = SnakeECSEngine
-
         StateManager.push(MainMenu())
     }
 
