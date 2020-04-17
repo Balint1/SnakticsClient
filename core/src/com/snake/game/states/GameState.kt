@@ -1,6 +1,7 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
@@ -59,6 +60,11 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         } catch (e: JSONException) {
             Gdx.app.log("SocketIO", "Error getting attributes: $e")
         }
+    }
+
+    override fun render(sb: SpriteBatch) {
+        super.render(sb)
+        ecs.render(sb)
     }
 
     /**

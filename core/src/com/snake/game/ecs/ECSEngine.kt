@@ -1,5 +1,6 @@
 package com.snake.game.ecs
 
+import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.snake.game.ecs.entity.EntityManager
 import com.snake.game.ecs.system.System
 
@@ -16,9 +17,18 @@ open class ECSEngine(vararg systems: System) {
      */
     fun update(dt: Float) {
         for (system in systems) {
-            // Update all entities that match the component tree for the this system
+            // Update all entities that match the component tree for this system
             for (entity in entityManager.getEntities(system.componentTypes))
                 system.update(dt, entity)
         }
+    }
+
+    /**
+     * Render the entities.
+     * @param sb a sprite batch
+     */
+    fun render(sb: SpriteBatch) {
+        for (system in systems)
+            system.render(sb)
     }
 }
