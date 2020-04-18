@@ -37,6 +37,12 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         }
     }
 
+    override fun activated() {
+        super.activated()
+
+        ecs.createEntities()
+    }
+
     private fun emitSliderValue(value: Int) {
         SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
     }
@@ -60,6 +66,11 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         } catch (e: JSONException) {
             Gdx.app.log("SocketIO", "Error getting attributes: $e")
         }
+    }
+
+    override fun update(dt: Float) {
+        super.update(dt)
+        ecs.update(dt)
     }
 
     override fun render(sb: SpriteBatch) {
