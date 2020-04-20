@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
@@ -30,19 +31,20 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private val FIELD_HEIGHT: Float = 300f
 
     private val ecs = SnakeECSEngine
-    private val cam = OrthographicCamera()
-    private var viewport = ExtendViewport(FIELD_WIDTH, FIELD_HEIGHT, FIELD_WIDTH, FIELD_HEIGHT, cam)
+    private val cam = OrthographicCamera(FIELD_WIDTH, FIELD_HEIGHT)
 
     init {
         cancelListeners()
         addListeners()
 
         slider.value = 0f
+
         slider.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
                 emitSliderValue(slider.value.toInt())
             }
         })
+
         addElement(slider)
 
         createTextButton("back") {
@@ -51,6 +53,8 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         }.apply {
             addElement(this)
         }
+
+        stage.viewport.camera = cam
     }
 
     override fun activated() {
@@ -117,10 +121,9 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     }
 
     override fun render(sb: SpriteBatch) {
-        super.render(sb)
-
         // Clear the screen
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
+
 
         sb.projectionMatrix = cam.combined
 
@@ -128,10 +131,12 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         sr.projectionMatrix = sb.projectionMatrix
         sr.begin(ShapeRenderer.ShapeType.Filled)
         sr.color = Color.DARK_GRAY
-        sr.rect(0f,0f,10000f,10000f)
+        sr.rect(0f,0f,FIELD_WIDTH,FIELD_HEIGHT)
         sr.end()
 
         ecs.render(sb)
+
+        super.render(sb)
     }
 
     override fun resize(width: Int, height: Int) {
@@ -140,7 +145,8 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
 
     private fun updateViewport() {
         var ratio = FIELD_WIDTH / FIELD_HEIGHT
-        viewport.update((Gdx.graphics.height * ratio).toInt(), Gdx.graphics.height, true)
+
+        stage.viewport.update((Gdx.graphics.height * ratio).toInt(), Gdx.graphics.height, true)
     }
 
     /**
