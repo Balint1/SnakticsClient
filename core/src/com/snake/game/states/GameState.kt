@@ -26,7 +26,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
 
     // TODO get from backend
-    private val FIELD_WIDTH: Float = 300f
+    private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
 
     private val ecs = SnakeECSEngine
@@ -127,7 +127,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         var sr = ShapeRenderer()
         sr.projectionMatrix = sb.projectionMatrix
         sr.begin(ShapeRenderer.ShapeType.Filled)
-        sr.color = Color.FIREBRICK
+        sr.color = Color.DARK_GRAY
         sr.rect(0f,0f,10000f,10000f)
         sr.end()
 
