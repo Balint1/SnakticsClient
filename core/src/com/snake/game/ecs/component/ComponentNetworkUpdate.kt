@@ -1,8 +1,4 @@
-package com.snake.game.ecs.system
-
-import com.snake.game.ecs.component.Component
-import com.snake.game.ecs.component.ComponentType
-import com.snake.game.ecs.component.PositionComponent
+package com.snake.game.ecs.component
 
 /**
  * Stores a component update from the network that has not been processed yet.

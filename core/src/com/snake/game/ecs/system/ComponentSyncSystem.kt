@@ -1,5 +1,6 @@
 package com.snake.game.ecs.system
 
+import com.snake.game.ecs.component.ComponentNetworkUpdate
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.entity.Entity
 

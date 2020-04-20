@@ -29,6 +29,6 @@ open class ECSEngine(vararg systems: System) {
      */
     fun render(sb: SpriteBatch) {
         for (system in systems)
-            system.render(sb)
+            system.render(sb, entityManager)
     }
 }
