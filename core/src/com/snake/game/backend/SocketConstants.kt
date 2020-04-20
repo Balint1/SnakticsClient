@@ -20,5 +20,6 @@ enum class Events(val value: String) {
     UPDATE("update-state"),
     SLIDER_CHANGE("slider-change"),
     OWNER_CHANGED("owner-changed"),
-    LEAVE_RESPONSE("leave-response")
+    LEAVE_RESPONSE("leave-response"),
+    START_GAME("start-game")
 }

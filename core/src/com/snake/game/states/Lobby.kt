@@ -92,6 +92,10 @@ class Lobby(private val roomId: String,
             Gdx.app.postRunnable {
                 initializePlayersList(updatedList.players)
             }
+        }.on(Events.START_GAME.value) {
+            Gdx.app.postRunnable {
+                StateManager.push(GameState(roomId, playerId))
+            }
         }
     }
 
