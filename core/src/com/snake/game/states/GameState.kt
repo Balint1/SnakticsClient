@@ -79,7 +79,8 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
     }
     private fun emitJoystickValue(x: Float,y : Float){
-        SocketService.socket.emit(Events.JOYSTICK_CHANGE.value, Data.JOYSTICK_CHANGE(x,y))
+        var value: Float = x*3
+        SocketService.socket.emit(Events.JOYSTICK_CHANGE.value, Data.JOYSTICK_CHANGE(value))
     }
 
     private fun addListeners() {

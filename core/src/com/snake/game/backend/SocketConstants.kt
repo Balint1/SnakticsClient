@@ -10,8 +10,8 @@ object Data {
     val SLIDER_CHANGE: (Int) -> JSONObject = { value: Int ->
         JSONObject("""{"value":"$value"}""")
     }
-    val JOYSTICK_CHANGE: (Float, Float) -> JSONObject = { x: Float, y: Float ->
-        JSONObject("""{"x":"$x", "y":"$y"}""")
+    val JOYSTICK_CHANGE: (Float) -> JSONObject = { x: Float->
+        JSONObject("""{"value":"$x"}""")
     }
 }
 
