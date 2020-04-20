@@ -19,8 +19,8 @@ class JoystickInput() {
         val deadZoneRadius: Float = 30f
 
 
-        val background = Texture("joystick/joystick_bg.jpg")
-        val knob = Texture("joystick/joystick_bg.jpg")
+        val background = Texture("joystick/joystick_bg.png")
+        val knob = Texture("joystick/joystick_knob.png")
 
 
         touchpadSkin = Skin()
