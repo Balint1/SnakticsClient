@@ -1,19 +1,14 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.badlogic.gdx.utils.viewport.FitViewport
-import com.badlogic.gdx.utils.viewport.Viewport
 import com.snake.game.backend.*
+import com.snake.game.controls.JoystickInput
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.componentTypeFromInternalName
@@ -157,7 +152,12 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
 
     private fun updateViewport() {
         var ratio: Float = FIELD_WIDTH / FIELD_HEIGHT
-        gameStage.viewport.update((Gdx.graphics.height * ratio).toInt(), Gdx.graphics.height, true)
+        var gameWidth = (Gdx.graphics.height * ratio).toInt()
+        gameStage.viewport.update(gameWidth, Gdx.graphics.height, true)
+
+        (stage.viewport as ExtendViewport).setWorldSize((Gdx.graphics.width - gameWidth).toFloat(), Gdx.graphics.height.toFloat())
+        stage.viewport.update(Gdx.graphics.width - gameWidth, Gdx.graphics.height)
+        stage.viewport.screenX = gameWidth
     }
 
     /**
