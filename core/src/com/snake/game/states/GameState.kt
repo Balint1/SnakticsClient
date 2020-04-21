@@ -25,6 +25,7 @@ import org.json.JSONObject
 
 class GameState(private val roomId: String, private val playerId: String) : MenuBaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
+    private val joystickInput:JoystickInput =  JoystickInput()
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
@@ -37,8 +38,18 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         cancelListeners()
         addListeners()
 
-        slider.value = 0f
+        addElement(joystickInput.touchpad)
 
+
+        joystickInput.touchpad.addListener(object : ChangeListener() {
+            @Override
+            override fun changed(event: ChangeListener.ChangeEvent?, actor: Actor?) {
+                emitJoystickValue(joystickInput.touchpad.knobPercentX, joystickInput.touchpad.knobPercentY)
+                System.out.println("emiting joystick change...")
+            }
+        });
+
+        slider.value = 0f
         slider.addListener(object : ChangeListener() {
             override fun changed(event: ChangeEvent?, actor: Actor?) {
                 emitSliderValue(slider.value.toInt())
@@ -66,6 +77,10 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
 
     private fun emitSliderValue(value: Int) {
         SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
+    }
+    private fun emitJoystickValue(x: Float,y : Float){
+        var value: Float = x*3
+        SocketService.socket.emit(Events.JOYSTICK_CHANGE.value, Data.JOYSTICK_CHANGE(value))
     }
 
     private fun addListeners() {
