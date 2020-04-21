@@ -2,17 +2,18 @@ package com.snake.game.states
 
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.viewport.ExtendViewport
 
 /**
  * Base class for menu states providing common functionality for creating menus
  *
  */
-abstract class MenuBaseState : BaseState() {
-
+abstract class MenuBaseState : BaseState(Stage(ExtendViewport(MIN_WORLD_WIDTH, MIN_WORLD_HEIGHT))) {
     var rootTable = Table()
     var dialog: Dialog? = null
 

@@ -26,6 +26,8 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
 
+
+
     // Different Stage and SpriteBatch used for rendering the game (non-UI part)
     private val gameStage = Stage(ExtendViewport(FIELD_WIDTH, FIELD_HEIGHT, FIELD_WIDTH, FIELD_HEIGHT))
     private val gameSpriteBatch = SpriteBatch()
