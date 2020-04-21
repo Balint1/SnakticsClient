@@ -44,8 +44,8 @@ object RenderingSystem: System(ComponentType.Position) {
         sr.color = BACKGROUND_COLOR
         sr.rect(0f,0f, worldWidth, worldHeight)
 
-        for(i in entities.indices) {
-            // Iterate over indices to avoid ConcurrentModificationException
+        // Iterate over indices to avoid ConcurrentModificationException
+        for(i in 0 until entities.size) {
             val entity = entities.elementAt(i)
 
             val pos = entity.getComponent(ComponentType.Position) as PositionComponent

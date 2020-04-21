@@ -1,12 +1,20 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
+import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.utils.viewport.FitViewport
 import com.snake.game.backend.*
 import com.snake.game.controls.JoystickInput
 import com.snake.game.ecs.SnakeECSEngine
@@ -16,29 +24,35 @@ import com.snake.game.ecs.component.createComponent
 import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
+import java.awt.Menu
 
 
-class GameState(private val roomId: String, private val playerId: String) : MenuBaseState() {
+class GameState(private val roomId: String, private val playerId: String) : BaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
     private val joystickInput: JoystickInput = JoystickInput()
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
-    private val FIELD_HEIGHT: Float = 300f
-
-
-
-    // Different Stage and SpriteBatch used for rendering the game (non-UI part)
-    private val gameStage = Stage(ExtendViewport(FIELD_WIDTH, FIELD_HEIGHT, FIELD_WIDTH, FIELD_HEIGHT))
-    private val gameSpriteBatch = SpriteBatch()
+    private val FIELD_HEIGHT: Float    = 300f
 
     private val ecs = SnakeECSEngine
+    private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
 
     init {
         cancelListeners()
         addListeners()
 
-        addElement(joystickInput.touchpad)
+        val uiGroup = VerticalGroup()
+
+        val splitPane = SplitPane(uiGroup, gameWidget, false,  skin)
+        splitPane.setBounds(0f,0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
+        splitPane.splitAmount = 0.2f
+        splitPane.minSplitAmount = 0.2f
+        splitPane.maxSplitAmount = 0.2f
+
+        stage.addActor(splitPane)
+
+        uiGroup.addActor(joystickInput.touchpad)
 
         joystickInput.touchpad.addListener(object : ChangeListener() {
             @Override
@@ -55,13 +69,13 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
             }
         })
 
-        addElement(slider)
+        uiGroup.addActor(slider)
 
         createTextButton("back") {
             HttpService.leaveRoom(roomId, playerId, ::onGameLeft)
             StateManager.pop()
         }.apply {
-            addElement(this)
+            uiGroup.addActor(this)
         }
 
     }
@@ -69,7 +83,6 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     override fun activated() {
         super.activated()
 
-        updateViewport()
         ecs.createEntities()
     }
 
@@ -134,32 +147,11 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     }
 
     override fun render(sb: SpriteBatch) {
-        // Clear the screen
-        //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
-
-        gameSpriteBatch.projectionMatrix = gameStage.camera.combined
-        gameStage.viewport.apply()
-        gameSpriteBatch.begin()
-
-        ecs.render(gameSpriteBatch, FIELD_WIDTH, FIELD_HEIGHT)
-
-        gameSpriteBatch.end()
-
         super.render(sb)
     }
 
     override fun resize(width: Int, height: Int) {
-        updateViewport()
-    }
-
-    private fun updateViewport() {
-        var ratio: Float = FIELD_WIDTH / FIELD_HEIGHT
-        var gameWidth = (Gdx.graphics.height * ratio).toInt()
-        gameStage.viewport.update(gameWidth, Gdx.graphics.height, true)
-
-        (stage.viewport as ExtendViewport).setWorldSize((Gdx.graphics.width - gameWidth).toFloat(), Gdx.graphics.height.toFloat())
-        stage.viewport.update(Gdx.graphics.width - gameWidth, Gdx.graphics.height)
-        stage.viewport.screenX = gameWidth
+        super.resize(width, height)
     }
 
     /**
@@ -168,6 +160,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
      * @param response response from create room http request
      */
     private fun onGameLeft(response: SimpleResponse) {
+        /*
         Gdx.app.debug("UI", "GameState::onGameLeft(%b)".format(response.success))
         hideDialog()
         if (response.success) {
@@ -175,5 +168,42 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         } else {
             showMessageDialog(response.message)
         }
+        */
+    }
+}
+
+
+class GameWidget(val ecs: SnakeECSEngine,
+                 private val fieldWidth: Float,
+                 private val fieldHeight: Float): Widget() {
+
+    val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
+
+    // The SpriteBatch used for rendering the game
+    val sb = SpriteBatch()
+
+    fun updateSize() {
+
+        width = MenuBaseState.VIRTUAL_WIDTH * 0.8f
+        height = MenuBaseState.VIRTUAL_HEIGHT
+
+        viewport.update(width.toInt(), height.toInt(), true)
+        viewport.setScreenBounds(x.toInt(), y.toInt(), width.toInt(), height.toInt())
+        /*var ratio: Float = fieldWidth / fieldHeight
+        var h = height
+        var gwidth = (h * ratio)
+        viewport.update(gwidth.toInt(), h.toInt(), true)*/
+    }
+
+    override fun draw(batch: Batch?, parentAlpha: Float) {
+        super.draw(batch, parentAlpha)
+        // TODO update only when necessary
+        updateSize()
+
+        viewport.apply(true)
+        sb.projectionMatrix = viewport.camera.combined
+        sb.begin()
+        ecs.render(sb, fieldWidth, fieldHeight)
+        sb.end()
     }
 }

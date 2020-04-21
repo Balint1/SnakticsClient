@@ -129,18 +129,18 @@ com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle: {
 		background: progress-bar
 		knobBefore: progress-bar-knob
 	}
-}
+},
 com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle: {
 	default: {
 		hScrollKnob: scrollbar-horizontal
 		vScrollKnob: scrollbar-vertical
-	}
+	},
 	select-box: {
 		background: select-box-list
 		hScrollKnob: scrollbar-horizontal
 		vScrollKnob: scrollbar-vertical
 	}
-}
+},
 com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle: {
 	default: {
 		font: font
@@ -219,6 +219,14 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
 	alt: {
 		background: narration-box
 		titleFont: font
+	}
+}
+com.badlogic.gdx.scenes.scene2d.ui.SplitPane$SplitPaneStyle: {
+	default-vertical: {
+		handle: vertical-splitpane
+	},
+	default-horizontal: {
+		handle: horizontal-splitpane
 	}
 }
 }

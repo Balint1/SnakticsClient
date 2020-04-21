@@ -18,8 +18,9 @@ open class ECSEngine(vararg systems: System) {
     fun update(dt: Float) {
         for (system in systems) {
             // Update all entities that match the component tree for this system
-            for (entity in entityManager.getEntities(system.componentTypes))
-                system.update(dt, entity)
+            var entities = entityManager.getEntities(system.componentTypes)
+            for (i in entities.indices)
+                system.update(dt, entities.elementAt(i))
         }
     }
 

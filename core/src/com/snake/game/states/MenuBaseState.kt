@@ -1,19 +1,14 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
-import com.badlogic.gdx.utils.viewport.ExtendViewport
 
 /**
  * Base class for menu states providing common functionality for creating menus
  *
  */
-abstract class MenuBaseState : BaseState(Stage(ExtendViewport(MIN_WORLD_WIDTH, MIN_WORLD_HEIGHT))) {
+abstract class MenuBaseState : BaseState() {
     var rootTable = Table()
     var dialog: Dialog? = null
 
@@ -24,29 +19,6 @@ abstract class MenuBaseState : BaseState(Stage(ExtendViewport(MIN_WORLD_WIDTH, M
 
         if (DEBUG_LAYOUT)
             rootTable.debug()
-    }
-
-    /**
-     * Creates a button with the provided text, size and on click event
-     *
-     * @param text The text on the button
-     * @param width The width of the button
-     * @param height The height of the button
-     * @param onClick The function called when the button is clicked
-     * @return The created button
-     */
-    protected fun createTextButton(text: String, width: Float = ELEMENT_WIDTH, height: Float = ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): TextButton {
-        val button = TextButton(text, skin)
-        button.setSize(width, height)
-        button.name = text
-        button.touchable = if (isDisabled) Touchable.disabled else Touchable.enabled
-        button.isDisabled = isDisabled
-        button.addListener(object : ClickListener() {
-            override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                onClick()
-            }
-        })
-        return button
     }
 
     /**
@@ -172,10 +144,10 @@ abstract class MenuBaseState : BaseState(Stage(ExtendViewport(MIN_WORLD_WIDTH, M
     companion object {
         const val DEBUG_LAYOUT = false
 
-        const val MIN_WORLD_WIDTH = 1600f
-        const val MIN_WORLD_HEIGHT = 900f
+        const val VIRTUAL_WIDTH = 1600f
+        const val VIRTUAL_HEIGHT = 900f
 
-        const val ELEMENT_WIDTH = MIN_WORLD_WIDTH / 2f
+        const val ELEMENT_WIDTH = VIRTUAL_WIDTH / 2f
         const val ELEMENT_HEIGHT = ELEMENT_WIDTH / 7f
         const val SPACING = ELEMENT_WIDTH / 10f
 
