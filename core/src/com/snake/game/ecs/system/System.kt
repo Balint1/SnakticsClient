@@ -20,6 +20,8 @@ abstract class System(var componentTypes: ComponentTypeTree) {
      * Render function that can be overridden to add rendering capabilities to the system.
      * @param sb a sprite batch
      * @param em the entity manager (could pass the entities instead the same way we do in update(), but we want freedom on rendering order)
+     * @param width the world width
+     * @param height the world height
      */
-    open fun render(sb: SpriteBatch, em: EntityManager) {}
+    open fun render(sb: SpriteBatch, em: EntityManager, width: Float, height: Float) {}
 }

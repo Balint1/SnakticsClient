@@ -15,19 +15,23 @@ import com.snake.game.ecs.entity.EntityManager
  */
 //object RenderingSystem: System(ComponentType.Position and (ComponentType.AnimatedSprite or ComponentType.Sprite)) {
 object RenderingSystem: System(ComponentType.Position) {
+    // Rendering constants // TODO move to other file?
     private const val SNAKE_RADIUS = 4f
+    private val BACKGROUND_COLOR = Color.DARK_GRAY
 
     private val debugFont = BitmapFont()
 
-    override fun update(dt: Float, entity: Entity) {
-        val pos = entity.getComponent(ComponentType.Position) as PositionComponent
-
+    init {
         debugFont.data.setScale(3f)
         debugFont.color = Color.WHITE
     }
 
-    override fun render(sb: SpriteBatch, em: EntityManager) {
-        super.render(sb, em)
+    override fun update(dt: Float, entity: Entity) {
+        //val pos = entity.getComponent(ComponentType.Position) as PositionComponent
+    }
+
+    override fun render(sb: SpriteBatch, em: EntityManager, worldWidth: Float, worldHeight: Float) {
+        super.render(sb, em, worldWidth, worldHeight)
 
         val entities = em.getEntities(componentTypes)
 
@@ -35,6 +39,10 @@ object RenderingSystem: System(ComponentType.Position) {
 
         sr.projectionMatrix = sb.projectionMatrix
         sr.begin(ShapeRenderer.ShapeType.Filled)
+
+        // Background
+        sr.color = BACKGROUND_COLOR
+        sr.rect(0f,0f, worldWidth, worldHeight)
 
         for(i in entities.indices) {
             // Iterate over indices to avoid ConcurrentModificationException

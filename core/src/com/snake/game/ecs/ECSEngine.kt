@@ -26,9 +26,11 @@ open class ECSEngine(vararg systems: System) {
     /**
      * Render the entities.
      * @param sb a sprite batch
+     * @param width the world width
+     * @param height the world height
      */
-    fun render(sb: SpriteBatch) {
+    fun render(sb: SpriteBatch, width: Float, height: Float) {
         for (system in systems)
-            system.render(sb, entityManager)
+            system.render(sb, entityManager, width, height)
     }
 }

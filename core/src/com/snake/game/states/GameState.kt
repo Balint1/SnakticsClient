@@ -25,21 +25,23 @@ import org.json.JSONObject
 
 class GameState(private val roomId: String, private val playerId: String) : MenuBaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
-    private val joystickInput:JoystickInput =  JoystickInput()
+    private val joystickInput: JoystickInput = JoystickInput()
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
 
+    // Different Stage and SpriteBatch used for rendering the game (non-UI part)
+    private val gameStage = Stage(ExtendViewport(FIELD_WIDTH, FIELD_HEIGHT, FIELD_WIDTH, FIELD_HEIGHT))
+    private val gameSpriteBatch = SpriteBatch()
+
     private val ecs = SnakeECSEngine
-    private val cam = OrthographicCamera()
 
     init {
         cancelListeners()
         addListeners()
 
         addElement(joystickInput.touchpad)
-
 
         joystickInput.touchpad.addListener(object : ChangeListener() {
             @Override
@@ -65,7 +67,6 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
             addElement(this)
         }
 
-        stage.viewport.camera = cam
     }
 
     override fun activated() {
@@ -139,17 +140,13 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         // Clear the screen
         //Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
 
+        gameSpriteBatch.projectionMatrix = gameStage.camera.combined
+        gameStage.viewport.apply()
+        gameSpriteBatch.begin()
 
-        sb.projectionMatrix = cam.combined
+        ecs.render(gameSpriteBatch, FIELD_WIDTH, FIELD_HEIGHT)
 
-        var sr = ShapeRenderer()
-        sr.projectionMatrix = sb.projectionMatrix
-        sr.begin(ShapeRenderer.ShapeType.Filled)
-        sr.color = Color.DARK_GRAY
-        sr.rect(0f,0f,FIELD_WIDTH,FIELD_HEIGHT)
-        sr.end()
-
-        ecs.render(sb)
+        gameSpriteBatch.end()
 
         super.render(sb)
     }
@@ -160,21 +157,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
 
     private fun updateViewport() {
         var ratio: Float = FIELD_WIDTH / FIELD_HEIGHT
-
-        var viewport = stage.viewport as ExtendViewport
-        viewport.minWorldWidth = FIELD_WIDTH
-        viewport.minWorldHeight = FIELD_HEIGHT
-        viewport.maxWorldWidth = FIELD_WIDTH
-        viewport.maxWorldHeight = FIELD_HEIGHT
-
-        //stage.viewport.setWorldSize(FIELD_WIDTH, FIELD_HEIGHT)
-
-
-        stage.viewport.update((Gdx.graphics.height * ratio).toInt(), Gdx.graphics.height, true)
-
-
-        //stage.viewport.update(FIELD_WIDTH.toInt(), FIELD_HEIGHT.toInt(), true)
-        stage.viewport.apply()
+        gameStage.viewport.update((Gdx.graphics.height * ratio).toInt(), Gdx.graphics.height, true)
     }
 
     /**
