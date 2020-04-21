@@ -31,7 +31,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private val FIELD_HEIGHT: Float = 300f
 
     private val ecs = SnakeECSEngine
-    private val cam = OrthographicCamera(FIELD_WIDTH, FIELD_HEIGHT)
+    private val cam = OrthographicCamera()
 
     init {
         cancelListeners()
@@ -144,15 +144,28 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     }
 
     private fun updateViewport() {
-        var ratio = FIELD_WIDTH / FIELD_HEIGHT
+        var ratio: Float = FIELD_WIDTH / FIELD_HEIGHT
+
+        var viewport = stage.viewport as ExtendViewport
+        viewport.minWorldWidth = FIELD_WIDTH
+        viewport.minWorldHeight = FIELD_HEIGHT
+        viewport.maxWorldWidth = FIELD_WIDTH
+        viewport.maxWorldHeight = FIELD_HEIGHT
+
+        //stage.viewport.setWorldSize(FIELD_WIDTH, FIELD_HEIGHT)
+
 
         stage.viewport.update((Gdx.graphics.height * ratio).toInt(), Gdx.graphics.height, true)
+
+
+        //stage.viewport.update(FIELD_WIDTH.toInt(), FIELD_HEIGHT.toInt(), true)
+        stage.viewport.apply()
     }
 
     /**
      * Called when the player success or fails to to leave the game
      *
-     * @param response response fom create room http request
+     * @param response response from create room http request
      */
     private fun onGameLeft(response: SimpleResponse) {
         Gdx.app.debug("UI", "GameState::onGameLeft(%b)".format(response.success))
