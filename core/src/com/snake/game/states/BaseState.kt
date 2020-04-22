@@ -1,6 +1,7 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -9,14 +10,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.snake.game.controls.SwipeDetector
 
 abstract class BaseState() : IState {
     protected val stage = Stage(ExtendViewport(MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT))
+    protected val multiplexer = InputMultiplexer()
 
     protected val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
 
     override fun activated() {
-        Gdx.input.inputProcessor = stage
+        multiplexer.addProcessor(SwipeDetector)
+        multiplexer.addProcessor(stage)
+        Gdx.input.inputProcessor = multiplexer
     }
 
     override fun deactivated() {}

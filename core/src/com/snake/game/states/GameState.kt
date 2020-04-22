@@ -1,22 +1,19 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.OrthographicCamera
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.Batch
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.Group
-import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.snake.game.backend.*
 import com.snake.game.controls.JoystickInput
+import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.componentTypeFromInternalName
@@ -24,12 +21,12 @@ import com.snake.game.ecs.component.createComponent
 import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
-import java.awt.Menu
 
 
 class GameState(private val roomId: String, private val playerId: String) : BaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
     private val joystickInput: JoystickInput = JoystickInput()
+    private val swipeDetector = SwipeDetector
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
@@ -56,7 +53,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
         joystickInput.touchpad.addListener(object : ChangeListener() {
             @Override
-            override fun changed(event: ChangeListener.ChangeEvent?, actor: Actor?) {
+            override fun changed(event: ChangeEvent?, actor: Actor?) {
                 emitJoystickValue(joystickInput.touchpad.knobPercentX, joystickInput.touchpad.knobPercentY)
                 System.out.println("emiting joystick change...")
             }
@@ -77,6 +74,9 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         }.apply {
             uiGroup.addActor(this)
         }
+
+        // we add swipe listener :
+        swipeDetector.active = true
 
     }
 
@@ -169,6 +169,9 @@ class GameState(private val roomId: String, private val playerId: String) : Base
             showMessageDialog(response.message)
         }
         */
+
+        // if he succed we stop the swipe detector
+        swipeDetector.active = false
     }
 }
 
