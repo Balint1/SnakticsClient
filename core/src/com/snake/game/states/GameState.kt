@@ -5,11 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
-import com.snake.game.backend.HttpService
-import com.snake.game.backend.SimpleResponse
-import com.snake.game.backend.Data
-import com.snake.game.backend.Events
-import com.snake.game.backend.SocketService
+import com.google.gson.Gson
+import com.snake.game.backend.*
 import com.snake.game.ecs.SnakeECSEngine
 import org.json.JSONException
 import org.json.JSONObject
@@ -20,7 +17,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private val ecs = SnakeECSEngine
 
     init {
-        cancelListeners()
+        cancelOldListeners()
         addListeners()
         slider.value = 0f
         slider.addListener(object : ChangeListener() {
@@ -30,8 +27,7 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
         })
         addElement(slider)
         createTextButton("back") {
-            HttpService.leaveRoom(roomId, playerId, ::onGameLeft)
-            StateManager.pop()
+            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }.apply {
             addElement(this)
         }
@@ -50,12 +46,23 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
             onStateUpdate(args)
+        }.on(Events.PLAYER_LEFT_GAME.value) {args ->
+            Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
+            playerLeftGame(args)
+        }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) {args ->
+            Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
+            leaveToLobby(args)
         }
     }
 
-    private fun cancelListeners() {
+    private fun cancelNewListeners() {
+        SocketService.socket.off(Events.PLAYER_LEFT_GAME.value)
+        SocketService.socket.off(Events.LEAVE_TO_LOBBY_RESPONSE.value)
+        SocketService.socket.off(Events.UPDATE.value)
+    }
+    private fun cancelOldListeners(){
         SocketService.socket.off(Events.OWNER_CHANGED.value)
-        SocketService.socket.off(Events.PLAYER_LEFT.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
 
     private fun onStateUpdate(args: Array<Any>) {
@@ -79,15 +86,29 @@ class GameState(private val roomId: String, private val playerId: String) : Menu
     }
 
     /**
-     * Called when the player success or fails to to leave the game
+     * Called when the player success or fails to leave to the lobby
      *
-     * @param response response fom create room http request
+     * @param args data from socket
      */
-    private fun onGameLeft(response: SimpleResponse) {
-        Gdx.app.debug("UI", "GameState::onGameLeft(%b)".format(response.success))
+    private fun leaveToLobby(args: Array<Any>) {
+        val data: JSONObject = args[0] as JSONObject
+        val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
+        Gdx.app.debug("UI", "GameState::leaveToLobby(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            StateManager.set(MainMenu())
+            cancelNewListeners()
+            StateManager.pop()
+        } else {
+            showMessageDialog(response.message)
+        }
+    }
+
+    private fun playerLeftGame(args: Array<Any>){
+        val data: JSONObject = args[0] as JSONObject
+        val response: PlayerLeftGame = Gson().fromJson(data.toString(), PlayerLeftGame::class.java)
+        Gdx.app.debug("UI", "GameState::playerLeftGame(%s, %b)".format(response.id, response.success))
+        if (response.success) {
+            //TODO Stop rendering 'response.id' player.
         } else {
             showMessageDialog(response.message)
         }

@@ -86,7 +86,7 @@ class Lobby(private val roomId: String,
             Gdx.app.postRunnable {
                 insertPlayer(player)
             }
-        }.on(Events.PLAYER_LEFT.value) { args ->
+        }.on(Events.PLAYER_LEFT_ROOM.value) { args ->
             val data: JSONObject = args[0] as JSONObject
             val updatedList: UpdatedList = Gson().fromJson(data.toString(), UpdatedList::class.java)
             Gdx.app.postRunnable {
@@ -102,8 +102,7 @@ class Lobby(private val roomId: String,
         SocketService.socket.off(Events.OWNER_CHANGED.value)
         SocketService.socket.off(Events.LEAVE_RESPONSE.value)
         SocketService.socket.off(Events.JOIN_RESPONSE.value)
-        SocketService.socket.off(Events.UPDATE.value)
-        SocketService.socket.off(Events.PLAYER_LEFT.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
 
     private fun assignOwner(args: Array<Any>) {

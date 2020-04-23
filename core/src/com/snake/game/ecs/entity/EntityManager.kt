@@ -24,7 +24,7 @@ class EntityManager {
         // For each component type, create an empty set that will store references to all entities with that component type
         for (componentType in ComponentType.values())
             entityMap[componentType] = HashSet()
-    }g g
+    }
 
     internal fun addEntity(entity: Entity) {
         entities.add(entity)
