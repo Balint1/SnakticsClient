@@ -20,7 +20,7 @@ object Data {
 
 enum class Events(val value: String) {
     NEW_PLAYER("new-player"),
-    PLAYER_LEFT("player-left"),
+    PLAYER_LEFT_ROOM("player-left-room"),
     JOIN_REQUEST("join-request"),
     JOIN_RESPONSE("join-response"),
     UPDATE("update-state"),
@@ -29,5 +29,8 @@ enum class Events(val value: String) {
     SWIPE("swipe"),
     OWNER_CHANGED("owner-changed"),
     LEAVE_RESPONSE("leave-response"),
+    LEAVE_TO_LOBBY("leave-to-lobby"),
+    PLAYER_LEFT_GAME("player-left-game"),
+    LEAVE_TO_LOBBY_RESPONSE ("leave-to-lobby-response"),
     START_GAME("start-game")
 }

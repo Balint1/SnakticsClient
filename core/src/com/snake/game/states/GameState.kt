@@ -1,19 +1,16 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.ui.Slider
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.snake.game.backend.*
 import com.snake.game.controls.JoystickInput
 import com.snake.game.controls.SwipeDetector
+import com.google.gson.Gson
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.componentTypeFromInternalName
@@ -36,7 +33,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
 
     init {
-        cancelListeners()
+        cancelOldListeners()
         addListeners()
 
         val uiGroup = VerticalGroup()
@@ -55,9 +52,9 @@ class GameState(private val roomId: String, private val playerId: String) : Base
             @Override
             override fun changed(event: ChangeEvent?, actor: Actor?) {
                 emitJoystickValue(joystickInput.touchpad.knobPercentX, joystickInput.touchpad.knobPercentY)
-                System.out.println("emiting joystick change...")
+                Gdx.app.log("GameState", "Emitting joystick change...")
             }
-        });
+        })
 
         slider.value = 0f
         slider.addListener(object : ChangeListener() {
@@ -69,8 +66,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         uiGroup.addActor(slider)
 
         createTextButton("back") {
-            HttpService.leaveRoom(roomId, playerId, ::onGameLeft)
-            StateManager.pop()
+            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }.apply {
             uiGroup.addActor(this)
         }
@@ -90,19 +86,30 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
     }
     private fun emitJoystickValue(x: Float,y : Float){
-        var value: Float = x*3
+        val value: Float = x*3
         SocketService.socket.emit(Events.JOYSTICK_CHANGE.value, Data.JOYSTICK_CHANGE(value))
     }
 
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
             onStateUpdate(args)
+        }.on(Events.PLAYER_LEFT_GAME.value) {args ->
+            Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
+            playerLeftGame(args)
+        }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) {args ->
+            Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
+            leaveToLobby(args)
         }
     }
 
-    private fun cancelListeners() {
+    private fun cancelNewListeners() {
+        SocketService.socket.off(Events.PLAYER_LEFT_GAME.value)
+        SocketService.socket.off(Events.LEAVE_TO_LOBBY_RESPONSE.value)
+        SocketService.socket.off(Events.UPDATE.value)
+    }
+    private fun cancelOldListeners(){
         SocketService.socket.off(Events.OWNER_CHANGED.value)
-        SocketService.socket.off(Events.PLAYER_LEFT.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
 
     private fun onStateUpdate(args: Array<Any>) {
@@ -115,22 +122,22 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
             for(i in 0 until state.length()) {
                 val componentData = state.getJSONObject(i)
-                val id: String = componentData.getString("entityId");
+                val id: String = componentData.getString("entityId")
                 val componentTypeName = componentData.getString("componentType")
 
-                var componentType: ComponentType? = componentTypeFromInternalName(componentTypeName)
+                val componentType: ComponentType? = componentTypeFromInternalName(componentTypeName)
                         ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
                 if(!em.hasEntity(id))
                     Entity(id, em)
-                var entity = em.getEntity(id)!!
+                val entity = em.getEntity(id)!!
 
                 // Create the component if necessary
                 if(!entity.hasComponent(componentType!!))
                     entity.addComponent(createComponent(componentType))
 
-                var component = entity.getComponent(componentType)!!
+                val component = entity.getComponent(componentType)!!
                 component.updateFromJSON(componentData)
 
             }
@@ -146,46 +153,46 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         ecs.update(dt)
     }
 
-    override fun render(sb: SpriteBatch) {
-        super.render(sb)
-    }
-
-    override fun resize(width: Int, height: Int) {
-        super.resize(width, height)
-    }
-
     /**
-     * Called when the player success or fails to to leave the game
+     * Called when the player success or fails to leave to the lobby
      *
-     * @param response response from create room http request
+     * @param args data from socket
      */
-    private fun onGameLeft(response: SimpleResponse) {
-        /*
-        Gdx.app.debug("UI", "GameState::onGameLeft(%b)".format(response.success))
-        hideDialog()
+    private fun leaveToLobby(args: Array<Any>) {
+        val data: JSONObject = args[0] as JSONObject
+        val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
+        Gdx.app.debug("UI", "GameState::leaveToLobby(%b)".format(response.success))
         if (response.success) {
-            StateManager.set(MainMenu())
+            swipeDetector.active = false
+            cancelNewListeners()
+            StateManager.pop()
         } else {
-            showMessageDialog(response.message)
+            Gdx.app.log("UI", "::leaveToLobby Error: ${response.message}")
         }
-        */
+    }
 
-        // if he succed we stop the swipe detector
-        swipeDetector.active = false
+    private fun playerLeftGame(args: Array<Any>){
+        val data: JSONObject = args[0] as JSONObject
+        val response: PlayerLeftGame = Gson().fromJson(data.toString(), PlayerLeftGame::class.java)
+        Gdx.app.debug("UI", "GameState::playerLeftGame(%s, %b)".format(response.id, response.success))
+        if (response.success) {
+            //TODO Stop rendering 'response.id' player.
+        } else {
+            Gdx.app.log("UI", "::playerLeftGame Error: ${response.message}")
+        }
     }
 }
-
 
 class GameWidget(val ecs: SnakeECSEngine,
                  private val fieldWidth: Float,
                  private val fieldHeight: Float): Widget() {
 
-    val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
+    private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
 
     // The SpriteBatch used for rendering the game
-    val sb = SpriteBatch()
+    private val sb = SpriteBatch()
 
-    fun updateSize() {
+    private fun updateSize() {
 
         width = MenuBaseState.VIRTUAL_WIDTH * 0.8f
         height = MenuBaseState.VIRTUAL_HEIGHT
