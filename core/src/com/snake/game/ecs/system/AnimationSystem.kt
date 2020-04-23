@@ -7,7 +7,7 @@ import com.snake.game.ecs.entity.Entity
 /**
  * Updates animations of entities with an AnimatedSprite component.
  */
-object AnimationSystem: System(ComponentType.AnimatedSprite) {
+object AnimationSystem : System(ComponentType.AnimatedSprite) {
     override fun update(dt: Float, entity: Entity) {
         var animComponent: AnimatedSpriteComponent = entity.getComponent(ComponentType.AnimatedSprite) as AnimatedSpriteComponent
         animComponent.time += dt

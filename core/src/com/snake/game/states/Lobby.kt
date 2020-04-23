@@ -9,8 +9,9 @@ import com.google.gson.Gson
 import com.snake.game.backend.*
 import org.json.JSONObject
 
-class Lobby(private val roomId: String,
-            players: MutableList<Player>
+class Lobby(
+    private val roomId: String,
+    players: MutableList<Player>
 ) : MenuBaseState() {
     private val playerId: String = SocketService.socket.id()
     private val playersList = Table()

@@ -8,7 +8,7 @@ object Data {
                 JSONObject("""{"nickname":"$nickname", "room_id":"$roomId", "password":"$password"}""")
             }
 
-    val SWIPE: (String) -> JSONObject = { swipeDirection: String->
+    val SWIPE: (String) -> JSONObject = { swipeDirection: String ->
         JSONObject("""{"direction":"$swipeDirection"}""")
     }
 }
