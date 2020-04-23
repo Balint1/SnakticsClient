@@ -1,6 +1,9 @@
 package com.snake.game.controls
 
 import com.badlogic.gdx.input.GestureDetector
+import com.snake.game.backend.Data
+import com.snake.game.backend.Events
+import com.snake.game.backend.SocketService
 import com.sun.org.apache.xpath.internal.functions.FuncFalse
 
 object SwipeDetector : GestureDetector(DirectionGestureListener()) {
@@ -8,21 +11,25 @@ object SwipeDetector : GestureDetector(DirectionGestureListener()) {
     public fun up(){
         if(active) {
             println("SWIPE UP")
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
         }
     }
     public fun down(){
         if(active) {
             println("SWIPE DOWN")
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
         }
     }
     public fun left(){
         if(active) {
             println("SWIPE LEFT")
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
         }
     }
     public fun right(){
         if(active) {
             println("SWIPE RIGHT")
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
         }
     }
     private class DirectionGestureListener() : GestureAdapter() {
