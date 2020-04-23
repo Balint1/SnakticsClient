@@ -66,7 +66,7 @@ open class CreateRoom : MenuBaseState() {
         if (response.success) {
             StateManager.push(JoinRoomState(response.id, response.name, nicknameField.text, password))
         } else {
-            showMessageDialog(response.message)
+            showButtonDialog(response.message, "Ok")
         }
     }
 }

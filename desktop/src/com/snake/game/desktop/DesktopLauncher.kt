@@ -3,8 +3,8 @@ package com.snake.game.desktop
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.snake.game.SnakeGame
-import com.snake.game.states.MenuBaseState.Companion.VIRTUAL_HEIGHT
-import com.snake.game.states.MenuBaseState.Companion.VIRTUAL_WIDTH
+import com.snake.game.states.BaseState.Companion.VIRTUAL_HEIGHT
+import com.snake.game.states.BaseState.Companion.VIRTUAL_WIDTH
 
 object DesktopLauncher {
     @JvmStatic

@@ -38,7 +38,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         val uiGroup = VerticalGroup()
 
         val splitPane = SplitPane(uiGroup, gameWidget, false, skin)
-        splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
+        splitPane.setBounds(0f, 0f, BaseState.VIRTUAL_WIDTH, BaseState.VIRTUAL_HEIGHT)
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
@@ -124,6 +124,20 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         ecs.update(dt)
     }
 
+    override fun onBackPressed() {
+        Gdx.app.log("UI", "GameState::onBackPressed")
+        showButtonDialog("Are you sure you want to exit the game?", "Yes", "No") {
+            if(it == 0) {
+                Gdx.app.log("SocketIO", "GameState::onBackPressed - Yes")
+                SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
+            }
+            else
+            {
+                Gdx.app.log("SocketIO", "GameState::onBackPressed - No")
+            }
+        }
+    }
+
     /**
      * Called when the player success or fails to leave to the lobby
      *
@@ -167,8 +181,8 @@ class GameWidget(
 
     private fun updateSize() {
 
-        width = MenuBaseState.VIRTUAL_WIDTH * 0.8f
-        height = MenuBaseState.VIRTUAL_HEIGHT
+        width = BaseState.VIRTUAL_WIDTH * 0.8f
+        height = BaseState.VIRTUAL_HEIGHT
 
         viewport.update(width.toInt(), height.toInt(), true)
         viewport.setScreenBounds(x.toInt(), y.toInt(), width.toInt(), height.toInt())

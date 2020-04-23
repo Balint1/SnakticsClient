@@ -59,7 +59,7 @@ class MainMenu : MenuBaseState() {
                 addElement(this)
             }
         } else {
-            showMessageDialog(message)
+            showButtonDialog(message, "Ok")
         }
     }
 
@@ -74,9 +74,9 @@ class MainMenu : MenuBaseState() {
         if (trying) {
             showWaitDialog("Connecting...$seconds")
         } else {
-            showMessageDialog("Couldn't connect", buttonText = "retry", onResult = {
+            showButtonDialog("Couldn't connect","Retry") {
                 SocketService.tryConnect(::onTryingConnect)
-            })
+            }
         }
     }
 }

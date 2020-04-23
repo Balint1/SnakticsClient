@@ -51,9 +51,9 @@ class JoinRoomState(
         if (response.success) {
             StateManager.push(Lobby(response.roomId, response.players))
         } else {
-            showMessageDialog(response.message, onResult = {
+            showButtonDialog(response.message, "Ok") {
                 StateManager.pop()
-            })
+            }
         }
     }
 }

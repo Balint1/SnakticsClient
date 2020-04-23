@@ -54,7 +54,7 @@ class Lobby(
         if (response.success) {
             StateManager.push(GameState(roomId, playerId))
         } else {
-            showMessageDialog(response.message)
+            showButtonDialog(response.message, "Ok")
         }
     }
 
@@ -70,7 +70,7 @@ class Lobby(
             cancelListeners()
             StateManager.set(MainMenu())
         } else {
-            showMessageDialog(response.message)
+            showButtonDialog(response.message, "Ok")
         }
     }
 
@@ -120,7 +120,7 @@ class Lobby(
         val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
         Gdx.app.debug("UI", "Lobby::assignOwner(%b)".format(response.success))
         if (response.success) {
-            showMessageDialog("Now you are the room owner ")
+            showButtonDialog("Now you are the room owner ", "Ok")
         }
     }
 

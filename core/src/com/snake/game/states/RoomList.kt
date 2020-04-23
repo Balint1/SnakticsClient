@@ -36,7 +36,7 @@ class RoomList : MenuBaseState() {
      */
     private fun updateRooms() {
         Gdx.app.debug("UI", "RoomList::updateRooms")
-        showMessageDialog("Getting rooms...", "Cancel") {
+        showButtonDialog("Getting rooms...", "Cancel") {
             HttpService.cancelGetRooms()
             StateManager.pop()
         }
