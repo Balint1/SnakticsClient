@@ -7,14 +7,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-<<<<<<< HEAD
-import com.snake.game.controls.JoystickInput
-=======
 import com.snake.game.backend.SocketService
 import com.snake.game.backend.Events
 import com.snake.game.backend.SimpleResponse
 import com.snake.game.backend.PlayerLeftGame
->>>>>>> 0a2399db022bd20244052b49dcca854942b82c70
 import com.snake.game.controls.SwipeDetector
 import com.google.gson.Gson
 import com.snake.game.backend.*
