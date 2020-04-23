@@ -1,5 +1,6 @@
 package com.snake.game.states
 
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 
@@ -25,15 +26,20 @@ class CreateAdvancedRoom : CreateRoom() {
         addElement(nicknameField)
         addElements(passwordField, capacityField, spacing = SPACING)
 
-        val create = createTextButton("Create", (ELEMENT_WIDTH - SPACING) / 2f) {
+        val create = createTextButton("Create", (ELEMENT_WIDTH - SPACING) / 3f) {
             password = passwordField.text
             createRoom(nameField.text, password, capacityField.selected)
         }
 
-        val back = createTextButton("Back", (ELEMENT_WIDTH - SPACING) / 2f) {
+        val back = createTextButton("Back", (ELEMENT_WIDTH - SPACING) / 3f) {
             StateManager.pop()
         }
 
-        addElements(back, create, spacing = SPACING)
+        val settingsTexture = Texture("buttons/settings.png")
+        val advancedSettings = creteImageButton(settingsTexture, ELEMENT_HEIGHT * 2 / 3, ELEMENT_HEIGHT * 2 / 3) {
+            StateManager.push(AdvancedSettings())
+        }
+
+        addElements(back, create, advancedSettings, spacing = SPACING)
     }
 }
