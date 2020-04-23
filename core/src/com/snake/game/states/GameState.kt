@@ -3,9 +3,7 @@ package com.snake.game.states
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
-import com.badlogic.gdx.scenes.scene2d.ui.Slider
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.utils.viewport.ExtendViewport
@@ -13,8 +11,6 @@ import com.snake.game.backend.SocketService
 import com.snake.game.backend.Events
 import com.snake.game.backend.SimpleResponse
 import com.snake.game.backend.PlayerLeftGame
-import com.snake.game.backend.Data
-import com.snake.game.controls.JoystickInput
 import com.snake.game.controls.SwipeDetector
 import com.google.gson.Gson
 import com.snake.game.ecs.SnakeECSEngine
