@@ -24,8 +24,6 @@ import org.json.JSONObject
 
 
 class GameState(private val roomId: String, private val playerId: String) : BaseState() {
-    private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
-    private val joystickInput: JoystickInput = JoystickInput()
     private val swipeDetector = SwipeDetector
 
     // TODO get from backend
@@ -48,25 +46,9 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         splitPane.maxSplitAmount = 0.2f
 
         stage.addActor(splitPane)
+        //element can be added to  the side panel with :
+        //uiGroup.addActor(joystickInput.touchpad)
 
-        uiGroup.addActor(joystickInput.touchpad)
-
-        joystickInput.touchpad.addListener(object : ChangeListener() {
-            @Override
-            override fun changed(event: ChangeEvent?, actor: Actor?) {
-                emitJoystickValue(joystickInput.touchpad.knobPercentX, joystickInput.touchpad.knobPercentY)
-                System.out.println("emiting joystick change...")
-            }
-        });
-
-        slider.value = 0f
-        slider.addListener(object : ChangeListener() {
-            override fun changed(event: ChangeEvent?, actor: Actor?) {
-                emitSliderValue(slider.value.toInt())
-            }
-        })
-
-        uiGroup.addActor(slider)
 
         createTextButton("back") {
             HttpService.leaveRoom(roomId, playerId, ::onGameLeft)
@@ -84,14 +66,6 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         super.activated()
 
         ecs.createEntities()
-    }
-
-    private fun emitSliderValue(value: Int) {
-        SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
-    }
-    private fun emitJoystickValue(x: Float,y : Float){
-        var value: Float = x*3
-        SocketService.socket.emit(Events.JOYSTICK_CHANGE.value, Data.JOYSTICK_CHANGE(value))
     }
 
     private fun addListeners() {
