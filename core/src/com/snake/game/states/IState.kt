@@ -47,4 +47,12 @@ interface IState {
      * @param height The new height of the window
      */
     fun resize(width: Int, height: Int)
+
+    /**
+     * Called when the physical back button is pressed
+     *
+     */
+    fun onBackPressed() {
+        StateManager.pop();
+    }
 }

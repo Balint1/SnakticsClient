@@ -40,4 +40,8 @@ class SnakeGame : ApplicationAdapter() {
         super.resize(width, height)
         StateManager.resize(width, height)
     }
+
+    fun onBackPressed() {
+        StateManager.onBackPressed()
+    }
 }

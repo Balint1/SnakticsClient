@@ -1,5 +1,6 @@
 package com.snake.game.states
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 import java.util.Stack
@@ -18,7 +19,11 @@ object StateManager {
         val old = states.pop()
         old.deactivated()
         old.dispose()
-        states.peek().activated()
+
+        if(states.empty())
+            Gdx.app.exit()
+        else
+            states.peek().activated()
     }
 
     fun set(state: IState) {
@@ -43,5 +48,9 @@ object StateManager {
         for (s in states) {
             s.resize(width, height)
         }
+    }
+
+    fun onBackPressed() {
+        states.peek().onBackPressed()
     }
 }
