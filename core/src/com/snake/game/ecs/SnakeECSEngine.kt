@@ -1,6 +1,5 @@
 package com.snake.game.ecs
 
-import com.snake.game.ecs.entity.EntityFactory
 import com.snake.game.ecs.system.AnimationSystem
 import com.snake.game.ecs.system.ComponentSyncSystem
 import com.snake.game.ecs.system.RenderingSystem
@@ -12,8 +11,6 @@ object SnakeECSEngine : ECSEngine(
 
     fun createEntities() {
         entityManager.clearEntities()
-
-        val factory = EntityFactory
 
         // Testing
         // var test = Entity(UUID.randomUUID().toString(), entityManager)
