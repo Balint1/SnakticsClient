@@ -1,6 +1,8 @@
 package com.snake.game.ecs.component
 
-class MovementComponent(val maxSpeed: Float) : Component(ComponentType.Movement) {
+import com.google.gson.JsonObject
+
+class MovementComponent() : Component(ComponentType.Movement) {
     // Velocity
     var vx: Float = 0f
     var vy: Float = 0f
@@ -8,4 +10,5 @@ class MovementComponent(val maxSpeed: Float) : Component(ComponentType.Movement)
     // Acceleration
     var ax: Float = 0f
     var ay: Float = 0f
+
 }

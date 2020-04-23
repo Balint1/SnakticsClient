@@ -270,6 +270,24 @@ splitpane
   orig: 10, 10
   offset: 0, 0
   index: -1
+vertical-splitpane
+  rotate: false
+  xy: 1003, 246
+  size: 20, 9
+  split: 0, 0, 4, 4
+  pad: 0, 0, 2, 2
+  orig: 20, 9
+  offset: 0, 0
+  index: -1
+horizontal-splitpane
+  rotate: false
+  xy: 255, 31
+  size: 9, 20
+  split: 4, 4, 0, 0
+  pad: -1, -1, 0, 0
+  orig: 9, 20
+  offset: 0, 0
+  index: -1
 text-field
   rotate: false
   xy: 1, 94

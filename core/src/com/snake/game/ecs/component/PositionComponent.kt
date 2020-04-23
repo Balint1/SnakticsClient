@@ -1,5 +1,14 @@
 package com.snake.game.ecs.component
 
-class PositionComponent(var x: Float, var y: Float) : Component(ComponentType.Position) {
-    constructor() : this(0f, 0f)
+import org.json.JSONObject
+
+class PositionComponent(): Component(ComponentType.Position) {
+    var x: Float = 0f
+    var y: Float = 0f
+
+    override fun updateFromJSON(data: JSONObject) {
+        val pos = data.getJSONObject("position")
+        x = pos.getDouble("x").toFloat()
+        y = pos.getDouble("y").toFloat()
+    }
 }

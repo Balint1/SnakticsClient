@@ -11,7 +11,10 @@ import kotlin.collections.HashSet
  * @constructor Creates an Entity Manager with no entities.
  */
 class EntityManager {
-    private var entities: HashSet<Entity> = HashSet()
+    // Store entities by ID
+    private var entities: HashMap<String, Entity> = HashMap()
+
+    // Map each component type to a list of entities that have that component
     private var entityMap: EnumMap<ComponentType, HashSet<Entity>> = EnumMap(ComponentType::class.java)
 
     init {
@@ -26,8 +29,26 @@ class EntityManager {
             entityMap[componentType] = HashSet()
     }
 
+    /**
+     * Get whether or not the entity manager has an entity with the given ID.
+     * @param entityId an entity UUID.
+     * @return true if an entity with the given id exists, else false.
+     */
+    fun hasEntity(entityId: String): Boolean {
+        return entities.containsKey(entityId)
+    }
+
+    /**
+     * Get an entity by its ID.
+     * @param entityId an entity UUID.
+     * @return the entity if it exists, else null.
+     */
+    fun getEntity(entityId: String): Entity? {
+        return entities[entityId]
+    }
+
     internal fun addEntity(entity: Entity) {
-        entities.add(entity)
+        entities[entity.id] = entity
         for (c in entity.getComponents())
             mapEntityComponent(c.type, entity)
     }

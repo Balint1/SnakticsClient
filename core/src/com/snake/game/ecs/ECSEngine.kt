@@ -18,17 +18,20 @@ open class ECSEngine(vararg systems: System) {
     fun update(dt: Float) {
         for (system in systems) {
             // Update all entities that match the component tree for this system
-            for (entity in entityManager.getEntities(system.componentTypes))
-                system.update(dt, entity)
+            var entities = entityManager.getEntities(system.componentTypes)
+            for (i in entities.indices)
+                system.update(dt, entities.elementAt(i))
         }
     }
 
     /**
      * Render the entities.
      * @param sb a sprite batch
+     * @param width the world width
+     * @param height the world height
      */
-    fun render(sb: SpriteBatch) {
+    fun render(sb: SpriteBatch, width: Float, height: Float) {
         for (system in systems)
-            system.render(sb)
+            system.render(sb, entityManager, width, height)
     }
 }

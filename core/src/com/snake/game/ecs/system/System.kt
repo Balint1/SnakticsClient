@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.ComponentTypeTree
 import com.snake.game.ecs.entity.Entity
+import com.snake.game.ecs.entity.EntityManager
 
 abstract class System(var componentTypes: ComponentTypeTree) {
     constructor(componentType: ComponentType) : this(ComponentTypeTree(componentType))
@@ -17,6 +18,10 @@ abstract class System(var componentTypes: ComponentTypeTree) {
 
     /**
      * Render function that can be overridden to add rendering capabilities to the system.
+     * @param sb a sprite batch
+     * @param em the entity manager (could pass the entities instead the same way we do in update(), but we want freedom on rendering order)
+     * @param width the world width
+     * @param height the world height
      */
-    fun render(sb: SpriteBatch) {}
+    open fun render(sb: SpriteBatch, em: EntityManager, width: Float, height: Float) {}
 }
