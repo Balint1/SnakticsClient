@@ -19,6 +19,7 @@ enum class Events(val value: String) {
     JOIN_REQUEST("join-request"),
     JOIN_RESPONSE("join-response"),
     UPDATE("update-state"),
+    DELETE_ENTITIES("delete-entities"),
     SWIPE("swipe"),
     OWNER_CHANGED("owner-changed"),
     LEAVE_RESPONSE("leave-response"),

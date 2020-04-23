@@ -15,7 +15,7 @@ class EntityManager {
     private var entities: HashMap<String, Entity> = HashMap()
 
     // Map each component type to a list of entities that have that component
-    private var entityMap: EnumMap<ComponentType, HashSet<Entity>> = EnumMap(ComponentType::class.java)
+    private var entityMap: EnumMap<ComponentType, ArrayList<Entity>> = EnumMap(ComponentType::class.java)
 
     init {
         clearEntities()
@@ -26,7 +26,7 @@ class EntityManager {
 
         // For each component type, create an empty set that will store references to all entities with that component type
         for (componentType in ComponentType.values())
-            entityMap[componentType] = HashSet()
+            entityMap[componentType] = ArrayList()
     }
 
     /**
@@ -75,20 +75,33 @@ class EntityManager {
     /**
      * Get all entities that match the component type tree.
      * @param componentTree a component type tree (i.e. (Position and Movement) or (Collision and Position and Movement))
-     * @return a set of entities that match the given [componentTree]
+     * @return a list of entities that match the given [componentTree]
      */
-    fun getEntities(componentTree: ComponentTypeTree): Set<Entity> {
+    fun getEntities(componentTree: ComponentTypeTree): List<Entity> {
         return when {
             // Leaf node
             componentTree.leftChild == null -> entityMap[componentTree.node.type]!!
             // AND
             componentTree.node.operator == ComponentTypeOperator.AND ->
-                getEntities(componentTree.leftChild!!).intersect(getEntities(componentTree.rightChild!!))
+                getEntities(componentTree.leftChild!!).intersect(getEntities(componentTree.rightChild!!)).toList()
             // OR
             componentTree.node.operator == ComponentTypeOperator.OR ->
-                getEntities(componentTree.leftChild!!).union(getEntities(componentTree.rightChild!!))
+                getEntities(componentTree.leftChild!!).union(getEntities(componentTree.rightChild!!)).toList()
             // Should never happen
-            else -> HashSet()
+            else -> ArrayList()
+        }
+    }
+
+    /**
+     * Removes an entity by ID.
+     * @param entityId the ID of an entity
+     */
+    fun removeEntity(entityId: String) {
+        if(hasEntity(entityId)) {
+            for(component in entities[entityId]!!.getComponents())
+                entityMap[component.type]!!.filter { e -> e.id != entityId}
+
+            entities.remove(entityId)
         }
     }
 }

@@ -13,6 +13,7 @@ import com.snake.game.backend.SimpleResponse
 import com.snake.game.backend.PlayerLeftGame
 import com.snake.game.controls.SwipeDetector
 import com.google.gson.Gson
+import com.snake.game.backend.*
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.componentTypeFromInternalName
@@ -66,6 +67,9 @@ class GameState(private val roomId: String, private val playerId: String) : Base
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
             onStateUpdate(args)
+        }.on(Events.DELETE_ENTITIES.value) { args ->
+            Gdx.app.log("SocketIO", "DELETE_ENTITY")
+            deleteEntities(args)
         }.on(Events.PLAYER_LEFT_GAME.value) { args ->
             Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
             playerLeftGame(args)
@@ -93,6 +97,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
             val state = data.getJSONArray("state")
             Gdx.app.log("SocketIO", "state: $state")
 
+            // Update components
             for (i in 0 until state.length()) {
                 val componentData = state.getJSONObject(i)
                 val id: String = componentData.getString("entityId")
@@ -117,6 +122,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
             Gdx.app.log("SocketIO", "Error getting attributes: $e")
         }
     }
+
 
     override fun update(dt: Float) {
         super.update(dt)
@@ -165,6 +171,13 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         } else {
             Gdx.app.log("UI", "::playerLeftGame Error: ${response.message}")
         }
+    }
+
+    private fun deleteEntities(args: Array<Any>) {
+        val data: DeleteEntities = Gson().fromJson((args[0] as JSONObject).toString(), DeleteEntities::class.java)
+
+        for(entityId in data.entityIds)
+            ecs.removeEntity(entityId)
     }
 }
 

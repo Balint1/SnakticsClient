@@ -34,4 +34,12 @@ open class ECSEngine(vararg systems: System) {
         for (system in systems)
             system.render(sb, entityManager, width, height)
     }
+
+    /**
+     * Removes an entity with a given id.
+     * @param entityId the ID of an entity
+     */
+    fun removeEntity(entityId: String) {
+        entityManager.removeEntity(entityId)
+    }
 }

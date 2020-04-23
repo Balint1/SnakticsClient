@@ -50,3 +50,7 @@ data class PlayerLeftGame(
     var success: Boolean,
     var message: String
 )
+
+data class DeleteEntities(
+    var entityIds: List<String>
+)
