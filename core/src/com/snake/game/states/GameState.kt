@@ -4,10 +4,17 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import com.badlogic.gdx.scenes.scene2d.ui.Slider
+import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
+import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.snake.game.backend.*
+import com.snake.game.backend.SocketService
+import com.snake.game.backend.Events
+import com.snake.game.backend.SimpleResponse
+import com.snake.game.backend.PlayerLeftGame
+import com.snake.game.backend.Data
 import com.snake.game.controls.JoystickInput
 import com.snake.game.controls.SwipeDetector
 import com.google.gson.Gson
@@ -19,7 +26,6 @@ import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
 
-
 class GameState(private val roomId: String, private val playerId: String) : BaseState() {
     private val slider: Slider = Slider(-3f, 3f, 1f, false, skin)
     private val joystickInput: JoystickInput = JoystickInput()
@@ -27,7 +33,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
-    private val FIELD_HEIGHT: Float    = 300f
+    private val FIELD_HEIGHT: Float = 300f
 
     private val ecs = SnakeECSEngine
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
@@ -38,8 +44,8 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
         val uiGroup = VerticalGroup()
 
-        val splitPane = SplitPane(uiGroup, gameWidget, false,  skin)
-        splitPane.setBounds(0f,0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
+        val splitPane = SplitPane(uiGroup, gameWidget, false, skin)
+        splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
@@ -73,7 +79,6 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
         // we add swipe listener :
         swipeDetector.active = true
-
     }
 
     override fun activated() {
@@ -85,18 +90,18 @@ class GameState(private val roomId: String, private val playerId: String) : Base
     private fun emitSliderValue(value: Int) {
         SocketService.socket.emit(Events.SLIDER_CHANGE.value, Data.SLIDER_CHANGE(value))
     }
-    private fun emitJoystickValue(x: Float,y : Float){
-        val value: Float = x*3
+    private fun emitJoystickValue(x: Float, y: Float) {
+        val value: Float = x * 3
         SocketService.socket.emit(Events.JOYSTICK_CHANGE.value, Data.JOYSTICK_CHANGE(value))
     }
 
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
             onStateUpdate(args)
-        }.on(Events.PLAYER_LEFT_GAME.value) {args ->
+        }.on(Events.PLAYER_LEFT_GAME.value) { args ->
             Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
             playerLeftGame(args)
-        }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) {args ->
+        }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
             Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
             leaveToLobby(args)
         }
@@ -107,7 +112,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         SocketService.socket.off(Events.LEAVE_TO_LOBBY_RESPONSE.value)
         SocketService.socket.off(Events.UPDATE.value)
     }
-    private fun cancelOldListeners(){
+    private fun cancelOldListeners() {
         SocketService.socket.off(Events.OWNER_CHANGED.value)
         SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
@@ -120,7 +125,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
             val state = data.getJSONArray("state")
             Gdx.app.log("SocketIO", "state: $state")
 
-            for(i in 0 until state.length()) {
+            for (i in 0 until state.length()) {
                 val componentData = state.getJSONObject(i)
                 val id: String = componentData.getString("entityId")
                 val componentTypeName = componentData.getString("componentType")
@@ -129,19 +134,17 @@ class GameState(private val roomId: String, private val playerId: String) : Base
                         ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
-                if(!em.hasEntity(id))
+                if (!em.hasEntity(id))
                     Entity(id, em)
                 val entity = em.getEntity(id)!!
 
                 // Create the component if necessary
-                if(!entity.hasComponent(componentType!!))
+                if (!entity.hasComponent(componentType!!))
                     entity.addComponent(createComponent(componentType))
 
                 val component = entity.getComponent(componentType)!!
                 component.updateFromJSON(componentData)
-
             }
-
         } catch (e: JSONException) {
             Gdx.app.log("SocketIO", "Error getting attributes: $e")
         }
@@ -171,21 +174,23 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         }
     }
 
-    private fun playerLeftGame(args: Array<Any>){
+    private fun playerLeftGame(args: Array<Any>) {
         val data: JSONObject = args[0] as JSONObject
         val response: PlayerLeftGame = Gson().fromJson(data.toString(), PlayerLeftGame::class.java)
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s, %b)".format(response.id, response.success))
         if (response.success) {
-            //TODO Stop rendering 'response.id' player.
+            // TODO Stop rendering 'response.id' player.
         } else {
             Gdx.app.log("UI", "::playerLeftGame Error: ${response.message}")
         }
     }
 }
 
-class GameWidget(val ecs: SnakeECSEngine,
-                 private val fieldWidth: Float,
-                 private val fieldHeight: Float): Widget() {
+class GameWidget(
+    val ecs: SnakeECSEngine,
+    private val fieldWidth: Float,
+    private val fieldHeight: Float
+) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
 

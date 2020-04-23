@@ -10,10 +10,10 @@ object Data {
     val SLIDER_CHANGE: (Int) -> JSONObject = { value: Int ->
         JSONObject("""{"value":"$value"}""")
     }
-    val JOYSTICK_CHANGE: (Float) -> JSONObject = { x: Float->
+    val JOYSTICK_CHANGE: (Float) -> JSONObject = { x: Float ->
         JSONObject("""{"value":"$x"}""")
     }
-    val SWIPE: (String) -> JSONObject = { swipeDirection: String->
+    val SWIPE: (String) -> JSONObject = { swipeDirection: String ->
         JSONObject("""{"direction":"$swipeDirection"}""")
     }
 }
@@ -31,6 +31,6 @@ enum class Events(val value: String) {
     LEAVE_RESPONSE("leave-response"),
     LEAVE_TO_LOBBY("leave-to-lobby"),
     PLAYER_LEFT_GAME("player-left-game"),
-    LEAVE_TO_LOBBY_RESPONSE ("leave-to-lobby-response"),
+    LEAVE_TO_LOBBY_RESPONSE("leave-to-lobby-response"),
     START_GAME("start-game")
 }

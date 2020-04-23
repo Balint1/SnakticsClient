@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 
 import com.snake.game.backend.SocketService
-import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.states.MainMenu
 import com.snake.game.states.StateManager
 

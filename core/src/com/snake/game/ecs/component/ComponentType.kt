@@ -1,7 +1,5 @@
 package com.snake.game.ecs.component
 
-import kotlin.reflect.typeOf
-
 enum class ComponentType(val internalName: String) {
     Tag("tag"),
     Player("player"),
@@ -30,8 +28,8 @@ enum class ComponentType(val internalName: String) {
  * @return the associated component type, if it exists (else null).
  */
 fun componentTypeFromInternalName(internalName: String): ComponentType? {
-    for(type in ComponentType.values()) {
-        if(type.internalName == internalName)
+    for (type in ComponentType.values()) {
+        if (type.internalName == internalName)
             return type
     }
     return null
@@ -43,7 +41,7 @@ fun componentTypeFromInternalName(internalName: String): ComponentType? {
  * @return a component of the given type
  */
 fun createComponent(type: ComponentType): Component {
-    return when(type) {
+    return when (type) {
         ComponentType.Position -> PositionComponent()
         ComponentType.Movement -> MovementComponent()
         ComponentType.Tag -> TagComponent()

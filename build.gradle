@@ -12,7 +12,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:3.6.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }
 }
@@ -97,8 +97,7 @@ project(":core") {
         api "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
         implementation "io.socket:socket.io-client:0.8.3"
-        implementation 'com.github.jkcclemens:khttp:0.1.0'
         implementation 'com.google.code.gson:gson:2.8.5'
-        implementation 'com.squareup.okhttp3:okhttp:4.4.0'
+        implementation 'com.squareup.okhttp3:okhttp:4.5.0'
     }
 }

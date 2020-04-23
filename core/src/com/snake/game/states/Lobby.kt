@@ -6,11 +6,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.google.gson.Gson
-import com.snake.game.backend.*
+import com.snake.game.backend.Player
+import com.snake.game.backend.SocketService
+import com.snake.game.backend.SimpleResponse
+import com.snake.game.backend.HttpService
+import com.snake.game.backend.Events
+import com.snake.game.backend.UpdatedList
 import org.json.JSONObject
 
-class Lobby(private val roomId: String,
-            players: MutableList<Player>
+class Lobby(
+    private val roomId: String,
+    players: MutableList<Player>
 ) : MenuBaseState() {
     private val playerId: String = SocketService.socket.id()
     private val playersList = Table()
@@ -34,7 +40,7 @@ class Lobby(private val roomId: String,
             HttpService.leaveRoom(roomId, playerId, ::onLeaveRoom)
         }
 
-        addElements(playBtn, leaveBtn, spacing = SPACING)
+        addElements(leaveBtn, playBtn, spacing = SPACING)
     }
 
     /**
