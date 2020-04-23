@@ -4,7 +4,11 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.snake.game.ecs.component.*
+import com.snake.game.ecs.component.ComponentType
+import com.snake.game.ecs.component.PositionComponent
+import com.snake.game.ecs.component.SpriteComponent
+import com.snake.game.ecs.component.AnimatedSpriteComponent
+import com.snake.game.ecs.component.TagComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
 

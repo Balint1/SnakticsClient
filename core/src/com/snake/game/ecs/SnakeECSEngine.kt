@@ -4,7 +4,6 @@ import com.snake.game.ecs.entity.EntityFactory
 import com.snake.game.ecs.system.AnimationSystem
 import com.snake.game.ecs.system.ComponentSyncSystem
 import com.snake.game.ecs.system.RenderingSystem
-import java.util.*
 
 object SnakeECSEngine : ECSEngine(
         ComponentSyncSystem, AnimationSystem, RenderingSystem) {

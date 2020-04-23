@@ -44,3 +44,9 @@ data class JoinResponse(
     var message: String,
     var players: MutableList<Player>
 )
+
+data class PlayerLeftGame(
+    var id: String,
+    var success: Boolean,
+    var message: String
+)

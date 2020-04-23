@@ -6,7 +6,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.google.gson.Gson
-import com.snake.game.backend.*
+import com.snake.game.backend.Player
+import com.snake.game.backend.SocketService
+import com.snake.game.backend.SimpleResponse
+import com.snake.game.backend.HttpService
+import com.snake.game.backend.Events
+import com.snake.game.backend.UpdatedList
 import org.json.JSONObject
 
 class Lobby(
@@ -35,7 +40,7 @@ class Lobby(
             HttpService.leaveRoom(roomId, playerId, ::onLeaveRoom)
         }
 
-        addElements(playBtn, leaveBtn, spacing = SPACING)
+        addElements(leaveBtn, playBtn, spacing = SPACING)
     }
 
     /**
@@ -87,7 +92,7 @@ class Lobby(
             Gdx.app.postRunnable {
                 insertPlayer(player)
             }
-        }.on(Events.PLAYER_LEFT.value) { args ->
+        }.on(Events.PLAYER_LEFT_ROOM.value) { args ->
             val data: JSONObject = args[0] as JSONObject
             val updatedList: UpdatedList = Gson().fromJson(data.toString(), UpdatedList::class.java)
             Gdx.app.postRunnable {
@@ -107,8 +112,7 @@ class Lobby(
         SocketService.socket.off(Events.OWNER_CHANGED.value)
         SocketService.socket.off(Events.LEAVE_RESPONSE.value)
         SocketService.socket.off(Events.JOIN_RESPONSE.value)
-        SocketService.socket.off(Events.UPDATE.value)
-        SocketService.socket.off(Events.PLAYER_LEFT.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
 
     private fun assignOwner(args: Array<Any>) {
