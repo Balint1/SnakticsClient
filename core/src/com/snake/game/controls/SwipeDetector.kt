@@ -10,26 +10,22 @@ object SwipeDetector : GestureDetector(DirectionGestureListener()) {
     var active: Boolean = false
     public fun up(){
         if(active) {
-            println("SWIPE UP")
             SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
         }
     }
     public fun down(){
         if(active) {
-            println("SWIPE DOWN")
-            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("down"))
         }
     }
     public fun left(){
         if(active) {
-            println("SWIPE LEFT")
-            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("left"))
         }
     }
     public fun right(){
         if(active) {
-            println("SWIPE RIGHT")
-            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("up"))
+            SocketService.socket.emit(Events.SWIPE.value, Data.SWIPE("right"))
         }
     }
     private class DirectionGestureListener() : GestureAdapter() {
