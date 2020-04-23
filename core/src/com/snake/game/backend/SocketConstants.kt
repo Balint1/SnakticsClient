@@ -31,7 +31,6 @@ enum class Events(val value: String) {
     LEAVE_RESPONSE("leave-response"),
     LEAVE_TO_LOBBY("leave-to-lobby"),
     PLAYER_LEFT_GAME("player-left-game"),
-    LEAVE_TO_LOBBY_RESPONSE ("leave-to-lobby-response")
-    LEAVE_RESPONSE("leave-response"),
+    LEAVE_TO_LOBBY_RESPONSE ("leave-to-lobby-response"),
     START_GAME("start-game")
 }
