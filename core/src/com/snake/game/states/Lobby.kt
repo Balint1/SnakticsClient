@@ -102,6 +102,8 @@ class Lobby(
             Gdx.app.postRunnable {
                 StateManager.push(GameState(roomId, playerId))
             }
+        }.on(Events.UPDATE.value) {
+            Gdx.app.log("PROBLEM","received update while in menu state")
         }
     }
 
@@ -113,6 +115,7 @@ class Lobby(
         SocketService.socket.off(Events.LEAVE_RESPONSE.value)
         SocketService.socket.off(Events.JOIN_RESPONSE.value)
         SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
+        SocketService.socket.off(Events.UPDATE.value)
     }
 
     private fun assignOwner(args: Array<Any>) {

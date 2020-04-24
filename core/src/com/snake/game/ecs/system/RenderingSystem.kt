@@ -44,13 +44,11 @@ object RenderingSystem : System(ComponentType.Position) {
         val sr = ShapeRenderer()
 
         sr.projectionMatrix = sb.projectionMatrix
-
+        sr.begin(ShapeType.Filled)
 
         // Background
         sr.color = BACKGROUND_COLOR
-        sr.begin(ShapeRenderer.ShapeType.Filled)
         sr.rect(0f, 0f, worldWidth, worldHeight)
-        sr.end()
 
         // Iterate over indices to avoid ConcurrentModificationException
         for (i in 0 until entities.size) {
@@ -68,31 +66,26 @@ object RenderingSystem : System(ComponentType.Position) {
 
                 // Render snake head
                 if(tag == TagComponent.EntityTagType.SnakeHead) {
-                    sr.begin(ShapeType.Filled)
+
                     //sr.color = Color.FOREST
                     //sr.circle(pos.x, pos.y, SNAKE_RADIUS * 1.5f)
                     renderSnake(sb, em, entity, sr)
-                    sr.end()
                 }
                 else if (tag == TagComponent.EntityTagType.SnakeBody) {
 
                 }
                 else {
                     // Temporary render
-                    sr.begin(ShapeRenderer.ShapeType.Filled)
                     sr.color = Color.YELLOW
                     sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
-                    sr.end()
 
                     debugFont.draw(sb, "TEST STRING", 0f, 0f)
                     debugFont.draw(sb, tag.typeString, pos.x, pos.y)
                 }
             } else {
                 // Temporary render
-                sr.begin(ShapeRenderer.ShapeType.Filled)
                 sr.color = Color.RED
                 sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
-                sr.end()
             }
         }
 
