@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Vector2
 import com.snake.game.ecs.component.*
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
+import kotlin.math.sin
 
 /**
  * Handles rendering entities that have a position and a sprite component.
@@ -112,12 +113,16 @@ object RenderingSystem : System(ComponentType.Position) {
      * @param snakeHead the first snake piece
      */
     private fun renderSnake(sb: SpriteBatch, em: EntityManager, snakeHead: Entity, shapeRenderer: ShapeRenderer) {
-        var pieceId = (snakeHead.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
+        var playerComponent = snakeHead.getComponent(ComponentType.Player) as PlayerComponent
 
+        // Stop rendering the snake once it is dead and decayed
+        if(!playerComponent.alive && !playerComponent.decaying)
+            return
+
+        var pieceId = (snakeHead.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
         var headPosition = snakeHead.getComponent(ComponentType.Position) as PositionComponent
 
         val snakePoints: ArrayList<Vector2> = ArrayList()
-
         // Add the head position twice to force the CatmullRomSpline to start there
         snakePoints.add(Vector2(headPosition.x, headPosition.y))
         snakePoints.add(Vector2(headPosition.x, headPosition.y))
@@ -134,11 +139,20 @@ object RenderingSystem : System(ComponentType.Position) {
         if(pos != null)
             snakePoints.add(Vector2(pos!!.x, pos!!.y))
 
-        val startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
-        val endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
+        var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
+        var endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
+
+        // Handle blinding during decay
+        var alpha = 1.0f
+        if(!playerComponent.alive && playerComponent.decaying) {
+            var blinkTicks = 20
+            alpha = sin(Math.PI * (playerComponent.remainingDecayTicks % blinkTicks) / blinkTicks).toFloat()
+            startColor = Color(0.2f, 0.2f, 0.2f, alpha)
+            endColor = Color(0.12f, 0.12f, 0.12f, alpha)
+        }
 
         // number of points used for rendering the spline
-        var k = snakePoints.size * 5
+        var k = snakePoints.size * 6
 
         val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
         var points = ArrayList<Vector2>()
@@ -150,7 +164,7 @@ object RenderingSystem : System(ComponentType.Position) {
         }
 
         // Draw shadow
-        shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f))
+        shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f*alpha))
         for(i in 0 until points.size)
             shapeRenderer.circle(points[i].x, points[i].y - 2, SNAKE_RADIUS)
 
