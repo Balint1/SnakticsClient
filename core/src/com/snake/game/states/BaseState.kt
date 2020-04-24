@@ -2,13 +2,20 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.snake.game.controls.SwipeDetector
 
@@ -158,6 +165,20 @@ abstract class BaseState() : IState {
         }
         table.setSize(width, height)
         addElement(table, padTop, parent)
+    }
+
+    protected fun creteImageButton(texture: Texture, width: Float = BaseState.ELEMENT_WIDTH, height: Float = BaseState.ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
+        val drawable: Drawable = TextureRegionDrawable(TextureRegion(texture))
+        val button = ImageButton(drawable)
+        button.setSize(width, height)
+        button.touchable = if (isDisabled) Touchable.disabled else Touchable.enabled
+        button.isDisabled = isDisabled
+        button.addListener(object : ClickListener() {
+            override fun clicked(event: InputEvent?, x: Float, y: Float) {
+                onClick()
+            }
+        })
+        return button
     }
 
     companion object {

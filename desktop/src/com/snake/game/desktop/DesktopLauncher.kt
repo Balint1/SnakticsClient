@@ -12,6 +12,8 @@ object DesktopLauncher {
         val config = LwjglApplicationConfiguration()
         config.width = VIRTUAL_WIDTH.toInt()
         config.height = VIRTUAL_HEIGHT.toInt()
+        // Anti-aliasing
+        config.samples = 3
         LwjglApplication(SnakeGame(), config)
     }
 }

@@ -10,6 +10,7 @@ import okhttp3.Call
 import okhttp3.Response
 import okhttp3.RequestBody
 import okhttp3.FormBody
+import org.json.JSONObject
 import java.io.IOException
 
 object HttpService {
@@ -66,13 +67,14 @@ object HttpService {
      * @param capacity maximum allowed players in room
      * @param action a function that will execute when http response is received
      */
-    fun createRoom(name: String, password: String, capacity: Int, action: (CreateRoomResponse) -> Unit) {
+    fun createRoom(name: String, password: String, capacity: Int, settings: String, action: (CreateRoomResponse) -> Unit) {
         Gdx.app.log("Http", "Request::createRoom(name=$name, pw=$password, cap=$capacity)")
         val requestBody: RequestBody = FormBody.Builder()
                 .add("name", name)
                 .add("password", password)
                 .add("capacity", capacity.toString())
                 .add("ownerId", SocketService.socket.id())
+                .add("settings", settings)
                 .build()
 
         val request: Request = Request.Builder()

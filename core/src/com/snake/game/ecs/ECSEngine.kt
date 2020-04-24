@@ -1,5 +1,6 @@
 package com.snake.game.ecs
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.snake.game.ecs.entity.EntityManager
 import com.snake.game.ecs.system.System
@@ -40,6 +41,7 @@ open class ECSEngine(vararg systems: System) {
      * @param entityId the ID of an entity
      */
     fun removeEntity(entityId: String) {
+        Gdx.app.log("remove-entity", entityId)
         entityManager.removeEntity(entityId)
     }
 }
