@@ -64,7 +64,6 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
-            Gdx.app.log("PROBLEM","received update while in game state")
             onStateUpdate(args)
         }.on(Events.DELETE_ENTITIES.value) { args ->
             Gdx.app.log("SocketIO", "DELETE_ENTITY")
@@ -88,7 +87,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
 
-    private fun onStateUpdate(args: Array<Any>) {
+    fun onStateUpdate(args: Array<Any>) {
         val em = ecs.entityManager
 
         val data: JSONObject = args[0] as JSONObject

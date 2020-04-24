@@ -13,7 +13,6 @@ import com.snake.game.ecs.component.*
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
 
-
 /**
  * Handles rendering entities that have a position and a sprite component.
  */
@@ -66,7 +65,6 @@ object RenderingSystem : System(ComponentType.Position) {
 
                 // Render snake head
                 if(tag == TagComponent.EntityTagType.SnakeHead) {
-
                     //sr.color = Color.FOREST
                     //sr.circle(pos.x, pos.y, SNAKE_RADIUS * 1.5f)
                     renderSnake(sb, em, entity, sr)
@@ -114,17 +112,27 @@ object RenderingSystem : System(ComponentType.Position) {
      * @param snakeHead the first snake piece
      */
     private fun renderSnake(sb: SpriteBatch, em: EntityManager, snakeHead: Entity, shapeRenderer: ShapeRenderer) {
-        val snakePoints: ArrayList<Vector2> = ArrayList()
         var pieceId = (snakeHead.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
 
-        var time = java.lang.System.nanoTime()
+        var headPosition = snakeHead.getComponent(ComponentType.Position) as PositionComponent
 
+        val snakePoints: ArrayList<Vector2> = ArrayList()
+
+        // Add the head position twice to force the CatmullRomSpline to start there
+        snakePoints.add(Vector2(headPosition.x, headPosition.y))
+        snakePoints.add(Vector2(headPosition.x, headPosition.y))
+
+        var pos: PositionComponent? = null
         while(pieceId != null) {
             var entity = em.getEntity(pieceId)!!
-            val pos = entity.getComponent(ComponentType.Position) as PositionComponent
+            pos = entity.getComponent(ComponentType.Position) as PositionComponent
             pieceId = (entity.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
             snakePoints.add(Vector2(pos.x, pos.y))
         }
+
+        // Add the last position twice to force the CatmullRomSpline to end there
+        if(pos != null)
+            snakePoints.add(Vector2(pos!!.x, pos!!.y))
 
         val startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
         val endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
@@ -137,7 +145,7 @@ object RenderingSystem : System(ComponentType.Position) {
 
         for(i in 0 until k) {
             var pt = Vector2()
-            spline.valueAt(pt, i / k.toFloat())
+            spline.valueAt(pt, i / (k-1).toFloat())
             points.add(pt)
         }
 
@@ -151,7 +159,5 @@ object RenderingSystem : System(ComponentType.Position) {
             shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
             shapeRenderer.circle(points[i].x, points[i].y, SNAKE_RADIUS)
         }
-
-        //Gdx.app.log("snake_render", "rendering time=" + ((java.lang.System.nanoTime() - time) / 1000000f).toString())
     }
 }

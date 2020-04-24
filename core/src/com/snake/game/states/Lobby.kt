@@ -1,5 +1,6 @@
 package com.snake.game.states
 
+import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -13,6 +14,7 @@ import com.snake.game.backend.HttpService
 import com.snake.game.backend.Events
 import com.snake.game.backend.UpdatedList
 import org.json.JSONObject
+import javax.swing.plaf.nimbus.State
 
 class Lobby(
     private val roomId: String,
@@ -52,7 +54,9 @@ class Lobby(
         Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
+            cancelListeners()
             StateManager.push(GameState(roomId, playerId))
+
         } else {
             showMessageDialog(response.message)
         }
@@ -64,7 +68,7 @@ class Lobby(
      * @param response response fom create room http request
      */
     private fun onLeaveRoom(response: SimpleResponse) {
-        Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
+        Gdx.app.debug("UI", "Lobby::onLeaveRoom(%b)".format(response.success))
         hideDialog()
         if (response.success) {
             cancelListeners()
@@ -100,10 +104,9 @@ class Lobby(
             }
         }.on(Events.START_GAME.value) {
             Gdx.app.postRunnable {
+                cancelListeners()
                 StateManager.push(GameState(roomId, playerId))
             }
-        }.on(Events.UPDATE.value) {
-            Gdx.app.log("PROBLEM","received update while in menu state")
         }
     }
 
@@ -115,7 +118,6 @@ class Lobby(
         SocketService.socket.off(Events.LEAVE_RESPONSE.value)
         SocketService.socket.off(Events.JOIN_RESPONSE.value)
         SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
-        SocketService.socket.off(Events.UPDATE.value)
     }
 
     private fun assignOwner(args: Array<Any>) {
