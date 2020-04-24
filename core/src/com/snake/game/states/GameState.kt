@@ -1,11 +1,10 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.snake.game.backend.SocketService
 import com.snake.game.backend.Events
@@ -22,7 +21,7 @@ import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
 
-class GameState(private val roomId: String, private val playerId: String) : BaseState() {
+class GameState(private val roomId: String, private val playerId: String, private val players: MutableList<Player>) : BaseState() {
     private val swipeDetector = SwipeDetector
 
     // TODO get from backend
@@ -31,6 +30,8 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
     private val ecs = SnakeECSEngine
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
+    private val splitPane : SplitPane
+    private val playersList = Table()
 
     init {
         cancelOldListeners()
@@ -38,7 +39,7 @@ class GameState(private val roomId: String, private val playerId: String) : Base
 
         val uiGroup = VerticalGroup()
 
-        val splitPane = SplitPane(uiGroup, gameWidget, false, skin)
+        splitPane = SplitPane(uiGroup, gameWidget, false, skin)
         splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
@@ -47,6 +48,9 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         stage.addActor(splitPane)
         // element can be added to  the side panel with :
         // uiGroup.addActor(joystickInput.touchpad)
+        uiGroup.addActor(playersList)
+        // TODO: add players into the list
+        initializePlayersList(players)
 
         createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
@@ -62,6 +66,20 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         super.activated()
 
         ecs.createEntities()
+    }
+
+    private fun initializePlayersList(players: MutableList<Player>) {
+        playersList.clear()
+        for (player: Player in players) {
+            insertPlayer(player)
+        }
+    }
+    private fun insertPlayer(player: Player) {
+        val nicknameLabel = Label(player.nickname, skin, "title").apply {
+            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.5F , MenuBaseState.ELEMENT_HEIGHT / 2)
+        }
+        playersList.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height).padTop(nicknameLabel.height/3f).expandX()
+        playersList.row()
     }
 
     private fun addListeners() {
@@ -153,10 +171,13 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         val response: PlayerLeftGame = Gson().fromJson(data.toString(), PlayerLeftGame::class.java)
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s, %b)".format(response.id, response.success))
         if (response.success) {
+            // TODO: remove the player from the player list for the side panel, and update the player list in the side panel
+
             // TODO Stop rendering 'response.id' player.
         } else {
             Gdx.app.log("UI", "::playerLeftGame Error: ${response.message}")
         }
+
     }
 
     private fun deleteEntities(args: Array<Any>) {
