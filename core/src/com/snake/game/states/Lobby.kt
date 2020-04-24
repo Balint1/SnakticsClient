@@ -18,7 +18,7 @@ import javax.swing.plaf.nimbus.State
 
 class Lobby(
     private val roomId: String,
-    players: MutableList<Player>
+    private var players: MutableList<Player>
 ) : MenuBaseState() {
     private val playerId: String = SocketService.socket.id()
     private val playersList = Table()
@@ -55,8 +55,7 @@ class Lobby(
         hideDialog()
         if (response.success) {
             cancelListeners()
-            StateManager.push(GameState(roomId, playerId))
-
+            StateManager.push(GameState(roomId, playerId, players))
         } else {
             showMessageDialog(response.message)
         }
@@ -94,18 +93,20 @@ class Lobby(
             val data: JSONObject = args[0] as JSONObject
             val player: Player = Gson().fromJson(data.toString(), Player::class.java)
             Gdx.app.postRunnable {
+                this.players.add(player)
                 insertPlayer(player)
             }
         }.on(Events.PLAYER_LEFT_ROOM.value) { args ->
             val data: JSONObject = args[0] as JSONObject
             val updatedList: UpdatedList = Gson().fromJson(data.toString(), UpdatedList::class.java)
             Gdx.app.postRunnable {
+                this.players = updatedList.players.toMutableList()
                 initializePlayersList(updatedList.players)
             }
         }.on(Events.START_GAME.value) {
             Gdx.app.postRunnable {
                 cancelListeners()
-                StateManager.push(GameState(roomId, playerId))
+                StateManager.push(GameState(roomId, playerId, players))
             }
         }
     }
@@ -142,6 +143,7 @@ class Lobby(
         for (player: Player in players) {
             insertPlayer(player)
         }
+
     }
 
     private fun insertPlayer(player: Player) {
