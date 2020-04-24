@@ -5,6 +5,7 @@ enum class ComponentType(val internalName: String) {
     Player("player"),
     Position("position"),
     Movement("movement"),
+    Snake("snake"),
     Sprite("sprite"),
     AnimatedSprite("animatedsprite");
 
@@ -46,6 +47,7 @@ fun createComponent(type: ComponentType): Component {
         ComponentType.Movement -> MovementComponent()
         ComponentType.Tag -> TagComponent()
         ComponentType.Player -> PlayerComponent()
+        ComponentType.Snake -> SnakeComponent()
         ComponentType.Sprite -> TODO()
         ComponentType.AnimatedSprite -> TODO()
     }

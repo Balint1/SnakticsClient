@@ -8,6 +8,8 @@ class AndroidLauncher : AndroidApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = AndroidApplicationConfiguration()
+        // Anti-aliasing
+        config.numSamples = 2
         initialize(SnakeGame(), config)
     }
 }
