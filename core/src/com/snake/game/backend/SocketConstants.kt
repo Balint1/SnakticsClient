@@ -11,10 +11,6 @@ object Data {
     val SWIPE: (String) -> JSONObject = { swipeDirection: String ->
         JSONObject("""{"direction":"$swipeDirection"}""")
     }
-
-    val ROOM_SETTINGS: (Float, String, Boolean) -> JSONObject = { customSpeed: Float, snakeLength: String, colorsDisabled: Boolean ->
-        JSONObject("""{"speed":"$customSpeed", "snakeLength":"$snakeLength"}, "colorsDisabled":"$colorsDisabled"}""")
-    }
 }
 
 enum class Events(val value: String) {

@@ -1,6 +1,7 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.snake.game.Preferences
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
 import com.snake.game.backend.CreateRoomResponse
 import com.snake.game.backend.HttpService
@@ -22,6 +23,7 @@ open class CreateRoom : MenuBaseState() {
     protected var password = ""
 
     init {
+        Preferences.discard()
         rootTable.clear()
         setTitle("Create room")
 
@@ -52,7 +54,7 @@ open class CreateRoom : MenuBaseState() {
     protected fun createRoom(roomName: String, password: String, capacity: Int) {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
         showWaitDialog("Creating room...")
-        HttpService.createRoom(roomName, password, capacity, ::onRoomCreated)
+        HttpService.createRoom(roomName, password, capacity, Preferences.getSettings(), ::onRoomCreated)
     }
 
     /**

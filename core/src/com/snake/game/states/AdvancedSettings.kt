@@ -8,15 +8,15 @@ import com.snake.game.Preferences
 
 class AdvancedSettings : MenuBaseState() {
     private val maxSpeed = 1f
-    private val minSpeed = 0f
-    private var customSpeed = 0f
+    private val minSpeed = 0.1f
+    private var speed = 0f
     private var snakeLength = ""
     private var colorsDisabled = false
-    private var prevCustomSpeed = 0f
+    private var prevSpeed = 0f
     private var prevSnakeLength = ""
     private var prevColorsDisabled = false
     private var snakeLengthSelector: SelectBox<String>? = null
-    private var customSpeedSelector: Slider? = null
+    private var speedSelector: Slider? = null
     private var colorsDisabledSelector: CheckBox? = null
 
     private val applyButton = createTextButton("Apply") {
@@ -46,17 +46,17 @@ class AdvancedSettings : MenuBaseState() {
             setSize((ELEMENT_WIDTH - SPACING) * 2 / 5f, ELEMENT_HEIGHT)
         }
 
-        customSpeedSelector = Slider(minSpeed, maxSpeed, 0.1f, false, skin).apply {
+        speedSelector = Slider(minSpeed, maxSpeed, 0.1f, false, skin).apply {
             setSize((ELEMENT_WIDTH - SPACING) * 3 / 5f, ELEMENT_HEIGHT)
-            value = Preferences.customSpeed
+            value = Preferences.speed
             addListener {
                 checkChanges()
-                customSpeed = value
+                speed = value
                 false
             }
         }
 
-        addElements(label, customSpeedSelector!!, spacing = SPACING)
+        addElements(label, speedSelector!!, spacing = SPACING)
     }
 
     private fun addSnakeLengthSelector() {
@@ -98,11 +98,11 @@ class AdvancedSettings : MenuBaseState() {
 
     private fun chooseAction() {
         if (applyButton.text.toString() == "Apply") {
-            Preferences.apply(customSpeed, snakeLength, colorsDisabled)
+            Preferences.apply(speed, snakeLength, colorsDisabled)
             applyButton.setText("Discard")
         } else {
             Preferences.discard()
-            customSpeedSelector!!.value = 0.5f
+            speedSelector!!.value = 0.5f
             snakeLengthSelector!!.selected = "normal"
             colorsDisabledSelector!!.isChecked = false
             applyButton.setText("Apply")
@@ -116,9 +116,9 @@ class AdvancedSettings : MenuBaseState() {
                 changeDetected = true
                 prevColorsDisabled = colorsDisabled
             }
-            prevCustomSpeed != customSpeed -> {
+            prevSpeed != speed -> {
                 changeDetected = true
-                prevCustomSpeed = customSpeed
+                prevSpeed = speed
             }
             prevSnakeLength != snakeLength -> {
                 changeDetected = true
