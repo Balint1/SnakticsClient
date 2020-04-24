@@ -11,12 +11,5 @@ object SnakeECSEngine : ECSEngine(
 
     fun createEntities() {
         entityManager.clearEntities()
-
-        // Testing
-        // var test = Entity(UUID.randomUUID().toString(), entityManager)
-        // test.addComponent(PositionComponent())
-
-        // for(i in 0..3)
-            // factory.createSnake(entityManager)
     }
 }

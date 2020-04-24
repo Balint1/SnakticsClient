@@ -4,6 +4,7 @@ import com.badlogic.gdx.input.GestureDetector
 import com.snake.game.backend.Data
 import com.snake.game.backend.Events
 import com.snake.game.backend.SocketService
+import kotlin.math.abs
 
 object SwipeDetector : GestureDetector(DirectionGestureListener()) {
     var active: Boolean = false
@@ -29,7 +30,7 @@ object SwipeDetector : GestureDetector(DirectionGestureListener()) {
     }
     private class DirectionGestureListener() : GestureAdapter() {
         override fun fling(velocityX: Float, velocityY: Float, button: Int): Boolean {
-            if (Math.abs(velocityX) > Math.abs(velocityY)) {
+            if (abs(velocityX) > abs(velocityY)) {
                 if (velocityX > 0) {
                     SwipeDetector.right()
                 } else {

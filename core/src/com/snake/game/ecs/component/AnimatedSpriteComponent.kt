@@ -36,6 +36,10 @@ class AnimatedSpriteComponent(
         this.animation = Animation(frameDuration, frames)
     }
 
+    /**
+     * Get the current frame in the animation.
+     * @return the current frame to display.
+     */
     fun getCurrentFrame(): TextureRegion? {
         return this.animation!!.getKeyFrame(this.time, true)
     }

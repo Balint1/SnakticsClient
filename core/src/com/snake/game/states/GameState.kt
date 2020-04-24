@@ -1,19 +1,16 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.utils.viewport.ExtendViewport
-import com.snake.game.backend.SocketService
-import com.snake.game.backend.Events
-import com.snake.game.backend.SimpleResponse
-import com.snake.game.backend.PlayerLeftGame
-import com.snake.game.controls.SwipeDetector
 import com.google.gson.Gson
 import com.snake.game.backend.*
+import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.componentTypeFromInternalName
@@ -21,6 +18,7 @@ import com.snake.game.ecs.component.createComponent
 import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
+
 
 class GameState(private val roomId: String, private val playerId: String) : BaseState() {
     private val swipeDetector = SwipeDetector
