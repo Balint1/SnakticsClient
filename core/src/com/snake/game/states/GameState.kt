@@ -94,7 +94,6 @@ class GameState(private val roomId: String, private val playerId: String) : Base
         val data: JSONObject = args[0] as JSONObject
         try {
             val state = data.getJSONArray("state")
-            Gdx.app.log("SocketIO", "state: $state")
 
             // Update components
             for (i in 0 until state.length()) {
