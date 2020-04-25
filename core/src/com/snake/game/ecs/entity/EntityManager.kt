@@ -1,5 +1,6 @@
 package com.snake.game.ecs.entity
 
+import com.badlogic.gdx.Gdx
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.ComponentTypeOperator
 import com.snake.game.ecs.component.ComponentTypeTree
@@ -98,8 +99,11 @@ class EntityManager {
      */
     fun removeEntity(entityId: String) {
         if(hasEntity(entityId)) {
-            for(component in entities[entityId]!!.getComponents())
-                entityMap[component.type]!!.filter { e -> e.id != entityId}
+            for(component in getEntity(entityId)!!.getComponents()) {
+                val toRemove = entityMap[component.type]!!.filter { e -> e.id == entityId }
+                for(entity in toRemove)
+                    entityMap[component.type]!!.remove(entity)
+            }
 
             entities.remove(entityId)
         }
