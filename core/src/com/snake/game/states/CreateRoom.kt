@@ -53,8 +53,12 @@ open class CreateRoom : MenuBaseState() {
      */
     protected fun createRoom(roomName: String, password: String, capacity: Int) {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
-        showWaitDialog("Creating room...")
-        HttpService.createRoom(roomName, password, capacity, Preferences.getSettings(), ::onRoomCreated)
+        if(isAlphaNumeric(roomName) && isAlphaNumeric(password) && isAlphaNumeric(nicknameField.text)){
+            showWaitDialog("Creating room...")
+            HttpService.createRoom(roomName, password, capacity, Preferences.getSettings(), ::onRoomCreated)
+        }else{
+            showMessageDialog("All input fields must be alphanumeric")
+        }
     }
 
     /**
