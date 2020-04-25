@@ -16,7 +16,7 @@ import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
 
-class GameState(players: MutableList<Player>) : BaseState() {
+class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
     private val swipeDetector = SwipeDetector
 
     // TODO get from backend
@@ -192,11 +192,8 @@ class GameState(players: MutableList<Player>) : BaseState() {
     }
 
     private fun youDied(){
-        println("--------------")
-        println("youDied")
-        println("--------------")
         val dialog = createAlertDialog("You are dead", "Lobby", "Watch", {}, {})
-        dialog.setPosition(500f, 500f)
+        // TODO show this dialog
     }
 
     private fun deleteEntities(args: Array<Any>) {

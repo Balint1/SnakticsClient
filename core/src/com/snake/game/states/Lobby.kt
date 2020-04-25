@@ -53,7 +53,7 @@ class Lobby(
         hideDialog()
         if (response.success) {
             cancelListeners()
-            StateManager.push(GameState(players))
+            StateManager.push(GameState(playerId, players))
         } else {
             showMessageDialog(response.message)
         }
@@ -104,7 +104,7 @@ class Lobby(
         }.on(Events.START_GAME.value) {
             Gdx.app.postRunnable {
                 cancelListeners()
-                StateManager.push(GameState(players))
+                StateManager.push(GameState(playerId, players))
             }
         }
     }
