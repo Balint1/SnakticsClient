@@ -80,7 +80,7 @@ abstract class BaseState : IState {
         return button
     }
 
-    protected fun createAlertDialog(text: String, optionYes: String, optionNO: String, onYes: () -> Unit, onNo: () -> Unit): Dialog{
+    protected fun createAlertDialog(text: String, optionYes: String, optionNO: String, onYes: () -> Unit, onNo: () -> Unit): Dialog {
         return (object : Dialog("", skin, "default") {
             override fun result(result: Any) {
                 println("Result: $result")

@@ -7,7 +7,7 @@ class SnakeComponent() : Component(ComponentType.Snake) {
 
     override fun updateFromJSON(data: JSONObject) {
         nextPieceId = data.getString("next_entityId")
-        if(nextPieceId == "null")
+        if (nextPieceId == "null")
             nextPieceId = null
     }
 }
