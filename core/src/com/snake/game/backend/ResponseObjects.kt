@@ -31,6 +31,7 @@ data class SimpleResponse(
 
 data class Player(
     var nickname: String,
+    var id: String,
     var owner: Boolean
 )
 
