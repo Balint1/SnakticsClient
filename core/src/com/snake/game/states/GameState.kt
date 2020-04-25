@@ -30,6 +30,8 @@ class GameState(private val roomId: String, private val playerId: String, privat
     private val playersList = Table()
 
     init {
+        ecs.localPlayerId = playerId
+
         cancelOldListeners()
         addListeners()
 
