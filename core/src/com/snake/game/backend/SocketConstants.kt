@@ -11,6 +11,10 @@ object Data {
     val SWIPE: (String) -> JSONObject = { swipeDirection: String ->
         JSONObject("""{"direction":"$swipeDirection"}""")
     }
+
+    val USE_POWEUP: (String) -> JSONObject = { powerup: String ->
+        JSONObject("""{"powerup":"$powerup"}""")
+    }
 }
 
 enum class Events(val value: String) {
@@ -28,5 +32,7 @@ enum class Events(val value: String) {
     LEAVE_TO_LOBBY_RESPONSE("leave-to-lobby-response"),
     START_GAME("start-game"),
     PLAYER_DIED("player-died"),
-    YOU_DIED("you-died")
+    YOU_DIED("you-died"),
+    USE_POWERUP("use-powerup")
+
 }

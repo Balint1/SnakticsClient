@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.google.gson.Gson
 import com.snake.game.backend.*
+import com.snake.game.controls.PowerupsPanel
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.ComponentType
@@ -48,6 +49,7 @@ class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
         uiGroup.addActor(playersList)
         // TODO: add players into the list
         initializePlayersList(players)
+        PowerupsPanel(uiGroup)
 
         createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)

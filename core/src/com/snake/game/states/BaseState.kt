@@ -66,7 +66,7 @@ abstract class BaseState : IState {
         return button
     }
 
-    protected fun creteImageButton(texture: Texture, width: Float = MenuBaseState.ELEMENT_WIDTH, height: Float = MenuBaseState.ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
+    protected fun createImageButton(texture: Texture, width: Float = MenuBaseState.ELEMENT_WIDTH, height: Float = MenuBaseState.ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
         val drawable: Drawable = TextureRegionDrawable(TextureRegion(texture))
         val button = ImageButton(drawable)
         button.setSize(width, height)

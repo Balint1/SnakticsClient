@@ -36,7 +36,7 @@ class CreateAdvancedRoom : CreateRoom() {
         }
 
         val settingsTexture = Texture("buttons/settings.png")
-        val advancedSettings = creteImageButton(settingsTexture, ELEMENT_HEIGHT * 2 / 3, ELEMENT_HEIGHT * 2 / 3) {
+        val advancedSettings = createImageButton(settingsTexture, ELEMENT_HEIGHT * 2 / 3, ELEMENT_HEIGHT * 2 / 3) {
             StateManager.push(AdvancedSettings())
         }
 
