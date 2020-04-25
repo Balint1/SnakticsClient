@@ -1,6 +1,5 @@
 package com.snake.game.states
 
-import com.badlogic.gdx.Game
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.scenes.scene2d.ui.Image
@@ -14,7 +13,6 @@ import com.snake.game.backend.HttpService
 import com.snake.game.backend.Events
 import com.snake.game.backend.UpdatedList
 import org.json.JSONObject
-import javax.swing.plaf.nimbus.State
 
 class Lobby(
     private val roomId: String,
@@ -55,7 +53,7 @@ class Lobby(
         hideDialog()
         if (response.success) {
             cancelListeners()
-            StateManager.push(GameState(roomId, playerId, players))
+            StateManager.push(GameState(players))
         } else {
             showMessageDialog(response.message)
         }
@@ -106,7 +104,7 @@ class Lobby(
         }.on(Events.START_GAME.value) {
             Gdx.app.postRunnable {
                 cancelListeners()
-                StateManager.push(GameState(roomId, playerId, players))
+                StateManager.push(GameState(players))
             }
         }
     }

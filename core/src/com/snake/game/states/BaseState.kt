@@ -8,16 +8,14 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.snake.game.controls.SwipeDetector
 
-abstract class BaseState() : IState {
+abstract class BaseState : IState {
     protected val stage = Stage(ExtendViewport(MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT))
     private val multiplexer = InputMultiplexer()
 
@@ -80,5 +78,19 @@ abstract class BaseState() : IState {
             }
         })
         return button
+    }
+
+    protected fun createAlertDialog(text: String, optionYes: String, optionNO: String, onYes: () -> Unit, onNo: () -> Unit): Dialog{
+        return (object : Dialog("", skin, "default") {
+            override fun result(result: Any) {
+                println("Result: $result")
+            }
+        }).apply<Dialog> {
+            contentTable.add(Label(text, skin, "big"))
+            button(optionYes, true)
+            button(optionNO, false)
+            isMovable = false
+            isResizable = false
+        }
     }
 }
