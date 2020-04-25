@@ -93,23 +93,23 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
 
         val table = Table()
-        var width_total = 0f
-        var height_total = 0f
+        var widthTotal = 0f
+        var heightTotal = 0f
 
         if(alive == false){
-            var aliveIcone = Image(Texture("indicators/owner.png")).apply {
+            var aliveIcon = Image(Texture("indicators/owner.png")).apply {
                 width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount* 0.1F
                 height = width
             }
 
-            table.add(aliveIcone).width(aliveIcone.width).height(aliveIcone.height)
-            width_total += aliveIcone.width
-            height_total += height_total.coerceAtLeast(aliveIcone.height)
+            table.add(aliveIcon).width(aliveIcon.width).height(aliveIcon.height)
+            widthTotal += aliveIcon.width
+            heightTotal += heightTotal.coerceAtLeast(aliveIcon.height)
         }
 
         table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
-        width_total += nicknameLabel.width
-        height_total += height_total.coerceAtLeast(nicknameLabel.height)
+        widthTotal += nicknameLabel.width
+        heightTotal += heightTotal.coerceAtLeast(nicknameLabel.height)
         table.setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
         playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height/3f).expandX()
         playersList.row()
@@ -221,7 +221,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
     private fun playerDied(id: String) {
 
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
-        // TODO: add somme indicator that player is dead in side panel.
+        // TODO: add some indicator that player is dead in side panel.
 
         // TODO Stop rendering 'response.id' player.
     }
