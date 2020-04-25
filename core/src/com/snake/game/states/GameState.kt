@@ -69,34 +69,32 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         var players_entities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
 
         var players_components = mutableListOf<PlayerComponent>()
-        for (p:Entity in players_entities){
-            if(p.getComponent(ComponentType.Player) != null)
+        for (p: Entity in players_entities) {
+            if (p.getComponent(ComponentType.Player) != null)
                 players_components.add(p.getComponent(ComponentType.Player) as PlayerComponent)
         }
 
-
         for (player: Player in players) {
             var alive = false
-            for(p: PlayerComponent in players_components){
-                if(p.playerId == player.id){
+            for (p: PlayerComponent in players_components) {
+                if (p.playerId == player.id) {
                     alive = p.alive
                     println("zepofkzepofkzepofkzepofkzepofkzpofkzepfozkepfozkefpozekfpzkofpzokfzpoefkzpoefkzpokf")
                 }
             }
-            insertPlayer(player,alive)
+            insertPlayer(player, alive)
         }
     }
     private fun insertPlayer(player: Player, alive: Boolean) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.4F , MenuBaseState.ELEMENT_HEIGHT / 2)
+            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.4F, MenuBaseState.ELEMENT_HEIGHT / 2)
         }
-
 
         val table = Table()
         var widthTotal = 0f
         var heightTotal = 0f
 
-        if(alive == false){
+        if (alive == false) {
             var aliveIcon = Image(Texture("indicators/owner.png")).apply {
                 width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount* 0.1F
                 height = width
@@ -111,10 +109,9 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         widthTotal += nicknameLabel.width
         heightTotal += heightTotal.coerceAtLeast(nicknameLabel.height)
         table.setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
-        playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height/3f).expandX()
+        playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height / 3f).expandX()
         playersList.row()
     }
-
 
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
@@ -165,19 +162,18 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
                 val id: String = componentData.getString("entityId")
                 val componentTypeName = componentData.getString("componentType")
 
-                val componentType: ComponentType? = componentTypeFromInternalName(componentTypeName)
+                val componentType: ComponentType? = ComponentType.fromName(componentTypeName)
                         ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
-                if (!em.hasEntity(id)) {
-                    Gdx.app.log("update", "Create entity: " + id)
+                if (!em.hasEntity(id))
                     Entity(id, em)
-                }
+
                 val entity = em.getEntity(id)!!
 
                 // Create the component if necessary
                 if (!entity.hasComponent(componentType!!))
-                    entity.addComponent(createComponent(componentType))
+                    entity.addComponent(ComponentType.createComponent(componentType))
 
                 val component = entity.getComponent(componentType)!!
                 component.updateFromJSON(componentData)
@@ -186,7 +182,6 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
             Gdx.app.log("SocketIO", "Error getting attributes: $e")
         }
     }
-
 
     override fun update(dt: Float) {
         super.update(dt)
@@ -226,7 +221,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         // TODO Stop rendering 'response.id' player.
     }
 
-    private fun youDied(){
+    private fun youDied() {
         val dialog = createAlertDialog("You are dead", "Lobby", "Watch", {}, {})
         // TODO show this dialog
     }
@@ -235,15 +230,15 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         val data: JSONObject = args[0] as JSONObject
         val message: DeleteEntities = Gson().fromJson(data.toString(), DeleteEntities::class.java)
 
-        for(entityId in message.entityIds)
+        for (entityId in message.entityIds)
             ecs.removeEntity(entityId)
     }
 }
 
 class GameWidget(
-        val ecs: SnakeECSEngine,
-        private val fieldWidth: Float,
-        private val fieldHeight: Float
+    val ecs: SnakeECSEngine,
+    private val fieldWidth: Float,
+    private val fieldHeight: Float
 ) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)

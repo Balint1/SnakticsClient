@@ -15,8 +15,8 @@ class PlayerComponent() : Component(ComponentType.Player) {
         alive = data.getBoolean("alive")
         decaying = data.getBoolean("decaying")
 
-        if(decaying)
-            remainingDecayTicks = data.getInt   ("remainingDecayTicks")
+        if (decaying)
+            remainingDecayTicks = data.getInt("remainingDecayTicks")
 
         invisible = data.getBoolean("invisible")
     }

@@ -1,6 +1,5 @@
 package com.snake.game.ecs.system
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -58,8 +57,11 @@ object RenderingSystem : System(ComponentType.Position) {
 
             val pos = entity.getComponent(ComponentType.Position) as PositionComponent
 
-            if (entity.hasComponent(ComponentType.Sprite))
+            if (entity.hasComponent(ComponentType.Sprite)) {
+                sr.color = Color.RED
+                sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
                 render(sb, entity.getComponent(ComponentType.Sprite) as SpriteComponent, pos.x, pos.y)
+            }
             if (entity.hasComponent(ComponentType.AnimatedSprite))
                 render(sb, entity.getComponent(ComponentType.AnimatedSprite) as AnimatedSpriteComponent, pos.x, pos.y)
 
@@ -67,21 +69,12 @@ object RenderingSystem : System(ComponentType.Position) {
                 val tag = (entity.getComponent(ComponentType.Tag) as TagComponent).tag ?: continue
 
                 // Render snake head
-                if(tag == TagComponent.EntityTagType.SnakeHead) {
-                    //sr.color = Color.FOREST
-                    //sr.circle(pos.x, pos.y, SNAKE_RADIUS * 1.5f)
+                if (tag == TagComponent.EntityTagType.SnakeHead) {
+                    // sr.color = Color.FOREST
+                    // sr.circle(pos.x, pos.y, SNAKE_RADIUS * 1.5f)
                     renderSnake(sb, em, entity, sr)
-                }
-                else if (tag == TagComponent.EntityTagType.SnakeBody) {
+                } else if (tag == TagComponent.EntityTagType.SnakeBody) {
 
-                }
-                else {
-                    // Temporary render
-                    sr.color = Color.YELLOW
-                    sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
-
-                    debugFont.draw(sb, "TEST STRING", 0f, 0f)
-                    debugFont.draw(sb, tag.typeString, pos.x, pos.y)
                 }
             } else {
                 // Temporary render
@@ -118,7 +111,7 @@ object RenderingSystem : System(ComponentType.Position) {
         var playerComponent = snakeHead.getComponent(ComponentType.Player) as PlayerComponent
 
         // Stop rendering the snake once it is dead and decayed
-        if(!playerComponent.alive && !playerComponent.decaying)
+        if (!playerComponent.alive && !playerComponent.decaying)
             return
 
         var pieceId = (snakeHead.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
@@ -130,9 +123,9 @@ object RenderingSystem : System(ComponentType.Position) {
         snakePoints.add(Vector2(headPosition.x, headPosition.y))
 
         var pos: PositionComponent? = null
-        while(pieceId != null) {
+        while (pieceId != null) {
             if (!em.hasEntity(pieceId))
-                break;
+                break
             var entity = em.getEntity(pieceId)!!
             pos = entity.getComponent(ComponentType.Position) as PositionComponent
             pieceId = (entity.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
@@ -140,7 +133,7 @@ object RenderingSystem : System(ComponentType.Position) {
         }
 
         // Add the last position twice to force the CatmullRomSpline to end there
-        if(pos != null)
+        if (pos != null)
             snakePoints.add(Vector2(pos!!.x, pos!!.y))
 
         var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
@@ -148,7 +141,7 @@ object RenderingSystem : System(ComponentType.Position) {
 
         // Handle blinding during decay
         var alpha = 1.0f
-        if(!playerComponent.alive && playerComponent.decaying) {
+        if (!playerComponent.alive && playerComponent.decaying) {
             var blinkTicks = 20
             alpha = sin(Math.PI * (playerComponent.remainingDecayTicks % blinkTicks) / blinkTicks).toFloat()
             startColor = Color(0.2f, 0.2f, 0.2f, alpha)
@@ -157,21 +150,21 @@ object RenderingSystem : System(ComponentType.Position) {
 
         // number of points used for rendering the spline
         var pointsDensity = 5
-        var k = if(snakePoints.size > 2) snakePoints.size * pointsDensity else 1
+        var k = if (snakePoints.size > 2) snakePoints.size * pointsDensity else 1
 
         val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
         var points = ArrayList<Vector2>()
         var alphas = ArrayList<Float>()
 
-        for(i in 0 until k) {
+        for (i in 0 until k) {
             var pt = Vector2()
-            spline.valueAt(pt, i / (k-1).toFloat())
+            spline.valueAt(pt, i / (k - 1).toFloat())
             points.add(pt)
             alphas.add(alpha)
         }
 
         // In invisible mode, set the first alphas to 0 and then fade to 1
-        if(playerComponent.invisible && playerComponent.alive) {
+        if (playerComponent.invisible && playerComponent.alive) {
             var invisibilityLength = 4 * pointsDensity
             for (i in 0 until min(invisibilityLength, alphas.size))
                 alphas[i] = 0f
@@ -179,20 +172,20 @@ object RenderingSystem : System(ComponentType.Position) {
                 alphas[i] = (i - invisibilityLength) / invisibilityLength.toFloat()
 
             // If the invisible player is the local player, set a minimum opacity of 0.1
-            if(playerComponent.playerId == SnakeECSEngine.localPlayerId) {
+            if (playerComponent.playerId == SnakeECSEngine.localPlayerId) {
                 for (i in 0 until min(invisibilityLength * 2, alphas.size))
                     alphas[i] = max(alphas[i], 0.2f)
             }
         }
 
         // Draw shadow
-        for(i in 0 until points.size) {
+        for (i in 0 until points.size) {
             shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f*alphas[i]))
             shapeRenderer.circle(points[i].x, points[i].y - 2, SNAKE_RADIUS)
         }
 
         // Draw colored snake
-        for(i in 0 until points.size) {
+        for (i in 0 until points.size) {
             shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
             shapeRenderer.color.a = alphas[i]
             shapeRenderer.circle(points[i].x, points[i].y, SNAKE_RADIUS)
