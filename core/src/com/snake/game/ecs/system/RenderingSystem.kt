@@ -8,9 +8,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.CatmullRomSpline
 import com.badlogic.gdx.math.Vector2
+import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.*
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sin
 
 /**
@@ -153,25 +156,45 @@ object RenderingSystem : System(ComponentType.Position) {
         }
 
         // number of points used for rendering the spline
-        var k = if(snakePoints.size > 2) snakePoints.size * 5 else 1
+        var pointsDensity = 5
+        var k = if(snakePoints.size > 2) snakePoints.size * pointsDensity else 1
 
         val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
         var points = ArrayList<Vector2>()
+        var alphas = ArrayList<Float>()
 
         for(i in 0 until k) {
             var pt = Vector2()
             spline.valueAt(pt, i / (k-1).toFloat())
             points.add(pt)
+            alphas.add(alpha)
+        }
+
+        // In invisible mode, set the first alphas to 0 and then fade to 1
+        if(playerComponent.invisible && playerComponent.alive) {
+            var invisibilityLength = 4 * pointsDensity
+            for (i in 0 until min(invisibilityLength, alphas.size))
+                alphas[i] = 0f
+            for (i in invisibilityLength until min(invisibilityLength * 2, alphas.size))
+                alphas[i] = (i - invisibilityLength) / invisibilityLength.toFloat()
+
+            // If the invisible player is the local player, set a minimum opacity of 0.1
+            if(playerComponent.playerId == SnakeECSEngine.localPlayerId) {
+                for (i in 0 until min(invisibilityLength * 2, alphas.size))
+                    alphas[i] = max(alphas[i], 0.2f)
+            }
         }
 
         // Draw shadow
-        shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f*alpha))
-        for(i in 0 until points.size)
+        for(i in 0 until points.size) {
+            shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f*alphas[i]))
             shapeRenderer.circle(points[i].x, points[i].y - 2, SNAKE_RADIUS)
+        }
 
         // Draw colored snake
         for(i in 0 until points.size) {
             shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
+            shapeRenderer.color.a = alphas[i]
             shapeRenderer.circle(points[i].x, points[i].y, SNAKE_RADIUS)
         }
     }

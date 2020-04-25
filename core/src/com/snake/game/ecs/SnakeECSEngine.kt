@@ -6,6 +6,9 @@ import com.snake.game.ecs.system.RenderingSystem
 
 object SnakeECSEngine : ECSEngine(
         ComponentSyncSystem, AnimationSystem, RenderingSystem) {
+
+    var localPlayerId: String? = null
+
     init {
     }
 
