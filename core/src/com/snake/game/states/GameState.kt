@@ -1,6 +1,7 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.*
@@ -9,14 +10,12 @@ import com.google.gson.Gson
 import com.snake.game.backend.*
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
-import com.snake.game.ecs.component.ComponentType
-import com.snake.game.ecs.component.componentTypeFromInternalName
-import com.snake.game.ecs.component.createComponent
+import com.snake.game.ecs.component.*
 import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
 
-class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
+class GameState(playerId: String, var players: MutableList<Player>) : BaseState() {
     private val swipeDetector = SwipeDetector
 
     // TODO get from backend
@@ -47,7 +46,7 @@ class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
         // uiGroup.addActor(joystickInput.touchpad)
         uiGroup.addActor(playersList)
         // TODO: add players into the list
-        initializePlayersList(players)
+        updatePlayersList()
 
         createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
@@ -65,20 +64,57 @@ class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
         ecs.createEntities()
     }
 
-    private fun initializePlayersList(players: MutableList<Player>) {
+    private fun updatePlayersList() {
         playersList.clear()
+        var players_entities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
+
+        var players_components = mutableListOf<PlayerComponent>()
+        for (p:Entity in players_entities){
+            if(p.getComponent(ComponentType.Player) != null)
+                players_components.add(p.getComponent(ComponentType.Player) as PlayerComponent)
+        }
+
+
         for (player: Player in players) {
-            insertPlayer(player)
+            var alive = false
+            for(p: PlayerComponent in players_components){
+                if(p.playerId == player.id){
+                    alive = p.alive
+                    println("zepofkzepofkzepofkzepofkzepofkzpofkzepfozkepfozkefpozekfpzkofpzokfzpoefkzpoefkzpokf")
+                }
+            }
+            insertPlayer(player,alive)
         }
     }
-
-    private fun insertPlayer(player: Player) {
+    private fun insertPlayer(player: Player, alive: Boolean) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
+            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.4F , MenuBaseState.ELEMENT_HEIGHT / 2)
         }
-        playersList.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height).padTop(nicknameLabel.height / 3f).expandX()
+
+
+        val table = Table()
+        var width_total = 0f
+        var height_total = 0f
+
+        if(alive == false){
+            var aliveIcone = Image(Texture("indicators/owner.png")).apply {
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount* 0.1F
+                height = width
+            }
+
+            table.add(aliveIcone).width(aliveIcone.width).height(aliveIcone.height)
+            width_total += aliveIcone.width
+            height_total += height_total.coerceAtLeast(aliveIcone.height)
+        }
+
+        table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
+        width_total += nicknameLabel.width
+        height_total += height_total.coerceAtLeast(nicknameLabel.height)
+        table.setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
+        playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height/3f).expandX()
         playersList.row()
     }
+
 
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
@@ -154,8 +190,8 @@ class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
 
     override fun update(dt: Float) {
         super.update(dt)
-
         ecs.update(dt)
+        updatePlayersList()
     }
 
     /**
@@ -179,7 +215,6 @@ class GameState(playerId: String, players: MutableList<Player>) : BaseState() {
     private fun playerLeftGame(id: String) {
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
         // TODO: remove the player from the player list for the side panel, and update the player list in the side panel
-
         // TODO Stop rendering 'response.id' player.
     }
 
