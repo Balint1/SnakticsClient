@@ -13,6 +13,8 @@ class CreateAdvancedRoom : CreateRoom() {
             }
     private var passwordField = TextField("", skin, "big")
             .apply {
+                setPasswordCharacter('*')
+                isPasswordMode = true
                 messageText = "password"
                 setSize((ELEMENT_WIDTH - SPACING) * 3 / 4, ELEMENT_HEIGHT)
             }
