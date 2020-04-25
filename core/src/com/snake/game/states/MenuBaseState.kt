@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.Align
  */
 abstract class MenuBaseState : BaseState() {
     var rootTable = Table()
-    var dialog: Dialog? = null
+    private var dialog: Dialog? = null
 
     init {
         rootTable.setFillParent(true)

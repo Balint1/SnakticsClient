@@ -1,7 +1,6 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.*
@@ -17,7 +16,7 @@ import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
 
-class GameState(private val roomId: String, private val playerId: String, private val players: MutableList<Player>) : BaseState() {
+class GameState(players: MutableList<Player>) : BaseState() {
     private val swipeDetector = SwipeDetector
 
     // TODO get from backend
@@ -26,7 +25,7 @@ class GameState(private val roomId: String, private val playerId: String, privat
 
     private val ecs = SnakeECSEngine
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
-    private val splitPane : SplitPane
+    private val splitPane: SplitPane
     private val playersList = Table()
 
     init {
@@ -70,11 +69,12 @@ class GameState(private val roomId: String, private val playerId: String, privat
             insertPlayer(player)
         }
     }
+
     private fun insertPlayer(player: Player) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.5F , MenuBaseState.ELEMENT_HEIGHT / 2)
+            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
         }
-        playersList.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height).padTop(nicknameLabel.height/3f).expandX()
+        playersList.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height).padTop(nicknameLabel.height / 3f).expandX()
         playersList.row()
     }
 
@@ -86,10 +86,20 @@ class GameState(private val roomId: String, private val playerId: String, privat
             deleteEntities(args)
         }.on(Events.PLAYER_LEFT_GAME.value) { args ->
             Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
-            playerLeftGame(args)
+            val data: JSONObject = args[0] as JSONObject
+            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
+            playerLeftGame(response.id)
         }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
             Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
             leaveToLobby(args)
+        }.on(Events.PLAYER_DIED.value) { args ->
+            Gdx.app.log("SocketIO", "PLAYER_DIED")
+            val data: JSONObject = args[0] as JSONObject
+            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
+            playerDied(response.id)
+        }.on(Events.YOU_DIED.value) {
+            Gdx.app.log("SocketIO", "YOU_DIED")
+            youDied()
         }
     }
 
@@ -98,12 +108,13 @@ class GameState(private val roomId: String, private val playerId: String, privat
         SocketService.socket.off(Events.LEAVE_TO_LOBBY_RESPONSE.value)
         SocketService.socket.off(Events.UPDATE.value)
     }
+
     private fun cancelOldListeners() {
         SocketService.socket.off(Events.OWNER_CHANGED.value)
         SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
     }
 
-    fun onStateUpdate(args: Array<Any>) {
+    private fun onStateUpdate(args: Array<Any>) {
         val em = ecs.entityManager
 
         val data: JSONObject = args[0] as JSONObject
@@ -161,32 +172,41 @@ class GameState(private val roomId: String, private val playerId: String, privat
         }
     }
 
-    private fun playerLeftGame(args: Array<Any>) {
-        val data: JSONObject = args[0] as JSONObject
-        val response: PlayerLeftGame = Gson().fromJson(data.toString(), PlayerLeftGame::class.java)
-        Gdx.app.debug("UI", "GameState::playerLeftGame(%s, %b)".format(response.id, response.success))
-        if (response.success) {
-            // TODO: remove the player from the player list for the side panel, and update the player list in the side panel
+    private fun playerLeftGame(id: String) {
+        Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
+        // TODO: remove the player from the player list for the side panel, and update the player list in the side panel
 
-            // TODO Stop rendering 'response.id' player.
-        } else {
-            Gdx.app.log("UI", "::playerLeftGame Error: ${response.message}")
-        }
+        // TODO Stop rendering 'response.id' player.
+    }
 
+    private fun playerDied(id: String) {
+
+        Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
+        // TODO: add somme indicator that player is dead in side panel.
+
+        // TODO Stop rendering 'response.id' player.
+    }
+
+    private fun youDied(){
+        println("--------------")
+        println("youDied")
+        println("--------------")
+        val dialog = createAlertDialog("You are dead", "Lobby", "Watch", {}, {})
+        dialog.setPosition(500f, 500f)
     }
 
     private fun deleteEntities(args: Array<Any>) {
         val data: DeleteEntities = Gson().fromJson((args[0] as JSONObject).toString(), DeleteEntities::class.java)
 
-        for(entityId in data.entityIds)
+        for (entityId in data.entityIds)
             ecs.removeEntity(entityId)
     }
 }
 
 class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float
+        val ecs: SnakeECSEngine,
+        private val fieldWidth: Float,
+        private val fieldHeight: Float
 ) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)

@@ -45,10 +45,8 @@ data class JoinResponse(
     var players: MutableList<Player>
 )
 
-data class PlayerLeftGame(
-    var id: String,
-    var success: Boolean,
-    var message: String
+data class PlayerEvent(
+    var id: String
 )
 
 data class DeleteEntities(
