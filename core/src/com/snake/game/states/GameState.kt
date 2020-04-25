@@ -120,8 +120,10 @@ class GameState(private val roomId: String, private val playerId: String, privat
                         ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
-                if (!em.hasEntity(id))
+                if (!em.hasEntity(id)) {
+                    Gdx.app.log("update", "Create entity: " + id)
                     Entity(id, em)
+                }
                 val entity = em.getEntity(id)!!
 
                 // Create the component if necessary
@@ -176,9 +178,10 @@ class GameState(private val roomId: String, private val playerId: String, privat
     }
 
     private fun deleteEntities(args: Array<Any>) {
-        val data: DeleteEntities = Gson().fromJson((args[0] as JSONObject).toString(), DeleteEntities::class.java)
+        val data: JSONObject = args[0] as JSONObject
+        val message: DeleteEntities = Gson().fromJson(data.toString(), DeleteEntities::class.java)
 
-        for(entityId in data.entityIds)
+        for(entityId in message.entityIds)
             ecs.removeEntity(entityId)
     }
 }

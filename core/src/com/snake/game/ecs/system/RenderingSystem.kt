@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.CatmullRomSpline
@@ -129,6 +128,8 @@ object RenderingSystem : System(ComponentType.Position) {
 
         var pos: PositionComponent? = null
         while(pieceId != null) {
+            if (!em.hasEntity(pieceId))
+                break;
             var entity = em.getEntity(pieceId)!!
             pos = entity.getComponent(ComponentType.Position) as PositionComponent
             pieceId = (entity.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
@@ -152,7 +153,7 @@ object RenderingSystem : System(ComponentType.Position) {
         }
 
         // number of points used for rendering the spline
-        var k = snakePoints.size * 6
+        var k = if(snakePoints.size > 2) snakePoints.size * 5 else 1
 
         val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
         var points = ArrayList<Vector2>()
