@@ -10,9 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
@@ -78,20 +76,6 @@ abstract class BaseState(protected val stage: Stage) : IState {
             }
         })
         return button
-    }
-
-    protected fun createAlertDialog(text: String, optionYes: String, optionNO: String, onYes: () -> Unit, onNo: () -> Unit): Dialog {
-        return (object : Dialog("", skin, "default") {
-            override fun result(result: Any) {
-                println("Result: $result")
-            }
-        }).apply<Dialog> {
-            contentTable.add(Label(text, skin, "big"))
-            button(optionYes, true)
-            button(optionNO, false)
-            isMovable = false
-            isResizable = false
-        }
     }
 
     companion object {

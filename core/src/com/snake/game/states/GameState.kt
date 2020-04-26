@@ -34,7 +34,6 @@ class GameState(
     var players: MutableList<Player>, // The player in the room
     updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
-
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
@@ -45,9 +44,7 @@ class GameState(
     private val swipeDetector = SwipeDetector
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
-    private val playersList = Table().apply {
-        height = MenuBaseState.ELEMENT_HEIGHT * 4
-    }
+    private val playersList = Table()
     private var infoPane: InfoPane
     private var itemPowerups: ItemPowerups
 
@@ -74,9 +71,9 @@ class GameState(
         updatePlayersList()
 
         infoPane = InfoPane(uiGroup, sidePanelWidth, sidePanelHeight)
-        itemPowerups = ItemPowerups(infoPane.paneWidth, infoPane.paneHeight)
+        itemPowerups = ItemPowerups(infoPane.width, infoPane.height)
 
-        val backButton = createTextButton("back") {
+        val backButton = createTextButton("lobby") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }
 
@@ -84,7 +81,7 @@ class GameState(
 
         infoPane.addRow(playersList)
         infoPane.addRow(itemPowerups.getPowerupsControlPanel())
-        infoPane.addRow(backButton)
+        infoPane.addBackButton(backButton)
 
         // we add swipe listener :
         swipeDetector.active = true
@@ -104,16 +101,18 @@ class GameState(
 
         for (player: Player in players) {
             var alive = false
+            var invisible = false
             for (p: PlayerComponent in playersComponents) {
                 if (p.playerId == player.id) {
                     alive = p.alive
+                    invisible = p.invisible
                 }
             }
-            insertPlayer(player, alive)
+            insertPlayer(player, alive, invisible)
         }
     }
 
-    private fun insertPlayer(player: Player, alive: Boolean) {
+    private fun insertPlayer(player: Player, alive: Boolean, invisible: Boolean = false) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
             setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, MenuBaseState.ELEMENT_HEIGHT / 2)
         }
@@ -123,14 +122,25 @@ class GameState(
         var heightTotal = 0f
 
         if (!alive) {
-            val aliveIcon = Image(Texture("indicators/owner.png")).apply {
-                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.1F
+            val aliveIcon = Image(Texture("indicators/dead-red.png")).apply {
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
-            table.add(aliveIcon).width(aliveIcon.width).height(aliveIcon.height)
-            widthTotal += aliveIcon.width
+            table.add(aliveIcon).width(aliveIcon.width).height(aliveIcon.height).padRight(aliveIcon.width / 2)
+            widthTotal += (aliveIcon.width + aliveIcon.width / 2)
             heightTotal += heightTotal.coerceAtLeast(aliveIcon.height)
+        }
+
+        if (invisible) {
+            val invisibleIcon = Image(Texture("powerup-sprites/powerup-invisible.png")).apply {
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
+                height = width
+            }
+
+            table.add(invisibleIcon).width(invisibleIcon.width).height(invisibleIcon.height).padRight(invisibleIcon.width / 2)
+            widthTotal += (invisibleIcon.width + invisibleIcon.width / 2)
+            heightTotal += heightTotal.coerceAtLeast(invisibleIcon.height)
         }
 
         table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
@@ -163,7 +173,9 @@ class GameState(
             playerDied(response.id)
         }.on(Events.YOU_DIED.value) {
             Gdx.app.log("SocketIO", "YOU_DIED")
-            youDied()
+            Gdx.app.postRunnable {
+                youDied()
+            }
         }
     }
 
@@ -248,13 +260,11 @@ class GameState(
 
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
         // TODO: add some indicator that player is dead in side panel.
-
         // TODO Stop rendering 'response.id' player.
     }
 
     private fun youDied() {
-        val dialog = createAlertDialog("You are dead", "Lobby", "Watch", {}, {})
-        // TODO show this dialog
+        infoPane.showDeathMessage(skin)
     }
 
     private fun deleteEntities(args: Array<Any>) {
@@ -273,9 +283,9 @@ class GameState(
 }
 
 class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float
+        val ecs: SnakeECSEngine,
+        private val fieldWidth: Float,
+        private val fieldHeight: Float
 ) : Widget() {
 
 
