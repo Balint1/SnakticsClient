@@ -20,7 +20,6 @@ import com.snake.game.ecs.component.SpriteComponent
 import com.snake.game.ecs.component.TagComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
-import com.snake.game.states.GameState
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -225,11 +224,11 @@ object RenderingSystem : System(ComponentType.Position) {
         }
 
         // Draw border around local snake
-        if(playerComponent.playerId == SnakeECSEngine.localPlayerId) {
+        if (playerComponent.playerId == SnakeECSEngine.localPlayerId) {
             shapeRenderer.color = Color(0.83f, 0.69f, 0.22f, 1f)
             for (i in 0 until points.size - 1) {
                 shapeRenderer.color.a = alphas[i]
-                shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS+1f)
+                shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS + 1f)
             }
         }
 

@@ -25,17 +25,17 @@ class PlayerComponent() : Component(ComponentType.Player) {
         invisible = data.getBoolean("invisible")
     }
 
-    private fun checkForItemPowerup(powerupsJson: JSONArray){
+    private fun checkForItemPowerup(powerupsJson: JSONArray) {
         fireballCount = 0
         throughWallsCount = 0
 
         if (powerupsJson.length() > 0) {
-            val powerups:Array<PowerupType> = Gson().fromJson(powerupsJson.toString(), Array<PowerupType>::class.java)
-            for (powerup:PowerupType in powerups){
-                if(powerup.activationStatus != "used"){
-                    if(powerup.type == TagComponent.EntityTagType.Fireball.typeString){
+            val powerups: Array<PowerupType> = Gson().fromJson(powerupsJson.toString(), Array<PowerupType>::class.java)
+            for (powerup: PowerupType in powerups) {
+                if (powerup.activationStatus != "used") {
+                    if (powerup.type == TagComponent.EntityTagType.Fireball.typeString) {
                         fireballCount ++
-                    }else if(powerup.type == TagComponent.EntityTagType.ThroughWalls.typeString){
+                    } else if (powerup.type == TagComponent.EntityTagType.ThroughWalls.typeString) {
                         throughWallsCount ++
                     }
                 }
@@ -44,6 +44,7 @@ class PlayerComponent() : Component(ComponentType.Player) {
     }
 
     data class PowerupType(
-            var type: String,
-            var activationStatus: String)
+        var type: String,
+        var activationStatus: String
+    )
 }

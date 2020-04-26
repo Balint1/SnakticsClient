@@ -34,9 +34,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-        playerId: String, // The ID of the local player
-        var players: MutableList<Player>, // The player in the room
-        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+    playerId: String, // The ID of the local player
+    var players: MutableList<Player>, // The player in the room
+    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
@@ -106,11 +106,6 @@ class GameState(
         }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
             Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
             leaveToLobby(args)
-        }.on(Events.PLAYER_DIED.value) { args ->
-            Gdx.app.log("SocketIO", "PLAYER_DIED")
-            val data: JSONObject = args[0] as JSONObject
-            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
-            playerDied(response.id)
         }
     }
 
@@ -223,7 +218,6 @@ class GameState(
                 ?: return
         itemPowerups.updateFb(player.fireballCount)
         itemPowerups.updateTw(player.throughWallsCount)
-
     }
 
     override fun onBackPressed() {
@@ -249,13 +243,6 @@ class GameState(
     private fun playerLeftGame(id: String) {
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
         // TODO: remove the player from the player list for the side panel, and update the player list in the side panel
-        // TODO Stop rendering 'response.id' player.
-    }
-
-    private fun playerDied(id: String) {
-
-        Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
-        // TODO: add some indicator that player is dead in side panel.
         // TODO Stop rendering 'response.id' player.
     }
 
@@ -297,14 +284,13 @@ class GameState(
         gameWidget.width = width * (1.0f - SIDE_PANEL_SIZE)
         gameWidget.height = height.toFloat()
     }
-
 }
 
 class GameWidget(
-        val ecs: SnakeECSEngine,
-        private val fieldWidth: Float,
-        private val fieldHeight: Float,
-        private val standardViewport: Viewport
+    val ecs: SnakeECSEngine,
+    private val fieldWidth: Float,
+    private val fieldHeight: Float,
+    private val standardViewport: Viewport
 ) : Widget() {
 
     // private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)

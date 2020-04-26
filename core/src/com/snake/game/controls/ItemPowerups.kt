@@ -25,7 +25,6 @@ class ItemPowerups(width: Float, height: Float) {
     private val redLabelStyle = Label.LabelStyle(BitmapFont(), Color.RED)
     private val greenLabelStyle = Label.LabelStyle(BitmapFont(), Color.GREEN)
 
-
     private val fireBallCount = Label("0", redLabelStyle).apply {
         setAlignment(Align.center)
     }
