@@ -1,5 +1,6 @@
 package com.snake.game.ecs.system
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -152,7 +153,7 @@ object RenderingSystem : System(ComponentType.Position) {
 
         // Add the last position twice to force the CatmullRomSpline to end there
         if (pos != null)
-            snakePoints.add(Vector2(pos!!.x, pos!!.y))
+            snakePoints.add(Vector2(pos.x, pos.y))
 
         var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
         var endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
