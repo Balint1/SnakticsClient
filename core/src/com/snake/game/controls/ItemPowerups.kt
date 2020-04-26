@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
@@ -61,9 +60,10 @@ class ItemPowerups(width: Float, height: Float) {
             add(throughWallsCount).width(buttonWidth).height(buttonWidth).align(Align.center)
         }
         mainTable.apply {
+            padTop(height/3)
             add(fireBallTable).padLeft(buttonWidth).padRight(buttonWidth)
             add(throughWallsTable).padLeft(buttonWidth).padRight(buttonWidth)
-            setPosition(0f, height/2)
+            padBottom(height/4)
         }
     }
 

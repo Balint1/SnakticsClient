@@ -4,11 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.google.gson.Gson
 import com.snake.game.backend.Player
@@ -43,8 +39,10 @@ class GameState(
     private val swipeDetector = SwipeDetector
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
-    private val infoPane: InfoPane = InfoPane()
-    private val playersList = Table()
+    private val playersList = Table().apply {
+        height = MenuBaseState.ELEMENT_HEIGHT * 4
+    }
+    private var infoPane: InfoPane
     private var itemPowerups: ItemPowerups
 
     init {
@@ -54,37 +52,33 @@ class GameState(
         addListeners()
 
         // Apply updates that were received by the lobby
-        updatesBuffer.forEach {args -> onStateUpdate(args)}
+        updatesBuffer.forEach { args -> onStateUpdate(args) }
 
         val uiGroup = VerticalGroup()
-
         splitPane = SplitPane(uiGroup, gameWidget, false, skin)
         splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
-        itemPowerups = ItemPowerups(splitPane.width * splitPane.splitAmount, splitPane.height)
+
+        updatePlayersList()
+
+        infoPane = InfoPane(uiGroup, splitPane.width * splitPane.splitAmount, splitPane.height)
+        itemPowerups = ItemPowerups(infoPane.paneWidth, infoPane.paneHeight)
+
+        val backButton = createTextButton("back") {
+            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
+        }
 
         stage.addActor(splitPane)
+
         infoPane.addRow(playersList)
-
-        // TODO: add players into the list
-        updatePlayersList()
         infoPane.addRow(itemPowerups.getPowerupsControlPanel())
-
-        createTextButton("back") {
-            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
-        }.apply {
-            infoPane.addRow(this)
-        }
+        infoPane.addRow(backButton)
 
         // we add swipe listener :
         swipeDetector.active = true
         itemPowerups.pickup(TagComponent.EntityTagType.Fireball)
-    }
-
-    override fun activated() {
-        super.activated()
     }
 
     private fun updatePlayersList() {
@@ -263,9 +257,9 @@ class GameState(
 }
 
 class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float
+        val ecs: SnakeECSEngine,
+        private val fieldWidth: Float,
+        private val fieldHeight: Float
 ) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
