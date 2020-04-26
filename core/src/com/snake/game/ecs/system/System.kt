@@ -23,5 +23,5 @@ abstract class System(var componentTypes: ComponentTypeTree) {
      * @param width the world width
      * @param height the world height
      */
-    open fun render(sb: SpriteBatch, em: EntityManager, width: Float, height: Float) {}
+    open fun render(sb: SpriteBatch, em: EntityManager, worldWidth: Float, worldHeight: Float) {}
 }
