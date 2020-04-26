@@ -21,6 +21,9 @@ class Lobby(
     private val playerId: String = SocketService.socket.id()
     private val playersList = Table()
 
+    // Store state updates that may have been received while in the lobby so the GameState can process them when it is ready
+    private val updatesBuffer = ArrayList<Array<Any>>()
+
     init {
         addListeners()
         setTitle("Lobby")
@@ -46,14 +49,14 @@ class Lobby(
     /**
      * Called when the player success or fails to to start the game
      *
-     * @param response response fom create room http request
+     * @param response response from start game http request
      */
     private fun onStartGame(response: SimpleResponse) {
-        Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
+        Gdx.app.debug("UI", "(Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            cancelListeners()
-            StateManager.push(GameState(playerId, players))
+            StateManager.push(GameState(playerId, players, updatesBuffer))
+            updatesBuffer.clear()
         } else {
             showMessageDialog(response.message)
         }
@@ -62,7 +65,7 @@ class Lobby(
     /**
      * Called when the player success or fails to to leave the room
      *
-     * @param response response fom create room http request
+     * @param response response from create room http request
      */
     private fun onLeaveRoom(response: SimpleResponse) {
         Gdx.app.debug("UI", "Lobby::onLeaveRoom(%b)".format(response.success))
@@ -103,9 +106,12 @@ class Lobby(
             }
         }.on(Events.START_GAME.value) {
             Gdx.app.postRunnable {
-                cancelListeners()
-                StateManager.push(GameState(playerId, players))
+                StateManager.push(GameState(playerId, players, updatesBuffer))
+                updatesBuffer.clear()
             }
+        }.on(Events.UPDATE.value) { args ->
+            // Store the update (will be given to the GameState when it is ready)
+            updatesBuffer.add(args)
         }
     }
 

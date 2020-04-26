@@ -12,12 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.google.gson.Gson
-import com.snake.game.backend.Player
-import com.snake.game.backend.SocketService
-import com.snake.game.backend.Events
-import com.snake.game.backend.PlayerEvent
-import com.snake.game.backend.SimpleResponse
-import com.snake.game.backend.DeleteEntities
+import com.snake.game.backend.*
 import com.snake.game.controls.PowerupsPanel
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
@@ -29,14 +24,18 @@ import com.snake.game.ecs.entity.Entity
 import org.json.JSONException
 import org.json.JSONObject
 
-class GameState(playerId: String, var players: MutableList<Player>) : BaseState() {
-    private val swipeDetector = SwipeDetector
+class GameState(
+        playerId: String, // The ID of the local player
+        var players: MutableList<Player>, // The player in the room
+        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+) : BaseState() {
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
 
     private val ecs = SnakeECSEngine
+    private val swipeDetector = SwipeDetector
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
     private val playersList = Table()
@@ -47,6 +46,9 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
         cancelOldListeners()
         addListeners()
+
+        // Apply updates that were received by the lobby
+        updatesBuffer.forEach {args -> onStateUpdate(args)}
 
         val uiGroup = VerticalGroup()
 
@@ -77,8 +79,6 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
     override fun activated() {
         super.activated()
-
-        ecs.createEntities()
     }
 
     private fun updatePlayersList() {
@@ -133,6 +133,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
     private fun addListeners() {
         SocketService.socket.on(Events.UPDATE.value) { args ->
+            Gdx.app.log("SocketIO", "UPDATE " + args[0].toString())
             onStateUpdate(args)
         }.on(Events.DELETE_ENTITIES.value) { args ->
             Gdx.app.log("SocketIO", "DELETE_ENTITY")
@@ -165,6 +166,8 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
     private fun cancelOldListeners() {
         SocketService.socket.off(Events.OWNER_CHANGED.value)
         SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
+        SocketService.socket.off(Events.UPDATE.value)
     }
 
     private fun onStateUpdate(args: Array<Any>) {
