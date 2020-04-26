@@ -1,5 +1,6 @@
 package com.snake.game.ecs.entity
 
+import com.badlogic.gdx.Gdx
 import com.snake.game.ecs.component.Component
 import com.snake.game.ecs.component.ComponentType
 import java.util.EnumMap
@@ -13,7 +14,7 @@ class Entity(val id: String, private val entityManager: EntityManager) {
     private var componentMap: EnumMap<ComponentType, Component> = EnumMap(ComponentType::class.java)
 
     init {
-        entityManager.addEntity(this)
+        entityManager.scheduleAddEntity(this)
     }
 
     /**

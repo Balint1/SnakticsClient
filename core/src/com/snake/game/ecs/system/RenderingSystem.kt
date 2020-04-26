@@ -55,7 +55,6 @@ object RenderingSystem : System(ComponentType.Position) {
         sr.rect(0f, 0f, worldWidth, worldHeight)
         sr.end()
 
-        // Iterate over indices to avoid ConcurrentModificationException
         entities.map { entity ->
             val pos = entity.getComponent(ComponentType.Position) as PositionComponent
 
@@ -91,8 +90,10 @@ object RenderingSystem : System(ComponentType.Position) {
                 }
             } else {
                 // Temporary render
-                sr.begin()
+                sr.begin(ShapeType.Filled)
                 sr.color = Color.RED
+                if(entity.getComponent(ComponentType.Tag) != null)
+                    sr.color = Color.ORANGE
                 sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
                 sr.end()
             }

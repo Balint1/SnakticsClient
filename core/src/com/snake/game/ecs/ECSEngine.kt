@@ -17,10 +17,12 @@ open class ECSEngine(vararg systems: System) {
      * @param dt the elapsed time since the last update, in ms.
      */
     fun update(dt: Float) {
+        entityManager.updateEntityStorage()
+
         for (system in systems) {
             // Update all entities that match the component tree for this system
-            entityManager.getEntities(system.componentTypes).map { entity ->
-                system.update(dt, entity)
+            entityManager.getEntities(system.componentTypes).map {
+                entity -> system.update(dt, entity)
             }
         }
     }
@@ -42,6 +44,6 @@ open class ECSEngine(vararg systems: System) {
      */
     fun removeEntity(entityId: String) {
         Gdx.app.log("remove-entity", entityId)
-        entityManager.removeEntity(entityId)
+        entityManager.scheduleRemoveEntity(entityId)
     }
 }

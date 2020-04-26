@@ -21,11 +21,9 @@ import com.snake.game.controls.SwipeDetector
 
 abstract class BaseState : IState {
     protected val stage = Stage(ExtendViewport(MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT))
-    private val multiplexer = InputMultiplexer()
-
-    protected val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
 
     override fun activated() {
+        val multiplexer = InputMultiplexer()
         multiplexer.addProcessor(SwipeDetector)
         multiplexer.addProcessor(stage)
         Gdx.input.inputProcessor = multiplexer
@@ -96,5 +94,9 @@ abstract class BaseState : IState {
             isMovable = false
             isResizable = false
         }
+    }
+
+    companion object {
+        val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
     }
 }
