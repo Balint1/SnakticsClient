@@ -17,9 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.snake.game.controls.SwipeDetector
 
-abstract class BaseState : IState {
-    protected val stage = Stage(ExtendViewport(MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT))
-
+abstract class BaseState(protected val stage: Stage) : IState {
     override fun activated() {
         val multiplexer = InputMultiplexer()
         multiplexer.addProcessor(SwipeDetector)
