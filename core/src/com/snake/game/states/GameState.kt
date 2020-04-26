@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.google.gson.Gson
 import com.snake.game.backend.*
+import com.snake.game.controls.PowerupsPanel
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.*
@@ -26,6 +27,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
     private val playersList = Table()
+    private var powerupsPanel: PowerupsPanel
 
     init {
         ecs.localPlayerId = playerId
@@ -40,6 +42,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
+        powerupsPanel = PowerupsPanel(skin, splitPane.width * splitPane.splitAmount)
 
         stage.addActor(splitPane)
         // element can be added to  the side panel with :
@@ -47,7 +50,8 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         uiGroup.addActor(playersList)
         // TODO: add players into the list
         updatePlayersList()
-
+        uiGroup.addActor(powerupsPanel.getPowerupsControlPanel())
+        println("Split panel width: ${splitPane.width * 0.2}")
         createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }.apply {
@@ -56,6 +60,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
         // we add swipe listener :
         swipeDetector.active = true
+        powerupsPanel.pickup(TagComponent.EntityTagType.Fireball)
     }
 
     override fun activated() {
@@ -79,15 +84,15 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
             for (p: PlayerComponent in players_components) {
                 if (p.playerId == player.id) {
                     alive = p.alive
-                    println("zepofkzepofkzepofkzepofkzepofkzpofkzepfozkepfozkefpozekfpzkofpzokfzpoefkzpoefkzpokf")
                 }
             }
             insertPlayer(player, alive)
         }
     }
+
     private fun insertPlayer(player: Player, alive: Boolean) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.4F, MenuBaseState.ELEMENT_HEIGHT / 2)
+            setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, MenuBaseState.ELEMENT_HEIGHT / 2)
         }
 
         val table = Table()
@@ -96,7 +101,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
         if (alive == false) {
             var aliveIcon = Image(Texture("indicators/owner.png")).apply {
-                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount* 0.1F
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.1F
                 height = width
             }
 
@@ -108,7 +113,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
         widthTotal += nicknameLabel.width
         heightTotal += heightTotal.coerceAtLeast(nicknameLabel.height)
-        table.setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount *0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
+        table.setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, MenuBaseState.ELEMENT_HEIGHT / 2)
         playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height / 3f).expandX()
         playersList.row()
     }
@@ -236,9 +241,9 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 }
 
 class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float
+        val ecs: SnakeECSEngine,
+        private val fieldWidth: Float,
+        private val fieldHeight: Float
 ) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
