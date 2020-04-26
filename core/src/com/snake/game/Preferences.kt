@@ -34,6 +34,4 @@ object Preferences {
         |"snakeLength":${castLength()}, 
         |"colorsDisabled":$colorsDisabled
         |}""".trimMargin()
-
-
 }

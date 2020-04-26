@@ -141,7 +141,6 @@ class Lobby(
         for (player: Player in players) {
             insertPlayer(player)
         }
-
     }
 
     private fun insertPlayer(player: Player) {
