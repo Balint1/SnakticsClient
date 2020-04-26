@@ -34,5 +34,4 @@ enum class Events(val value: String) {
     PLAYER_DIED("player-died"),
     YOU_DIED("you-died"),
     USE_POWERUP("use-powerup")
-
 }

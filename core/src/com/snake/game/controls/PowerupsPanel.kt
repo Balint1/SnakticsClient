@@ -4,7 +4,10 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
@@ -17,8 +20,8 @@ import com.snake.game.ecs.component.TagComponent
 class PowerupsPanel(skin: Skin, width: Float) {
     private val buttonWidth = width / 5
     private val mainTable = Table()
-    private val fireballTexture = Texture("powerUpsSprites/fireBallButton.png")
-    private val throughWallsTexture = Texture("powerUpsSprites/throughWallsButton.png")
+    private val fireballTexture = Texture("buttons/fire-ball-button.png")
+    private val throughWallsTexture = Texture("buttons/through-walls-button.png")
     private var fireBallCountNum: Int = 0
     private var throughWallsCountNum: Int = 0
 
@@ -86,7 +89,7 @@ class PowerupsPanel(skin: Skin, width: Float) {
     private fun shootFireball() {
         println("Shoot fireball")
         fireBallCountNum--
-        if(fireBallCountNum == 0){
+        if (fireBallCountNum == 0) {
             fireButton.touchable = Touchable.disabled
         }
         fireBallCount.setText(fireBallCountNum.toString())
@@ -96,7 +99,7 @@ class PowerupsPanel(skin: Skin, width: Float) {
     private fun activateThroughWalls() {
         println("Through th Walls")
         throughWallsCountNum--
-        if(throughWallsCountNum == 0){
+        if (throughWallsCountNum == 0) {
             throughWallsButton.touchable = Touchable.disabled
         }
         throughWallsCount.setText(throughWallsCountNum.toString())

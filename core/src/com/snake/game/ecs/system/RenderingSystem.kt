@@ -8,7 +8,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.CatmullRomSpline
 import com.badlogic.gdx.math.Vector2
 import com.snake.game.ecs.SnakeECSEngine
-import com.snake.game.ecs.component.*
+import com.snake.game.ecs.component.ComponentType
+import com.snake.game.ecs.component.SpriteComponent
+import com.snake.game.ecs.component.AnimatedSpriteComponent
+import com.snake.game.ecs.component.PlayerComponent
+import com.snake.game.ecs.component.SnakeComponent
+import com.snake.game.ecs.component.TagComponent
+import com.snake.game.ecs.component.PositionComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
 import kotlin.math.max
@@ -74,7 +80,6 @@ object RenderingSystem : System(ComponentType.Position) {
                     // sr.circle(pos.x, pos.y, SNAKE_RADIUS * 1.5f)
                     renderSnake(sb, em, entity, sr)
                 } else if (tag == TagComponent.EntityTagType.SnakeBody) {
-
                 }
             } else {
                 // Temporary render
