@@ -39,9 +39,7 @@ class GameState(
     private val swipeDetector = SwipeDetector
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
-    private val playersList = Table().apply {
-        height = MenuBaseState.ELEMENT_HEIGHT * 4
-    }
+    private val playersList = Table()
     private var infoPane: InfoPane
     private var itemPowerups: ItemPowerups
 
@@ -66,7 +64,7 @@ class GameState(
         infoPane = InfoPane(uiGroup, splitPane.width * splitPane.splitAmount, splitPane.height)
         itemPowerups = ItemPowerups(infoPane.width, infoPane.height)
 
-        val backButton = createTextButton("back") {
+        val backButton = createTextButton("lobby") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }
 
@@ -74,7 +72,7 @@ class GameState(
 
         infoPane.addRow(playersList)
         infoPane.addRow(itemPowerups.getPowerupsControlPanel())
-        infoPane.addRow(backButton)
+        infoPane.addBackButton(backButton)
 
         // we add swipe listener :
         swipeDetector.active = true
@@ -153,7 +151,9 @@ class GameState(
             playerDied(response.id)
         }.on(Events.YOU_DIED.value) {
             Gdx.app.log("SocketIO", "YOU_DIED")
-            youDied()
+            Gdx.app.postRunnable {
+                youDied()
+            }
         }
     }
 
@@ -238,14 +238,11 @@ class GameState(
 
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
         // TODO: add some indicator that player is dead in side panel.
-
         // TODO Stop rendering 'response.id' player.
     }
 
     private fun youDied() {
-        println("DEAD")
-        infoPane.showDeathMessage()
-        // TODO show this dialog
+        infoPane.showDeathMessage(skin)
     }
 
     private fun deleteEntities(args: Array<Any>) {

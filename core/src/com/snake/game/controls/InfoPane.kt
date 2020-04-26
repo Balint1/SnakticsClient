@@ -1,15 +1,12 @@
 package com.snake.game.controls
 
-import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
 
 class InfoPane(pseudoStage: VerticalGroup, val width: Float, val height: Float) {
     private val rootTable = Table()
+    private var backButton: TextButton? = null
 
     init {
         pseudoStage.addActor(rootTable)
@@ -22,12 +19,22 @@ class InfoPane(pseudoStage: VerticalGroup, val width: Float, val height: Float) 
         }
     }
 
-    fun showDeathMessage(){
-        val redLabelStyle = Label.LabelStyle(BitmapFont(), Color.RED)
-        val deathMessage = Label("You died. you can stay and watch the game or go to lobby", redLabelStyle).apply {
+    fun showDeathMessage(skin: Skin) {
+        rootTable.clear()
+        val deathMessage = Label("You died", skin, "big").apply {
+            width = this@InfoPane.width * 4 / 5
             setAlignment(Align.center)
         }
-        rootTable.clear()
+        rootTable.apply {
+            padTop(height * 2 / 6)
+            add(deathMessage).padBottom(height * 1 / 6)
+            row()
+            add(backButton)
+        }
+    }
 
+    fun addBackButton(button: TextButton) {
+        backButton = button
+        rootTable.add(backButton)
     }
 }

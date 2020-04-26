@@ -44,10 +44,6 @@ class ItemPowerups(width: Float, height: Float) {
     }
 
     init {
-//        val bgPixmap = Pixmap(1, 1, Pixmap.Format.RGB565)
-//        bgPixmap.setColor(Color.RED)
-//        bgPixmap.fill()
-//        var textureRegionDrawableBg = TextureRegionDrawable(TextureRegion(Texture(bgPixmap)))
         val fireBallTable = Table().apply {
             add(fireButton).width(buttonWidth).height(buttonWidth).align(Align.center)
             row()
