@@ -39,18 +39,14 @@ class EntityManager {
         try {
             removeEntityCache.forEach { id -> removeEntity(id) }
             removeEntityCache.clear()
-        }
-        catch(e: ConcurrentModificationException) {
-
+        } catch (e: ConcurrentModificationException) {
         }
 
         try {
             // Add entities that were scheduled to be added
             newEntityCache.values.forEach { entity -> addEntity(entity) }
             newEntityCache.clear()
-        }
-        catch(e: ConcurrentModificationException) {
-
+        } catch (e: ConcurrentModificationException) {
         }
     }
 

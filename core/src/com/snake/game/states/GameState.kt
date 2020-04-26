@@ -26,7 +26,6 @@ import com.snake.game.controls.ItemPowerups
 import com.snake.game.controls.InfoPane
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
-import com.snake.game.ecs.component.TagComponent
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.PlayerComponent
 import com.snake.game.ecs.component.ComponentTypeTree
@@ -70,8 +69,8 @@ class GameState(
         splitPane.minSplitAmount = SIDE_PANEL_SIZE
         splitPane.maxSplitAmount = SIDE_PANEL_SIZE
 
-        var sidePanelWidth = Gdx.graphics.width * SIDE_PANEL_SIZE
-        var sidePanelHeight = Gdx.graphics.height.toFloat()
+        val sidePanelWidth = Gdx.graphics.width * SIDE_PANEL_SIZE
+        val sidePanelHeight = Gdx.graphics.height.toFloat()
 
         updatePlayersList()
 
@@ -90,7 +89,58 @@ class GameState(
 
         // we add swipe listener :
         swipeDetector.active = true
-        itemPowerups.pickup(TagComponent.EntityTagType.Fireball)
+    }
+
+    private fun addListeners() {
+        SocketService.socket.on(Events.UPDATE.value) { args ->
+            // Gdx.app.log("SocketIO", "UPDATE " + args[0].toString())
+            onStateUpdate(args)
+        }.on(Events.DELETE_ENTITIES.value) { args ->
+            Gdx.app.log("SocketIO", "DELETE_ENTITY")
+            deleteEntities(args)
+        }.on(Events.PLAYER_LEFT_GAME.value) { args ->
+            Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
+            val data: JSONObject = args[0] as JSONObject
+            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
+            playerLeftGame(response.id)
+        }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
+            Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
+            leaveToLobby(args)
+        }
+    }
+
+    private fun onStateUpdate(args: Array<Any>) {
+        val em = ecs.entityManager
+
+        val data: JSONObject = args[0] as JSONObject
+        try {
+            val state = data.getJSONArray("state")
+
+            // Update components
+            for (i in 0 until state.length()) {
+                val componentData = state.getJSONObject(i)
+                val id: String = componentData.getString("entityId")
+                val componentTypeName = componentData.getString("componentType")
+
+                val componentType: ComponentType? = ComponentType.fromName(componentTypeName)
+                        ?: continue // skip if component type doesn't exist
+
+                // Create the entity if necessary
+                if (!em.hasEntity(id))
+                    Entity(id, em)
+
+                val entity = em.getEntity(id)!!
+
+                // Create the component if necessary
+                if (!entity.hasComponent(componentType!!))
+                    entity.addComponent(ComponentType.createComponent(componentType))
+
+                val component = entity.getComponent(componentType)!!
+                component.updateFromJSON(componentData)
+            }
+        } catch (e: JSONException) {
+            Gdx.app.log("SocketIO", "Error getting attributes: $e")
+        }
     }
 
     private fun updatePlayersList() {
@@ -156,85 +206,18 @@ class GameState(
         playersList.row()
     }
 
-    private fun addListeners() {
-        SocketService.socket.on(Events.UPDATE.value) { args ->
-            Gdx.app.log("SocketIO", "UPDATE " + args[0].toString())
-            onStateUpdate(args)
-        }.on(Events.DELETE_ENTITIES.value) { args ->
-            Gdx.app.log("SocketIO", "DELETE_ENTITY")
-            deleteEntities(args)
-        }.on(Events.PLAYER_LEFT_GAME.value) { args ->
-            Gdx.app.log("SocketIO", "PLAYER_LEFT_GAME")
-            val data: JSONObject = args[0] as JSONObject
-            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
-            playerLeftGame(response.id)
-        }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
-            Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
-            leaveToLobby(args)
-        }.on(Events.PLAYER_DIED.value) { args ->
-            Gdx.app.log("SocketIO", "PLAYER_DIED")
-            val data: JSONObject = args[0] as JSONObject
-            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
-            playerDied(response.id)
+    private fun checkPowerups() {
+        val playersEntities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
+        val playersComponents = mutableListOf<PlayerComponent>()
+
+        for (p: Entity in playersEntities) {
+            if (p.getComponent(ComponentType.Player) != null)
+                playersComponents.add(p.getComponent(ComponentType.Player) as PlayerComponent)
         }
-    }
-
-    private fun cancelNewListeners() {
-        SocketService.socket.off(Events.PLAYER_LEFT_GAME.value)
-        SocketService.socket.off(Events.LEAVE_TO_LOBBY_RESPONSE.value)
-        SocketService.socket.off(Events.UPDATE.value)
-    }
-
-    private fun cancelOldListeners() {
-        SocketService.socket.off(Events.OWNER_CHANGED.value)
-        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
-        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
-        SocketService.socket.off(Events.UPDATE.value)
-    }
-
-    private fun onStateUpdate(args: Array<Any>) {
-        val em = ecs.entityManager
-
-        val data: JSONObject = args[0] as JSONObject
-        try {
-            val state = data.getJSONArray("state")
-
-            // Update components
-            for (i in 0 until state.length()) {
-                val componentData = state.getJSONObject(i)
-                val id: String = componentData.getString("entityId")
-                val componentTypeName = componentData.getString("componentType")
-
-                val componentType: ComponentType? = ComponentType.fromName(componentTypeName)
-                        ?: continue // skip if component type doesn't exist
-
-                // Create the entity if necessary
-                if (!em.hasEntity(id))
-                    Entity(id, em)
-
-                val entity = em.getEntity(id)!!
-
-                // Create the component if necessary
-                if (!entity.hasComponent(componentType!!))
-                    entity.addComponent(ComponentType.createComponent(componentType))
-
-                val component = entity.getComponent(componentType)!!
-                component.updateFromJSON(componentData)
-            }
-        } catch (e: JSONException) {
-            Gdx.app.log("SocketIO", "Error getting attributes: $e")
-        }
-    }
-
-    override fun update(dt: Float) {
-        super.update(dt)
-        ecs.update(dt)
-        updatePlayersList()
-    }
-
-    override fun render(sb: SpriteBatch) {
-        gameWidget.render()
-        super.render(sb)
+        val player = playersComponents.find { player -> player.playerId == ecs.localPlayerId }
+                ?: return
+        itemPowerups.updateFb(player.fireballCount)
+        itemPowerups.updateTw(player.throughWallsCount)
     }
 
     override fun onBackPressed() {
@@ -244,11 +227,6 @@ class GameState(
         }
     }
 
-    /**
-     * Called when the player success or fails to leave to the lobby
-     *
-     * @param args data from socket
-     */
     private fun leaveToLobby(args: Array<Any>) {
         val data: JSONObject = args[0] as JSONObject
         val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
@@ -268,19 +246,37 @@ class GameState(
         // TODO Stop rendering 'response.id' player.
     }
 
-    private fun playerDied(id: String) {
-
-        Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
-        // TODO: add some indicator that player is dead in side panel.
-        // TODO Stop rendering 'response.id' player.
-    }
-
     private fun deleteEntities(args: Array<Any>) {
         val data: JSONObject = args[0] as JSONObject
         val message: DeleteEntities = Gson().fromJson(data.toString(), DeleteEntities::class.java)
 
         for (entityId in message.entityIds)
             ecs.removeEntity(entityId)
+    }
+
+    private fun cancelNewListeners() {
+        SocketService.socket.off(Events.PLAYER_LEFT_GAME.value)
+        SocketService.socket.off(Events.LEAVE_TO_LOBBY_RESPONSE.value)
+        SocketService.socket.off(Events.UPDATE.value)
+    }
+
+    private fun cancelOldListeners() {
+        SocketService.socket.off(Events.OWNER_CHANGED.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
+        SocketService.socket.off(Events.PLAYER_LEFT_ROOM.value)
+        SocketService.socket.off(Events.UPDATE.value)
+    }
+
+    override fun update(dt: Float) {
+        super.update(dt)
+        ecs.update(dt)
+        updatePlayersList()
+        checkPowerups()
+    }
+
+    override fun render(sb: SpriteBatch) {
+        gameWidget.render()
+        super.render(sb)
     }
 
     override fun resize(width: Int, height: Int) {

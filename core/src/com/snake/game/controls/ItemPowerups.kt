@@ -5,7 +5,6 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.InputEvent
-import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
@@ -25,13 +24,11 @@ class ItemPowerups(width: Float, height: Float) {
     private val throughWallsTexture = Texture("powerup-sprites/powerup-tw-32bits.png")
     private val redLabelStyle = Label.LabelStyle(BitmapFont(), Color.RED)
     private val greenLabelStyle = Label.LabelStyle(BitmapFont(), Color.GREEN)
-    private var fireBallCountNum: Int = 0
-    private var throughWallsCountNum: Int = 0
 
-    private val fireBallCount = Label(fireBallCountNum.toString(), redLabelStyle).apply {
+    private val fireBallCount = Label("0", redLabelStyle).apply {
         setAlignment(Align.center)
     }
-    private val throughWallsCount = Label(throughWallsCountNum.toString(), redLabelStyle).apply {
+    private val throughWallsCount = Label("0", redLabelStyle).apply {
         setAlignment(Align.center)
     }
 
@@ -71,8 +68,6 @@ class ItemPowerups(width: Float, height: Float) {
         val drawable: Drawable = TextureRegionDrawable(TextureRegion(texture))
         val button = ImageButton(drawable)
         button.setSize(width, height)
-        button.touchable = Touchable.disabled
-        button.isDisabled = true
         button.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
                 onClick()
@@ -81,39 +76,29 @@ class ItemPowerups(width: Float, height: Float) {
         return button
     }
 
-    fun pickup(powerup: TagComponent.EntityTagType) {
-        if (powerup == TagComponent.EntityTagType.Fireball) {
-            fireButton.touchable = Touchable.enabled
-            fireBallCountNum++
+    fun updateFb(fireballCount: Int) {
+        if (fireballCount > 0) {
             fireBallCount.style = greenLabelStyle
-            fireBallCount.setText(fireBallCountNum.toString())
-        } else if (powerup == TagComponent.EntityTagType.ThroughWalls) {
-            throughWallsButton.touchable = Touchable.enabled
-            throughWallsCountNum++
-            throughWallsCount.style = greenLabelStyle
-            throughWallsCount.setText(throughWallsCountNum.toString())
+        } else if (fireballCount == 0) {
+            fireBallCount.style = redLabelStyle
         }
+        fireBallCount.setText(fireballCount.toString())
+    }
+
+    fun updateTw(twCount: Int) {
+        if (twCount > 0) {
+            throughWallsCount.style = greenLabelStyle
+        } else if (twCount == 0) {
+            throughWallsCount.style = redLabelStyle
+        }
+        throughWallsCount.setText(twCount.toString())
     }
 
     private fun shootFireball() {
-        println("Shoot fireball")
-        fireBallCountNum--
-        if (fireBallCountNum == 0) {
-            fireButton.touchable = Touchable.disabled
-            fireBallCount.style = redLabelStyle
-        }
-        fireBallCount.setText(fireBallCountNum.toString())
         SocketService.socket.emit(Events.USE_POWERUP.value, Data.USE_POWEUP(TagComponent.EntityTagType.Fireball.typeString))
     }
 
     private fun activateThroughWalls() {
-        println("Through th Walls")
-        throughWallsCountNum--
-        if (throughWallsCountNum == 0) {
-            throughWallsButton.touchable = Touchable.disabled
-            throughWallsCount.style = redLabelStyle
-        }
-        throughWallsCount.setText(throughWallsCountNum.toString())
         SocketService.socket.emit(Events.USE_POWERUP.value, Data.USE_POWEUP("through-walls"))
     }
 }
