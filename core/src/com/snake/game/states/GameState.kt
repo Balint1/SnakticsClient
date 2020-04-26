@@ -1,11 +1,15 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.badlogic.gdx.utils.viewport.*
 import com.google.gson.Gson
 import com.snake.game.backend.Player
 import com.snake.game.backend.SocketService
@@ -29,11 +33,13 @@ class GameState(
     playerId: String, // The ID of the local player
     var players: MutableList<Player>, // The player in the room
     updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
-) : BaseState() {
+) : BaseState(Stage(ScreenViewport())) {
 
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
+
+    private val SIDE_PANEL_SIZE = 0.2f
 
     private val ecs = SnakeECSEngine
     private val swipeDetector = SwipeDetector
@@ -55,15 +61,19 @@ class GameState(
         updatesBuffer.forEach { args -> onStateUpdate(args) }
 
         val uiGroup = VerticalGroup()
+
         splitPane = SplitPane(uiGroup, gameWidget, false, skin)
-        splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
-        splitPane.splitAmount = 0.2f
-        splitPane.minSplitAmount = 0.2f
-        splitPane.maxSplitAmount = 0.2f
+        splitPane.setFillParent(true)
+        splitPane.splitAmount = SIDE_PANEL_SIZE
+        splitPane.minSplitAmount = SIDE_PANEL_SIZE
+        splitPane.maxSplitAmount = SIDE_PANEL_SIZE
+
+        var sidePanelWidth = Gdx.graphics.width * SIDE_PANEL_SIZE
+        var sidePanelHeight = Gdx.graphics.height.toFloat()
 
         updatePlayersList()
 
-        infoPane = InfoPane(uiGroup, splitPane.width * splitPane.splitAmount, splitPane.height)
+        infoPane = InfoPane(uiGroup, sidePanelWidth, sidePanelHeight)
         itemPowerups = ItemPowerups(infoPane.paneWidth, infoPane.paneHeight)
 
         val backButton = createTextButton("back") {
@@ -254,6 +264,12 @@ class GameState(
         for (entityId in message.entityIds)
             ecs.removeEntity(entityId)
     }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        gameWidget.width = width * (1.0f - SIDE_PANEL_SIZE)
+        gameWidget.height = height.toFloat()
+    }
 }
 
 class GameWidget(
@@ -262,31 +278,41 @@ class GameWidget(
     private val fieldHeight: Float
 ) : Widget() {
 
-    private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
+
+    //private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)
+    private val viewport = FitViewport(fieldWidth, fieldHeight)
 
     // The SpriteBatch used for rendering the game
     private val sb = SpriteBatch()
 
-    private fun updateSize() {
+    init {
 
-        width = MenuBaseState.VIRTUAL_WIDTH * 0.8f
-        height = MenuBaseState.VIRTUAL_HEIGHT
-
-        viewport.update(width.toInt(), height.toInt(), true)
-        viewport.setScreenBounds(x.toInt(), y.toInt(), width.toInt(), height.toInt())
-        /*var ratio: Float = fieldWidth / fieldHeight
-        var h = height
-        var gwidth = (h * ratio)
-        viewport.update(gwidth.toInt(), h.toInt(), true)*/
     }
+
+    fun updateSize() {
+        // Gdx.app.log("debug", "x=$x, w=$width, h=$height")
+
+        viewport.update(width.toInt(), height.toInt())
+        viewport.screenX = Gdx.graphics.width - width.toInt()
+    }
+
 
     override fun draw(batch: Batch?, parentAlpha: Float) {
         super.draw(batch, parentAlpha)
-        // TODO update only when necessary
+
+        // TODO Would be better to only update size when necessary, but for some reason it doesn't work too well
         updateSize()
 
         viewport.apply(true)
         sb.projectionMatrix = viewport.camera.combined
+
         ecs.render(sb, fieldWidth, fieldHeight)
+
+        val sr = ShapeRenderer()
+        sr.projectionMatrix = sb.projectionMatrix
+        sr.begin(ShapeRenderer.ShapeType.Line)
+        sr.color = Color.RED
+        sr.rect(5f, 5f, fieldWidth-10, fieldHeight-10)
+        sr.end()
     }
 }
