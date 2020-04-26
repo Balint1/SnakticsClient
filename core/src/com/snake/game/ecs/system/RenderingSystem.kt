@@ -87,6 +87,11 @@ object RenderingSystem : System(ComponentType.Position) {
                 if (tag == TagComponent.EntityTagType.SnakeHead) {
                     renderSnake(sb, em, entity, sr)
                 } else if (tag == TagComponent.EntityTagType.SnakeBody) {
+                } else if (tag == TagComponent.EntityTagType.Fireball){
+                    sr.begin(ShapeType.Filled)
+                    sr.color = Color.RED
+                    sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
+                    sr.end()
                 }
             } else {
                 // Temporary render
