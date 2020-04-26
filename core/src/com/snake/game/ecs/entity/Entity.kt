@@ -1,6 +1,5 @@
 package com.snake.game.ecs.entity
 
-import com.badlogic.gdx.Gdx
 import com.snake.game.ecs.component.Component
 import com.snake.game.ecs.component.ComponentType
 import java.util.EnumMap

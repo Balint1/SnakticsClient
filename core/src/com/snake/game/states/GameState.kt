@@ -4,16 +4,17 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
-import com.badlogic.gdx.scenes.scene2d.ui.Label
-import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
+import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.google.gson.Gson
-import com.snake.game.backend.*
-import com.snake.game.controls.PowerupsPanel
+import com.snake.game.backend.Player
+import com.snake.game.backend.SocketService
+import com.snake.game.backend.Events
+import com.snake.game.backend.PlayerEvent
+import com.snake.game.backend.SimpleResponse
+import com.snake.game.backend.DeleteEntities
+import com.snake.game.controls.ItemPowerups
+import com.snake.game.controls.InfoPane
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.TagComponent
@@ -25,9 +26,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-        playerId: String, // The ID of the local player
-        var players: MutableList<Player>, // The player in the room
-        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+    playerId: String, // The ID of the local player
+    var players: MutableList<Player>, // The player in the room
+    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState() {
 
     // TODO get from backend
@@ -38,8 +39,11 @@ class GameState(
     private val swipeDetector = SwipeDetector
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
-    private val playersList = Table()
-    private var powerupsPanel: PowerupsPanel
+    private val playersList = Table().apply {
+        height = MenuBaseState.ELEMENT_HEIGHT * 4
+    }
+    private var infoPane: InfoPane
+    private var itemPowerups: ItemPowerups
 
     init {
         ecs.localPlayerId = playerId
@@ -48,37 +52,33 @@ class GameState(
         addListeners()
 
         // Apply updates that were received by the lobby
-        updatesBuffer.forEach {args -> onStateUpdate(args)}
+        updatesBuffer.forEach { args -> onStateUpdate(args) }
 
         val uiGroup = VerticalGroup()
-
         splitPane = SplitPane(uiGroup, gameWidget, false, skin)
         splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
-        powerupsPanel = PowerupsPanel(skin, splitPane.width * splitPane.splitAmount)
+
+        updatePlayersList()
+
+        infoPane = InfoPane(uiGroup, splitPane.width * splitPane.splitAmount, splitPane.height)
+        itemPowerups = ItemPowerups(infoPane.paneWidth, infoPane.paneHeight)
+
+        val backButton = createTextButton("back") {
+            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
+        }
 
         stage.addActor(splitPane)
-        uiGroup.addActor(playersList)
 
-        // TODO: add players into the list
-        updatePlayersList()
-        uiGroup.addActor(powerupsPanel.getPowerupsControlPanel())
-
-        createTextButton("back") {
-            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
-        }.apply {
-            uiGroup.addActor(this)
-        }
+        infoPane.addRow(playersList)
+        infoPane.addRow(itemPowerups.getPowerupsControlPanel())
+        infoPane.addRow(backButton)
 
         // we add swipe listener :
         swipeDetector.active = true
-        powerupsPanel.pickup(TagComponent.EntityTagType.Fireball)
-    }
-
-    override fun activated() {
-        super.activated()
+        itemPowerups.pickup(TagComponent.EntityTagType.Fireball)
     }
 
     private fun updatePlayersList() {

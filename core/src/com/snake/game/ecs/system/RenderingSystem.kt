@@ -33,11 +33,11 @@ object RenderingSystem : System(ComponentType.Position) {
 
     override fun update(dt: Float, entity: Entity) {
         // Update bouncing animation components
-        if(entity.hasComponent(ComponentType.BouncingRender)) {
+        if (entity.hasComponent(ComponentType.BouncingRender)) {
             var bouncingComponent = entity.getComponent(ComponentType.BouncingRender) as BouncingRenderComponent
 
             var t = (bouncingComponent.time % bouncingComponent.duration) / bouncingComponent.duration
-            bouncingComponent.offsetY = bouncingComponent.amplitude * max(0f, sin((t-0.5) * 2 * Math.PI).toFloat())
+            bouncingComponent.offsetY = bouncingComponent.amplitude * max(0f, sin((t - 0.5) * 2 * Math.PI).toFloat())
             bouncingComponent.time += dt
         }
     }
@@ -60,10 +60,10 @@ object RenderingSystem : System(ComponentType.Position) {
             val pos = entity.getComponent(ComponentType.Position) as PositionComponent
 
             // Render shadow
-            if(entity.hasComponent(ComponentType.ShadowRender)) {
+            if (entity.hasComponent(ComponentType.ShadowRender)) {
                 var shadowRenderC = entity.getComponent(ComponentType.ShadowRender) as ShadowRenderComponent
                 sr.begin(ShapeType.Filled)
-                sr.color = Color(0f,0f,0f,0.2f)
+                sr.color = Color(0f, 0f, 0f, 0.2f)
                 sr.ellipse(pos.x, pos.y, shadowRenderC.width, shadowRenderC.height + shadowRenderC.offsetY)
                 sr.end()
             }
@@ -72,10 +72,10 @@ object RenderingSystem : System(ComponentType.Position) {
                 var y = pos.y
 
                 // Handle bouncing animation rendering
-                if(entity.hasComponent(ComponentType.BouncingRender))
+                if (entity.hasComponent(ComponentType.BouncingRender))
                     y += (entity.getComponent(ComponentType.BouncingRender) as BouncingRenderComponent).offsetY
 
-                if(entity.hasComponent(ComponentType.Sprite))
+                if (entity.hasComponent(ComponentType.Sprite))
                     render(sb, entity.getComponent(ComponentType.Sprite) as SpriteComponent, pos.x, y)
                 if (entity.hasComponent(ComponentType.AnimatedSprite))
                     render(sb, entity.getComponent(ComponentType.AnimatedSprite) as AnimatedSpriteComponent, pos.x, y)
@@ -93,7 +93,7 @@ object RenderingSystem : System(ComponentType.Position) {
                 // Temporary render
                 sr.begin(ShapeType.Filled)
                 sr.color = Color.RED
-                if(entity.getComponent(ComponentType.Tag) != null)
+                if (entity.getComponent(ComponentType.Tag) != null)
                     sr.color = Color.ORANGE
                 sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
                 sr.end()
@@ -164,7 +164,7 @@ object RenderingSystem : System(ComponentType.Position) {
             val blinkTicks = 30f
             var t = (RenderingConstants.SNAKE_DECAYING_TICKS - playerComponent.remainingDecayTicks) / blinkTicks.toFloat()
             t = t.pow(1.25f) // makes bounces faster and faster
-            alpha = 1f - max(0f, sin(2f*Math.PI * (t-0.5f)).toFloat())
+            alpha = 1f - max(0f, sin(2f*Math.PI * (t - 0.5f)).toFloat())
             startColor = Color(0.2f, 0.2f, 0.2f, alpha)
             endColor = Color(0.12f, 0.12f, 0.12f, alpha)
         }
