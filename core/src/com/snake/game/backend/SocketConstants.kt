@@ -5,7 +5,7 @@ import org.json.JSONObject
 object Data {
     val JOIN_REQUEST: (String, String, String) -> JSONObject =
             { nickname: String, roomId: String, password: String ->
-                JSONObject("""{"nickname":"$nickname", "room_id":"$roomId", "password":"$password"}""")
+                JSONObject("""{"nickname":"${nickname.toLowerCase()}", "room_id":"$roomId", "password":"$password"}""")
             }
 
     val SWIPE: (String) -> JSONObject = { swipeDirection: String ->
