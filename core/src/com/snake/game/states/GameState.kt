@@ -94,16 +94,18 @@ class GameState(
 
         for (player: Player in players) {
             var alive = false
+            var invisible = false
             for (p: PlayerComponent in playersComponents) {
                 if (p.playerId == player.id) {
                     alive = p.alive
+                    invisible = p.invisible
                 }
             }
-            insertPlayer(player, alive)
+            insertPlayer(player, alive,invisible)
         }
     }
 
-    private fun insertPlayer(player: Player, alive: Boolean) {
+    private fun insertPlayer(player: Player, alive: Boolean, invisible: Boolean = false) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
             setSize(MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, MenuBaseState.ELEMENT_HEIGHT / 2)
         }
@@ -113,7 +115,7 @@ class GameState(
         var heightTotal = 0f
 
         if (!alive) {
-            val aliveIcon = Image(Texture("indicators/owner.png")).apply {
+            val aliveIcon = Image(Texture("indicators/dead-red.png")).apply {
                 width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.1F
                 height = width
             }
@@ -121,6 +123,17 @@ class GameState(
             table.add(aliveIcon).width(aliveIcon.width).height(aliveIcon.height)
             widthTotal += aliveIcon.width
             heightTotal += heightTotal.coerceAtLeast(aliveIcon.height)
+        }
+
+        if (invisible) {
+            val invisibleIcon = Image(Texture("powerup-sprites/powerup-invisible.png")).apply {
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.1F
+                height = width
+            }
+
+            table.add(invisibleIcon).width(invisibleIcon.width).height(invisibleIcon.height)
+            widthTotal += invisibleIcon.width
+            heightTotal += heightTotal.coerceAtLeast(invisibleIcon.height)
         }
 
         table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
