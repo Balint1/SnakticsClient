@@ -8,7 +8,8 @@ class TagComponent() : Component(ComponentType.Tag) {
         SnakeBody("snakeBody"),
         Food("food"),
         Powerup("powerup"),
-        Fireball("Fireball")
+        Fireball("Fireball"),
+        ThroughWalls("ThroughWalls")
     }
 
     var tag: EntityTagType? = null
