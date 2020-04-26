@@ -64,7 +64,7 @@ class GameState(
         updatePlayersList()
 
         infoPane = InfoPane(uiGroup, splitPane.width * splitPane.splitAmount, splitPane.height)
-        itemPowerups = ItemPowerups(infoPane.paneWidth, infoPane.paneHeight)
+        itemPowerups = ItemPowerups(infoPane.width, infoPane.height)
 
         val backButton = createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
@@ -243,7 +243,8 @@ class GameState(
     }
 
     private fun youDied() {
-        val dialog = createAlertDialog("You are dead", "Lobby", "Watch", {}, {})
+        println("DEAD")
+        infoPane.showDeathMessage()
         // TODO show this dialog
     }
 
