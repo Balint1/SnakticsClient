@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.scenes.scene2d.ui.Widget
@@ -18,7 +17,8 @@ import com.snake.game.backend.Events
 import com.snake.game.backend.PlayerEvent
 import com.snake.game.backend.SimpleResponse
 import com.snake.game.backend.DeleteEntities
-import com.snake.game.controls.PowerupsPanel
+import com.snake.game.controls.ItemPowerups
+import com.snake.game.controls.InfoPane
 import com.snake.game.controls.SwipeDetector
 import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.TagComponent
@@ -39,8 +39,9 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
     private val ecs = SnakeECSEngine
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
+    private val infoPane: InfoPane = InfoPane()
     private val playersList = Table()
-    private var powerupsPanel: PowerupsPanel
+    private var itemPowerups: ItemPowerups
 
     init {
         ecs.localPlayerId = playerId
@@ -48,31 +49,29 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         cancelOldListeners()
         addListeners()
 
-        val uiGroup = VerticalGroup()
-
-        splitPane = SplitPane(uiGroup, gameWidget, false, skin)
+        splitPane = SplitPane(infoPane.getStage(), gameWidget, false, skin)
         splitPane.setBounds(0f, 0f, MenuBaseState.VIRTUAL_WIDTH, MenuBaseState.VIRTUAL_HEIGHT)
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
-        powerupsPanel = PowerupsPanel(skin, splitPane.width * splitPane.splitAmount)
+        itemPowerups = ItemPowerups(splitPane.width * splitPane.splitAmount, splitPane.height)
 
         stage.addActor(splitPane)
-        uiGroup.addActor(playersList)
+        infoPane.addRow(playersList)
 
         // TODO: add players into the list
         updatePlayersList()
-        uiGroup.addActor(powerupsPanel.getPowerupsControlPanel())
+        infoPane.addRow(itemPowerups.getPowerupsControlPanel())
 
         createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }.apply {
-            uiGroup.addActor(this)
+            infoPane.addRow(this)
         }
 
         // we add swipe listener :
         swipeDetector.active = true
-        powerupsPanel.pickup(TagComponent.EntityTagType.Fireball)
+        itemPowerups.pickup(TagComponent.EntityTagType.Fireball)
     }
 
     override fun activated() {
