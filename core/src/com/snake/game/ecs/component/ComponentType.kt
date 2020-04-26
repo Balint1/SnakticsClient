@@ -6,9 +6,13 @@ enum class ComponentType(val internalName: String) {
     Position("position"),
     Movement("movement"),
     Snake("snake"),
+    PowerUp("powerup"),
+
+    // Client-side only
     Sprite("sprite"),
     AnimatedSprite("animatedsprite"),
-    PowerUp("powerup");
+    BouncingRender("bouncing-render"),
+    ShadowRender("shadow-render");
 
     infix fun and(component: ComponentType): ComponentTypeTree {
         return ComponentTypeTree(this) and component
@@ -52,6 +56,8 @@ enum class ComponentType(val internalName: String) {
                 PowerUp -> PowerUpComponent()
                 Sprite -> TODO()
                 AnimatedSprite -> TODO()
+                BouncingRender -> TODO()
+                ShadowRender -> TODO()
             }
         }
     }

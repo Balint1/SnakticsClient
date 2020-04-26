@@ -66,17 +66,17 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
 
     private fun updatePlayersList() {
         playersList.clear()
-        var players_entities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
+        var playersEntities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
 
-        var players_components = mutableListOf<PlayerComponent>()
-        for (p: Entity in players_entities) {
+        var playersComponents = mutableListOf<PlayerComponent>()
+        for (p: Entity in playersEntities) {
             if (p.getComponent(ComponentType.Player) != null)
-                players_components.add(p.getComponent(ComponentType.Player) as PlayerComponent)
+                playersComponents.add(p.getComponent(ComponentType.Player) as PlayerComponent)
         }
 
         for (player: Player in players) {
             var alive = false
-            for (p: PlayerComponent in players_components) {
+            for (p: PlayerComponent in playersComponents) {
                 if (p.playerId == player.id) {
                     alive = p.alive
                     println("zepofkzepofkzepofkzepofkzepofkzpofkzepfozkepfozkefpozekfpzkofpzokfzpoefkzpoefkzpokf")
@@ -94,7 +94,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         var widthTotal = 0f
         var heightTotal = 0f
 
-        if (alive == false) {
+        if (!alive) {
             var aliveIcon = Image(Texture("indicators/owner.png")).apply {
                 width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount* 0.1F
                 height = width
@@ -266,8 +266,6 @@ class GameWidget(
 
         viewport.apply(true)
         sb.projectionMatrix = viewport.camera.combined
-        sb.begin()
         ecs.render(sb, fieldWidth, fieldHeight)
-        sb.end()
     }
 }
