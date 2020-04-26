@@ -25,7 +25,6 @@ class Lobby(
     private val updatesBuffer = ArrayList<Array<Any>>()
 
     init {
-        addListeners()
         setTitle("Lobby")
 
         createScrollPane(playersList, ELEMENT_WIDTH * 2 / 3).apply {
@@ -44,6 +43,11 @@ class Lobby(
         }
 
         addElements(leaveBtn, playBtn, spacing = SPACING)
+    }
+
+    override fun activated() {
+        super.activated()
+        addListeners()
     }
 
     /**
