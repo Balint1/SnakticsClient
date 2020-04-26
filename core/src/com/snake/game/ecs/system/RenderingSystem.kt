@@ -100,6 +100,11 @@ object RenderingSystem : System(ComponentType.Position) {
                     sr.color = Color.RED
                     sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
                     sr.end()
+                } else if (tag == TagComponent.EntityTagType.Food) {
+                    sr.begin(ShapeType.Filled)
+                    sr.color = Color.GREEN
+                    sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
+                    sr.end()
                 }
             } else {
                 // Temporary render
