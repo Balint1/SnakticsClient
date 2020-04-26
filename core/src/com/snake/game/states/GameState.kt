@@ -26,9 +26,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-    playerId: String, // The ID of the local player
-    var players: MutableList<Player>, // The player in the room
-    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+        playerId: String, // The ID of the local player
+        var players: MutableList<Player>, // The player in the room
+        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState() {
 
     // TODO get from backend
@@ -99,7 +99,7 @@ class GameState(
                     invisible = p.invisible
                 }
             }
-            insertPlayer(player, alive,invisible)
+            insertPlayer(player, alive, invisible)
         }
     }
 
@@ -118,8 +118,8 @@ class GameState(
                 height = width
             }
 
-            table.add(aliveIcon).width(aliveIcon.width).height(aliveIcon.height)
-            widthTotal += aliveIcon.width
+            table.add(aliveIcon).width(aliveIcon.width).height(aliveIcon.height).padRight(aliveIcon.width / 2)
+            widthTotal += (aliveIcon.width + aliveIcon.width / 2)
             heightTotal += heightTotal.coerceAtLeast(aliveIcon.height)
         }
 
@@ -129,8 +129,8 @@ class GameState(
                 height = width
             }
 
-            table.add(invisibleIcon).width(invisibleIcon.width).height(invisibleIcon.height)
-            widthTotal += invisibleIcon.width
+            table.add(invisibleIcon).width(invisibleIcon.width).height(invisibleIcon.height).padRight(invisibleIcon.width / 2)
+            widthTotal += (invisibleIcon.width + invisibleIcon.width / 2)
             heightTotal += heightTotal.coerceAtLeast(invisibleIcon.height)
         }
 
@@ -268,9 +268,9 @@ class GameState(
 }
 
 class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float
+        val ecs: SnakeECSEngine,
+        private val fieldWidth: Float,
+        private val fieldHeight: Float
 ) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
