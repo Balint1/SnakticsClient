@@ -148,8 +148,6 @@ class RoomList : MenuBaseState() {
                 pad(SPACING / 5f)
                 isMovable = false
                 isResizable = false
-                if (DEBUG_LAYOUT)
-                    contentTable.debug()
                 show(super.stage)
             }
         } else {
@@ -174,8 +172,6 @@ class RoomList : MenuBaseState() {
                 pad(SPACING / 5f)
                 isMovable = false
                 isResizable = false
-                if (DEBUG_LAYOUT)
-                    contentTable.debug()
                 show(super.stage)
             }
         }

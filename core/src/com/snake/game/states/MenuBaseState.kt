@@ -20,8 +20,6 @@ abstract class MenuBaseState : BaseState(Stage(ExtendViewport(VIRTUAL_WIDTH, VIR
         rootTable.setFillParent(true)
         rootTable.width = ELEMENT_WIDTH
         stage.addActor(rootTable)
-        if (DEBUG_LAYOUT)
-            rootTable.debug()
     }
 
     /**

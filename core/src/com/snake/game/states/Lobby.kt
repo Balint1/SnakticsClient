@@ -82,6 +82,10 @@ class Lobby(
         }
     }
 
+    override fun onBackPressed() {
+        HttpService.leaveRoom(roomId, playerId, ::onLeaveRoom)
+    }
+
     /**
      * Start listening to responses on owner change events
      */

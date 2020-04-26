@@ -42,7 +42,7 @@ class GameState(
 
     private val ecs = SnakeECSEngine
     private val swipeDetector = SwipeDetector
-    private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
+    private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT, getViewport())
     private val splitPane: SplitPane
     private val playersList = Table()
     private var infoPane: InfoPane
@@ -74,7 +74,7 @@ class GameState(
         itemPowerups = ItemPowerups(infoPane.width, infoPane.height)
 
         val backButton = createTextButton("lobby") {
-            SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
+            onBackPressed()
         }
 
         stage.addActor(splitPane)
@@ -227,17 +227,15 @@ class GameState(
         updatePlayersList()
     }
 
+    override fun render(sb: SpriteBatch) {
+        gameWidget.render()
+        super.render(sb)
+    }
+
     override fun onBackPressed() {
-        Gdx.app.log("UI", "GameState::onBackPressed")
-        showButtonDialog("Are you sure you want to exit the game?", "Yes", "No") {
-            if(it == 0) {
-                Gdx.app.log("SocketIO", "GameState::onBackPressed - Yes")
+        showButtonDialog("Are you sure you want to return to the lobby?", "Yes", "No") {
+            if(it == 0)
                 SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
-            }
-            else
-            {
-                Gdx.app.log("SocketIO", "GameState::onBackPressed - No")
-            }
         }
     }
 
@@ -290,7 +288,8 @@ class GameState(
 class GameWidget(
         val ecs: SnakeECSEngine,
         private val fieldWidth: Float,
-        private val fieldHeight: Float
+        private val fieldHeight: Float,
+        private val standardViewport: Viewport
 ) : Widget() {
 
 
@@ -304,17 +303,14 @@ class GameWidget(
 
     }
 
-    fun updateSize() {
+    private fun updateSize() {
         // Gdx.app.log("debug", "x=$x, w=$width, h=$height")
 
         viewport.update(width.toInt(), height.toInt())
         viewport.screenX = Gdx.graphics.width - width.toInt()
     }
 
-
-    override fun draw(batch: Batch?, parentAlpha: Float) {
-        super.draw(batch, parentAlpha)
-
+    fun render() {
         // TODO Would be better to only update size when necessary, but for some reason it doesn't work too well
         updateSize()
 
@@ -329,5 +325,7 @@ class GameWidget(
         sr.color = Color.RED
         sr.rect(5f, 5f, fieldWidth-10, fieldHeight-10)
         sr.end()
+
+        standardViewport.apply(true)
     }
 }

@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
+import com.badlogic.gdx.utils.viewport.Viewport
 import com.snake.game.controls.SwipeDetector
 
 abstract class BaseState(protected val stage: Stage) : IState {
@@ -25,7 +26,7 @@ abstract class BaseState(protected val stage: Stage) : IState {
         multiplexer.addProcessor(stage)
         Gdx.input.inputProcessor = multiplexer
 
-        stage.isDebugAll = true
+        //stage.isDebugAll = true
     }
 
     override fun deactivated() {}
@@ -42,6 +43,23 @@ abstract class BaseState(protected val stage: Stage) : IState {
 
     override fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
+    }
+
+    fun getViewport() : Viewport {
+        return stage.viewport
+    }
+
+    override fun onBackPressed() {
+        if(StateManager.numStates() == 1) {
+            showButtonDialog("Are you sure you want to exit the game?", "Yes", "No") {
+                if (it == 0)
+                    super.onBackPressed()
+            }
+        }
+        else
+        {
+            super.onBackPressed()
+        }
     }
 
     /**
@@ -79,8 +97,6 @@ abstract class BaseState(protected val stage: Stage) : IState {
             pad(BaseState.SPACING / 5f)
             isMovable = false
             isResizable = false
-            if (BaseState.DEBUG_LAYOUT)
-                contentTable.debug()
             show(this@BaseState.stage)
         }
     }
@@ -107,8 +123,6 @@ abstract class BaseState(protected val stage: Stage) : IState {
             pad(BaseState.SPACING / 5f)
             isMovable = false
             isResizable = false
-            if (BaseState.DEBUG_LAYOUT)
-                contentTable.debug()
             show(this@BaseState.stage)
         }
     }
@@ -143,9 +157,6 @@ abstract class BaseState(protected val stage: Stage) : IState {
      */
     protected fun addElements(vararg actors: Actor, spacing: Float = 0f, padTop: Float = SPACING, parent: Table) {
         val table = Table()
-        if (DEBUG_LAYOUT)
-            table.debug()
-
         var pad = spacing
         var height = 0f
         var width = 0f
@@ -175,8 +186,6 @@ abstract class BaseState(protected val stage: Stage) : IState {
     }
 
     companion object {
-        const val DEBUG_LAYOUT = true
-
         const val VIRTUAL_WIDTH = 1600f
         const val VIRTUAL_HEIGHT = 900f
 
