@@ -9,7 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
-import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
@@ -26,7 +31,7 @@ abstract class BaseState(protected val stage: Stage) : IState {
         multiplexer.addProcessor(stage)
         Gdx.input.inputProcessor = multiplexer
 
-        //stage.isDebugAll = true
+        // stage.isDebugAll = true
     }
 
     override fun deactivated() {}
@@ -45,19 +50,17 @@ abstract class BaseState(protected val stage: Stage) : IState {
         stage.viewport.update(width, height, true)
     }
 
-    fun getViewport() : Viewport {
+    fun getViewport(): Viewport {
         return stage.viewport
     }
 
     override fun onBackPressed() {
-        if(StateManager.numStates() == 1) {
+        if (StateManager.numStates() == 1) {
             showButtonDialog("Are you sure you want to exit the game?", "Yes", "No") {
                 if (it == 0)
                     super.onBackPressed()
             }
-        }
-        else
-        {
+        } else {
             super.onBackPressed()
         }
     }
@@ -91,6 +94,7 @@ abstract class BaseState(protected val stage: Stage) : IState {
      * @param text The text in the dialog
      */
     protected fun showWaitDialog(text: String) {
+        hideDialog()
         dialog = (object : Dialog("", skin, "default") {
         }).apply {
             addElement(Label(text, skin, "big"), parent = contentTable)
@@ -109,6 +113,7 @@ abstract class BaseState(protected val stage: Stage) : IState {
      * @param onResult Function called when the button is clicked. The parameter is set to the index of the button that was clicked
      */
     protected fun showButtonDialog(text: String, vararg buttons: String = arrayOf("Ok"), onResult: (Int) -> Unit = {}) {
+        hideDialog()
         dialog = (object : Dialog("", skin, "default") {
             override fun result(result: Any) {
                 if (result is Int)

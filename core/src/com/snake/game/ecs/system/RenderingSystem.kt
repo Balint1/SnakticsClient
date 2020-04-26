@@ -1,6 +1,5 @@
 package com.snake.game.ecs.system
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
@@ -10,10 +9,17 @@ import com.badlogic.gdx.math.CatmullRomSpline
 import com.badlogic.gdx.math.Vector2
 import com.snake.game.RenderingConstants
 import com.snake.game.ecs.SnakeECSEngine
-import com.snake.game.ecs.component.*
+import com.snake.game.ecs.component.AnimatedSpriteComponent
+import com.snake.game.ecs.component.BouncingRenderComponent
+import com.snake.game.ecs.component.ComponentType
+import com.snake.game.ecs.component.PlayerComponent
+import com.snake.game.ecs.component.PositionComponent
+import com.snake.game.ecs.component.ShadowRenderComponent
+import com.snake.game.ecs.component.SnakeComponent
+import com.snake.game.ecs.component.SpriteComponent
+import com.snake.game.ecs.component.TagComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
-import java.lang.Math.pow
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -86,9 +92,9 @@ object RenderingSystem : System(ComponentType.Position) {
 
                 // Render snake head
                 if (tag == TagComponent.EntityTagType.SnakeHead) {
-                    renderSnake(sb, em, entity, sr)
+                    renderSnake(em, entity, sr)
                 } else if (tag == TagComponent.EntityTagType.SnakeBody) {
-                } else if (tag == TagComponent.EntityTagType.Fireball){
+                } else if (tag == TagComponent.EntityTagType.Fireball) {
                     sr.begin(ShapeType.Filled)
                     sr.color = Color.RED
                     sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
@@ -131,7 +137,7 @@ object RenderingSystem : System(ComponentType.Position) {
      * @param em the entity manager
      * @param snakeHead the first snake piece
      */
-    private fun renderSnake(sb: SpriteBatch, em: EntityManager, snakeHead: Entity, shapeRenderer: ShapeRenderer) {
+    private fun renderSnake(em: EntityManager, snakeHead: Entity, shapeRenderer: ShapeRenderer) {
         var playerComponent = snakeHead.getComponent(ComponentType.Player) as PlayerComponent
 
         // Stop rendering the snake once it is dead and decayed

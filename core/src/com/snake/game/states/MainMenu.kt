@@ -74,7 +74,7 @@ class MainMenu : MenuBaseState() {
         if (trying) {
             showWaitDialog("Connecting...$seconds")
         } else {
-            showButtonDialog("Couldn't connect","Retry") {
+            showButtonDialog("Couldn't connect", "Retry") {
                 SocketService.tryConnect(::onTryingConnect)
             }
         }

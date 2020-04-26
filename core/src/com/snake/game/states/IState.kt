@@ -53,6 +53,6 @@ interface IState {
      *
      */
     fun onBackPressed() {
-        StateManager.pop();
+        StateManager.pop()
     }
 }

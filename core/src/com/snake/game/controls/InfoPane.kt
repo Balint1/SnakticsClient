@@ -1,8 +1,9 @@
 package com.snake.game.controls
 
 import com.badlogic.gdx.scenes.scene2d.Actor
-import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 
 class InfoPane(pseudoStage: VerticalGroup, val width: Float, val height: Float) {
     private val rootTable = Table()

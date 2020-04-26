@@ -99,5 +99,6 @@ project(":core") {
         implementation "io.socket:socket.io-client:0.8.3"
         implementation 'com.google.code.gson:gson:2.8.5'
         implementation 'com.squareup.okhttp3:okhttp:4.5.0'
+        implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     }
 }

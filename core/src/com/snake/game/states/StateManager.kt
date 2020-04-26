@@ -8,7 +8,7 @@ import java.util.Stack
 object StateManager {
     private val states: Stack<IState> by lazy { Stack<IState>() }
 
-    fun numStates() : Int {
+    fun numStates(): Int {
         return states.size
     }
 
@@ -26,7 +26,7 @@ object StateManager {
         old.deactivated()
         old.dispose()
 
-        if(states.empty())
+        if (states.empty())
             Gdx.app.exit()
         else
             states.peek().activated()

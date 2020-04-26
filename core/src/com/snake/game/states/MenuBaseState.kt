@@ -74,7 +74,6 @@ abstract class MenuBaseState : BaseState(Stage(ExtendViewport(VIRTUAL_WIDTH, VIR
         addElements(*actors, spacing = spacing, padTop = padTop, parent = rootTable)
     }
 
-
     protected fun isAlphaNumeric(text: String): Boolean {
         return text.matches("^[a-zA-Z0-9]*$".toRegex())
     }

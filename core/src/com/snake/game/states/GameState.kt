@@ -2,14 +2,19 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.utils.viewport.*
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.badlogic.gdx.scenes.scene2d.ui.Widget
+import com.badlogic.gdx.utils.viewport.FitViewport
+import com.badlogic.gdx.utils.viewport.ScreenViewport
+import com.badlogic.gdx.utils.viewport.Viewport
 import com.google.gson.Gson
 import com.snake.game.backend.Player
 import com.snake.game.backend.SocketService
@@ -234,7 +239,7 @@ class GameState(
 
     override fun onBackPressed() {
         showButtonDialog("Are you sure you want to return to the lobby?", "Yes", "No") {
-            if(it == 0)
+            if (it == 0)
                 SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }
     }
@@ -286,21 +291,19 @@ class GameState(
 }
 
 class GameWidget(
-        val ecs: SnakeECSEngine,
-        private val fieldWidth: Float,
-        private val fieldHeight: Float,
-        private val standardViewport: Viewport
+    val ecs: SnakeECSEngine,
+    private val fieldWidth: Float,
+    private val fieldHeight: Float,
+    private val standardViewport: Viewport
 ) : Widget() {
 
-
-    //private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)
+    // private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)
     private val viewport = FitViewport(fieldWidth, fieldHeight)
 
     // The SpriteBatch used for rendering the game
     private val sb = SpriteBatch()
 
     init {
-
     }
 
     private fun updateSize() {
@@ -323,7 +326,7 @@ class GameWidget(
         sr.projectionMatrix = sb.projectionMatrix
         sr.begin(ShapeRenderer.ShapeType.Line)
         sr.color = Color.RED
-        sr.rect(5f, 5f, fieldWidth-10, fieldHeight-10)
+        sr.rect(5f, 5f, fieldWidth - 10, fieldHeight - 10)
         sr.end()
 
         standardViewport.apply(true)
