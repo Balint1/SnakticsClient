@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 class InfoPane(stage: VerticalGroup, val paneWidth: Float, val paneHeight: Float) {
     private val rootTable = Table()
 
-    init{
+    init {
         stage.addActor(rootTable)
     }
 
@@ -17,5 +17,4 @@ class InfoPane(stage: VerticalGroup, val paneWidth: Float, val paneHeight: Float
             row()
         }
     }
-
 }

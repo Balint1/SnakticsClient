@@ -60,10 +60,10 @@ class ItemPowerups(width: Float, height: Float) {
             add(throughWallsCount).width(buttonWidth).height(buttonWidth).align(Align.center)
         }
         mainTable.apply {
-            padTop(height/3)
+            padTop(height / 3)
             add(fireBallTable).padLeft(buttonWidth).padRight(buttonWidth)
             add(throughWallsTable).padLeft(buttonWidth).padRight(buttonWidth)
-            padBottom(height/4)
+            padBottom(height / 4)
         }
     }
 

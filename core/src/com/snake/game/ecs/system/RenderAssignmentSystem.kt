@@ -8,7 +8,6 @@ import com.snake.game.ecs.component.SpriteComponent
 import com.snake.game.ecs.component.PowerUpComponent
 import com.snake.game.ecs.entity.Entity
 
-
 /**
  * Adds sprite and other rendering components to entities when required.
  */
@@ -23,7 +22,7 @@ object RenderAssignmentSystem : System(ComponentType.PowerUp) {
                 val spriteComponent = SpriteComponent(ptype.spriteFile, ptype.spriteSize, ptype.spriteSize)
                 entity.addComponent(spriteComponent)
                 entity.addComponent(BouncingRenderComponent(RenderingConstants.POWERUP_BOUNCE_AMPLITUDE, RenderingConstants.POWERUP_BOUNCE_DURATION))
-                entity.addComponent(ShadowRenderComponent(ptype.spriteSize, ptype.spriteSize/3))
+                entity.addComponent(ShadowRenderComponent(ptype.spriteSize, ptype.spriteSize / 3))
             }
         }
     }

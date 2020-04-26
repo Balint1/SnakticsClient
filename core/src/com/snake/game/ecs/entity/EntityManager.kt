@@ -1,7 +1,5 @@
 package com.snake.game.ecs.entity
 
-import com.badlogic.gdx.Gdx
-import com.snake.game.ecs.component.Component
 import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.ComponentTypeOperator
 import com.snake.game.ecs.component.ComponentTypeTree
@@ -71,7 +69,7 @@ class EntityManager {
     internal fun mapEntityComponent(componentType: ComponentType, entity: Entity) {
         // This check prevents mapping components for entities that are in newEntityCache but not added yet
         // (avoids concurrent modification exceptions)
-        if(entities.containsKey(entity.id))
+        if (entities.containsKey(entity.id))
             entityMap[componentType]!!.add(entity)
     }
 

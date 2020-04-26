@@ -26,9 +26,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-        playerId: String, // The ID of the local player
-        var players: MutableList<Player>, // The player in the room
-        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+    playerId: String, // The ID of the local player
+    var players: MutableList<Player>, // The player in the room
+    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState() {
 
     // TODO get from backend
@@ -257,9 +257,9 @@ class GameState(
 }
 
 class GameWidget(
-        val ecs: SnakeECSEngine,
-        private val fieldWidth: Float,
-        private val fieldHeight: Float
+    val ecs: SnakeECSEngine,
+    private val fieldWidth: Float,
+    private val fieldHeight: Float
 ) : Widget() {
 
     private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight)
