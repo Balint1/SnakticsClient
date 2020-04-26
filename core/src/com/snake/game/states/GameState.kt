@@ -116,7 +116,7 @@ class GameState(
 
         if (!alive) {
             val aliveIcon = Image(Texture("indicators/dead-red.png")).apply {
-                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.1F
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
@@ -127,7 +127,7 @@ class GameState(
 
         if (invisible) {
             val invisibleIcon = Image(Texture("powerup-sprites/powerup-invisible.png")).apply {
-                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.1F
+                width = MenuBaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
