@@ -36,12 +36,22 @@ class EntityManager {
 
     fun updateEntityStorage() {
         // Remove entities that were scheduled to be deleted
-        removeEntityCache.forEach { id -> removeEntity(id) }
-        removeEntityCache.clear()
+        try {
+            removeEntityCache.forEach { id -> removeEntity(id) }
+            removeEntityCache.clear()
+        }
+        catch(e: ConcurrentModificationException) {
 
-        // Add entities that were scheduled to be added
-        newEntityCache.values.forEach { entity -> addEntity(entity) }
-        newEntityCache.clear()
+        }
+
+        try {
+            // Add entities that were scheduled to be added
+            newEntityCache.values.forEach { entity -> addEntity(entity) }
+            newEntityCache.clear()
+        }
+        catch(e: ConcurrentModificationException) {
+
+        }
     }
 
     /**

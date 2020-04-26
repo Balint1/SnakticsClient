@@ -20,6 +20,7 @@ import com.snake.game.ecs.component.SpriteComponent
 import com.snake.game.ecs.component.TagComponent
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
+import com.snake.game.states.GameState
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
@@ -176,12 +177,12 @@ object RenderingSystem : System(ComponentType.Position) {
             var t = (RenderingConstants.SNAKE_DECAYING_TICKS - playerComponent.remainingDecayTicks) / blinkTicks.toFloat()
             t = t.pow(1.25f) // makes bounces faster and faster
             alpha = 1f - max(0f, sin(2f*Math.PI * (t - 0.5f)).toFloat())
-            startColor = Color(0.2f, 0.2f, 0.2f, alpha)
-            endColor = Color(0.12f, 0.12f, 0.12f, alpha)
+            startColor = Color(0.8f, 0.2f, 0.2f, alpha)
+            endColor = Color(0.6f, 0.12f, 0.12f, alpha)
         }
 
         // number of points used for rendering the spline
-        var pointsDensity = 5
+        var pointsDensity = 3
         var k = if (snakePoints.size > 2) snakePoints.size * pointsDensity else 1
 
         val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
@@ -218,7 +219,16 @@ object RenderingSystem : System(ComponentType.Position) {
             shapeRenderer.circle(points[i].x, points[i].y - 2, RenderingConstants.SNAKE_CIRCLE_RADIUS)
         }
 
-        // Draw colored snake
+        // Draw border around local snake
+        if(playerComponent.playerId == SnakeECSEngine.localPlayerId) {
+            shapeRenderer.color = Color(0.83f, 0.69f, 0.22f, 1f)
+            for (i in 0 until points.size - 1) {
+                shapeRenderer.color.a = alphas[i]
+                shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS+1f)
+            }
+        }
+
+        // Draw the snake
         for (i in 0 until points.size) {
             shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
             shapeRenderer.color.a = alphas[i]
