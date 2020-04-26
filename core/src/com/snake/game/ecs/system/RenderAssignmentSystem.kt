@@ -2,7 +2,12 @@ package com.snake.game.ecs.system
 
 import com.snake.game.RenderingConstants
 import com.snake.game.ecs.component.*
+
+import com.snake.game.ecs.component.ComponentType
+import com.snake.game.ecs.component.SpriteComponent
+import com.snake.game.ecs.component.PowerUpComponent
 import com.snake.game.ecs.entity.Entity
+
 
 /**
  * Adds sprite and other rendering components to entities when required.

@@ -107,7 +107,11 @@ class RoomList : MenuBaseState() {
      */
     private fun joinRoom(room: Room, nickname: String, password: String) {
         Gdx.app.debug("UI", "RoomList::joinRoom(%s, %s)".format(room.name, password))
-        StateManager.push(JoinRoomState(room.id, room.name, nickname, password))
+        if (isAlphaNumeric(nickname) && isAlphaNumeric(password)) {
+            StateManager.push(JoinRoomState(room.id, room.name, nickname, password))
+        } else {
+            showMessageDialog("All input fields must be alphanumeric")
+        }
     }
 
     /**

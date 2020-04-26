@@ -145,6 +145,10 @@ abstract class MenuBaseState : BaseState() {
         dialog?.hide(null)
     }
 
+    protected fun isAlphaNumeric(text: String): Boolean {
+        return text.matches("^[a-zA-Z0-9]*$".toRegex())
+    }
+
     companion object {
         const val DEBUG_LAYOUT = false
 

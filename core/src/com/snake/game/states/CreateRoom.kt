@@ -53,8 +53,10 @@ open class CreateRoom : MenuBaseState() {
      */
     protected fun createRoom(roomName: String, password: String, capacity: Int) {
         Gdx.app.debug("UI", "CreateRoom::createRoom(%s)".format(roomName))
-        showWaitDialog("Creating room...")
-        HttpService.createRoom(roomName, password, capacity, Preferences.getSettings(), ::onRoomCreated)
+        if (validateFields(roomName, nicknameField.text, password)) {
+            showWaitDialog("Creating room...")
+            HttpService.createRoom(roomName, password, capacity, Preferences.getSettings(), ::onRoomCreated)
+        }
     }
 
     /**
@@ -69,6 +71,27 @@ open class CreateRoom : MenuBaseState() {
             StateManager.push(JoinRoomState(response.id, response.name, nicknameField.text, password))
         } else {
             showMessageDialog(response.message)
+        }
+    }
+
+    private fun validateFields(roomName: String, nickname: String, password: String): Boolean {
+        if (roomName == "") {
+            showMessageDialog("Please enter room name")
+            return false
+        } else if (nicknameField.text == "") {
+            showMessageDialog("Please enter nickname")
+            return false
+        } else if (roomName.length > 15) {
+            showMessageDialog("Maximum allowed room name length is 15 characters")
+            return false
+        } else if (nickname.length > 15) {
+            showMessageDialog("Maximum allowed room name length is 15 characters")
+            return false
+        } else if (isAlphaNumeric(roomName) && isAlphaNumeric(password) && isAlphaNumeric(nicknameField.text)) {
+            return true
+        } else {
+            showMessageDialog("All input fields must be alphanumeric")
+            return false
         }
     }
 }

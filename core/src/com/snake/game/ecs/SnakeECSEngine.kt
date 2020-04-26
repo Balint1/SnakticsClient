@@ -11,7 +11,6 @@ object SnakeECSEngine : ECSEngine(
     var localPlayerId: String? = null
 
     init {
-
     }
 
     fun createEntities() {
