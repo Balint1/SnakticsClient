@@ -27,6 +27,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
     private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT)
     private val splitPane: SplitPane
     private val playersList = Table()
+    private var powerupsPanel: PowerupsPanel
 
     init {
         ecs.localPlayerId = playerId
@@ -41,6 +42,7 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         splitPane.splitAmount = 0.2f
         splitPane.minSplitAmount = 0.2f
         splitPane.maxSplitAmount = 0.2f
+        powerupsPanel = PowerupsPanel(skin, splitPane.width * splitPane.splitAmount)
 
         stage.addActor(splitPane)
         // element can be added to  the side panel with :
@@ -48,8 +50,8 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
         uiGroup.addActor(playersList)
         // TODO: add players into the list
         updatePlayersList()
-        PowerupsPanel(uiGroup)
-
+        uiGroup.addActor(powerupsPanel.getPowerupsControlPanel())
+        println("Split panel width: ${splitPane.width * 0.2}")
         createTextButton("back") {
             SocketService.socket.emit(Events.LEAVE_TO_LOBBY.value)
         }.apply {
@@ -81,7 +83,6 @@ class GameState(playerId: String, var players: MutableList<Player>) : BaseState(
             for (p: PlayerComponent in players_components) {
                 if (p.playerId == player.id) {
                     alive = p.alive
-                    println("zepofkzepofkzepofkzepofkzepofkzpofkzepfozkepfozkefpozekfpzkofpzokfzpoefkzpoefkzpokf")
                 }
             }
             insertPlayer(player, alive)
