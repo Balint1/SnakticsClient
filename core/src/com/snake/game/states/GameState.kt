@@ -162,11 +162,6 @@ class GameState(
             val data: JSONObject = args[0] as JSONObject
             val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
             playerDied(response.id)
-        }.on(Events.YOU_DIED.value) {
-            Gdx.app.log("SocketIO", "YOU_DIED")
-            Gdx.app.postRunnable {
-                youDied()
-            }
         }
     }
 
@@ -252,10 +247,6 @@ class GameState(
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
         // TODO: add some indicator that player is dead in side panel.
         // TODO Stop rendering 'response.id' player.
-    }
-
-    private fun youDied() {
-        infoPane.showDeathMessage(skin)
     }
 
     private fun deleteEntities(args: Array<Any>) {

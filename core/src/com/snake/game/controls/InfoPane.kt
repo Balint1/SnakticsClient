@@ -19,20 +19,6 @@ class InfoPane(pseudoStage: VerticalGroup, val width: Float, val height: Float) 
         }
     }
 
-    fun showDeathMessage(skin: Skin) {
-        rootTable.clear()
-        val deathMessage = Label("You died", skin, "big").apply {
-            width = this@InfoPane.width * 4 / 5
-            setAlignment(Align.center)
-        }
-        rootTable.apply {
-            padTop(height * 2 / 6)
-            add(deathMessage).padBottom(height * 1 / 6)
-            row()
-            add(backButton)
-        }
-    }
-
     fun addBackButton(button: TextButton) {
         backButton = button
         rootTable.add(backButton)
