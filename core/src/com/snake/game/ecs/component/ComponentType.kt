@@ -6,8 +6,13 @@ enum class ComponentType(val internalName: String) {
     Position("position"),
     Movement("movement"),
     Snake("snake"),
+    PowerUp("powerup"),
+
+    // Client-side only
     Sprite("sprite"),
-    AnimatedSprite("animatedsprite");
+    AnimatedSprite("animatedsprite"),
+    BouncingRender("bouncing-render"),
+    ShadowRender("shadow-render");
 
     infix fun and(component: ComponentType): ComponentTypeTree {
         return ComponentTypeTree(this) and component
@@ -21,34 +26,39 @@ enum class ComponentType(val internalName: String) {
     infix fun or(componentTree: ComponentTypeTree): ComponentTypeTree {
         return componentTree or this
     }
-}
 
-/**
- * Get a component type from its internal name.
- * @param internalName a string representing a component type (e.g. "position", "movement", etc).
- * @return the associated component type, if it exists (else null).
- */
-fun componentTypeFromInternalName(internalName: String): ComponentType? {
-    for (type in ComponentType.values()) {
-        if (type.internalName == internalName)
-            return type
-    }
-    return null
-}
+    companion object {
+        /**
+         * Get a component type from its internal name.
+         * @param name a string representing a component type (e.g. "position", "movement", etc).
+         * @return the associated component type, if it exists (else null).
+         */
+        fun fromName(name: String): ComponentType? {
+            for (type in ComponentType.values()) {
+                if (type.internalName == name)
+                    return type
+            }
+            return null
+        }
 
-/**
- * Get a new component for the given component type.
- * @param type a component type.
- * @return a component of the given type
- */
-fun createComponent(type: ComponentType): Component {
-    return when (type) {
-        ComponentType.Position -> PositionComponent()
-        ComponentType.Movement -> MovementComponent()
-        ComponentType.Tag -> TagComponent()
-        ComponentType.Player -> PlayerComponent()
-        ComponentType.Snake -> SnakeComponent()
-        ComponentType.Sprite -> TODO()
-        ComponentType.AnimatedSprite -> TODO()
+        /**
+         * Get a new component for the given component type.
+         * @param type a component type.
+         * @return a component of the given type
+         */
+        fun createComponent(type: ComponentType): Component {
+            return when (type) {
+                Position -> PositionComponent()
+                Movement -> MovementComponent()
+                Tag -> TagComponent()
+                Player -> PlayerComponent()
+                Snake -> SnakeComponent()
+                PowerUp -> PowerUpComponent()
+                Sprite -> TODO()
+                AnimatedSprite -> TODO()
+                BouncingRender -> TODO()
+                ShadowRender -> TODO()
+            }
+        }
     }
 }

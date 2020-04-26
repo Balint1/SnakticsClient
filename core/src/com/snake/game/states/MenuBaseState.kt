@@ -1,17 +1,19 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 
 import com.badlogic.gdx.utils.Align
+import com.badlogic.gdx.utils.viewport.ExtendViewport
 
 /**
  * Base class for menu states providing common functionality for creating menus
  *
  */
-abstract class MenuBaseState : BaseState() {
+abstract class MenuBaseState : BaseState(Stage(ExtendViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT))) {
     var rootTable = Table()
 
     init {
@@ -72,5 +74,10 @@ abstract class MenuBaseState : BaseState() {
      */
     protected fun addElements(vararg actors: Actor, spacing: Float = 0f, padTop: Float = SPACING) {
         addElements(*actors, spacing = spacing, padTop = padTop, parent = rootTable)
+    }
+
+
+    protected fun isAlphaNumeric(text: String): Boolean {
+        return text.matches("^[a-zA-Z0-9]*$".toRegex())
     }
 }

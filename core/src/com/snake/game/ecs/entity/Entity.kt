@@ -13,7 +13,7 @@ class Entity(val id: String, private val entityManager: EntityManager) {
     private var componentMap: EnumMap<ComponentType, Component> = EnumMap(ComponentType::class.java)
 
     init {
-        entityManager.addEntity(this)
+        entityManager.scheduleAddEntity(this)
     }
 
     /**

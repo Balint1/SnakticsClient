@@ -4,7 +4,6 @@ import com.snake.game.ecs.component.ComponentType
 import com.snake.game.ecs.component.ComponentTypeOperator
 import com.snake.game.ecs.component.ComponentTypeTree
 import java.util.EnumMap
-import kotlin.collections.HashSet
 
 /**
  * Manages entities in our ECS architecture.
@@ -17,16 +16,32 @@ class EntityManager {
     // Map each component type to a list of entities that have that component
     private var entityMap: EnumMap<ComponentType, ArrayList<Entity>> = EnumMap(ComponentType::class.java)
 
+    // Store entities to add in a cache so we can add them on the next update
+    private var newEntityCache: HashMap<String, Entity> = HashMap()
+
+    // Store the ID of entities to remove in a cache so we can remove them on the next update
+    private var removeEntityCache: ArrayList<String> = ArrayList()
+
     init {
-        clearEntities()
+        // For each component type, create an empty set that will store references to all entities with that component type
+        for (componentType in ComponentType.values())
+            entityMap[componentType] = ArrayList()
     }
 
     fun clearEntities() {
         entities.clear()
+        newEntityCache.clear()
+        removeEntityCache.clear()
+    }
 
-        // For each component type, create an empty set that will store references to all entities with that component type
-        for (componentType in ComponentType.values())
-            entityMap[componentType] = ArrayList()
+    fun updateEntityStorage() {
+        // Remove entities that were scheduled to be deleted
+        removeEntityCache.forEach { id -> removeEntity(id) }
+        removeEntityCache.clear()
+
+        // Add entities that were scheduled to be added
+        newEntityCache.values.forEach { entity -> addEntity(entity) }
+        newEntityCache.clear()
     }
 
     /**
@@ -35,7 +50,7 @@ class EntityManager {
      * @return true if an entity with the given id exists, else false.
      */
     fun hasEntity(entityId: String): Boolean {
-        return entities.containsKey(entityId)
+        return entities.containsKey(entityId) || newEntityCache.containsKey(entityId)
     }
 
     /**
@@ -44,33 +59,19 @@ class EntityManager {
      * @return the entity if it exists, else null.
      */
     fun getEntity(entityId: String): Entity? {
-        return entities[entityId]
-    }
-
-    internal fun addEntity(entity: Entity) {
-        entities[entity.id] = entity
-        for (c in entity.getComponents())
-            mapEntityComponent(c.type, entity)
+        return when {
+            entities.containsKey(entityId) -> entities[entityId]
+            newEntityCache.containsKey(entityId) -> newEntityCache[entityId]
+            else -> null
+        }
     }
 
     internal fun mapEntityComponent(componentType: ComponentType, entity: Entity) {
-        entityMap[componentType]!!.add(entity)
+        // This check prevents mapping components for entities that are in newEntityCache but not added yet
+        // (avoids concurrent modification exceptions)
+        if (entities.containsKey(entity.id))
+            entityMap[componentType]!!.add(entity)
     }
-
-    /**
-     * Get all entities that match at least a component in a given list of component types
-     * @param componentTypes a list of component types
-     * @return a set of entities that have at least one of the components listed in [componentTypes]
-     */
-    /*fun getEntities(componentTypes: List<ComponentType>): Set<Entity> {
-        return when {
-            componentTypes.isEmpty() -> HashSet()
-            componentTypes.size == 1 -> entityMap[componentTypes[0]]!!
-            // Recursion case
-            else -> getEntities(componentTypes.subList(0, 1))
-                    .union(getEntities(componentTypes.subList(1, componentTypes.size)))
-        }
-    }*/
 
     /**
      * Get all entities that match the component type tree.
@@ -93,14 +94,42 @@ class EntityManager {
     }
 
     /**
-     * Removes an entity by ID.
-     * @param entityId the ID of an entity
+     * Schedules an entity to be added on the next update.
+     * @param entity the entity to add.
      */
-    fun removeEntity(entityId: String) {
-        if(hasEntity(entityId)) {
-            for(component in entities[entityId]!!.getComponents())
-                entityMap[component.type]!!.filter { e -> e.id != entityId}
+    fun scheduleAddEntity(entity: Entity) {
+        newEntityCache[entity.id] = entity
+    }
 
+    /**
+     * Adds an entity to storage.
+     * @param entity the entity to add.
+     */
+    private fun addEntity(entity: Entity) {
+        entities[entity.id] = entity
+        for (c in entity.getComponents())
+            mapEntityComponent(c.type, entity)
+    }
+
+    /**
+     * Schedules an entity to be deleted on the next update.
+     * @param entityId the ID of the entity to remove.
+     */
+    fun scheduleRemoveEntity(entityId: String) {
+        removeEntityCache.add(entityId)
+    }
+
+    /**
+     * Removes an entity by ID.
+     * @param entityId the ID of an entity.
+     */
+    private fun removeEntity(entityId: String) {
+        if (hasEntity(entityId)) {
+            for (component in getEntity(entityId)!!.getComponents()) {
+                val toRemove = entityMap[component.type]!!.filter { e -> e.id == entityId }
+                for (entity in toRemove)
+                    entityMap[component.type]!!.remove(entity)
+            }
             entities.remove(entityId)
         }
     }

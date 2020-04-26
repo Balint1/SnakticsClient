@@ -4,27 +4,26 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ImmediateModeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType
 import com.badlogic.gdx.math.CatmullRomSpline
 import com.badlogic.gdx.math.Vector2
+import com.snake.game.RenderingConstants
+import com.snake.game.ecs.SnakeECSEngine
 import com.snake.game.ecs.component.*
 import com.snake.game.ecs.entity.Entity
 import com.snake.game.ecs.entity.EntityManager
-
+import java.lang.Math.pow
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.pow
+import kotlin.math.sin
 
 /**
  * Handles rendering entities that have a position and a sprite component.
  */
 // object RenderingSystem: System(ComponentType.Position and (ComponentType.AnimatedSprite or ComponentType.Sprite)) {
 object RenderingSystem : System(ComponentType.Position) {
-    // Rendering constants // TODO move to other file?
-    private const val SNAKE_RADIUS = 4f
-    private const val SNAKE_THICKNESS = 3f
-
-    private val BACKGROUND_COLOR = Color.DARK_GRAY
-
     private val debugFont = BitmapFont()
 
     init {
@@ -33,7 +32,14 @@ object RenderingSystem : System(ComponentType.Position) {
     }
 
     override fun update(dt: Float, entity: Entity) {
-        // val pos = entity.getComponent(ComponentType.Position) as PositionComponent
+        // Update bouncing animation components
+        if (entity.hasComponent(ComponentType.BouncingRender)) {
+            var bouncingComponent = entity.getComponent(ComponentType.BouncingRender) as BouncingRenderComponent
+
+            var t = (bouncingComponent.time % bouncingComponent.duration) / bouncingComponent.duration
+            bouncingComponent.offsetY = bouncingComponent.amplitude * max(0f, sin((t - 0.5) * 2 * Math.PI).toFloat())
+            bouncingComponent.time += dt
+        }
     }
 
     override fun render(sb: SpriteBatch, em: EntityManager, worldWidth: Float, worldHeight: Float) {
@@ -42,76 +48,81 @@ object RenderingSystem : System(ComponentType.Position) {
         val entities = em.getEntities(componentTypes)
 
         val sr = ShapeRenderer()
-
         sr.projectionMatrix = sb.projectionMatrix
 
-
         // Background
-        sr.color = BACKGROUND_COLOR
-        sr.begin(ShapeRenderer.ShapeType.Filled)
+        sr.begin(ShapeType.Filled)
+        sr.color = RenderingConstants.BACKGROUND_COLOR
         sr.rect(0f, 0f, worldWidth, worldHeight)
         sr.end()
 
-        // Iterate over indices to avoid ConcurrentModificationException
-        for (i in 0 until entities.size) {
-            val entity = entities.elementAt(i)
-
+        entities.map { entity ->
             val pos = entity.getComponent(ComponentType.Position) as PositionComponent
 
-            if (entity.hasComponent(ComponentType.Sprite))
-                render(sb, entity.getComponent(ComponentType.Sprite) as SpriteComponent, pos.x, pos.y)
-            if (entity.hasComponent(ComponentType.AnimatedSprite))
-                render(sb, entity.getComponent(ComponentType.AnimatedSprite) as AnimatedSpriteComponent, pos.x, pos.y)
+            // Render shadow
+            if (entity.hasComponent(ComponentType.ShadowRender)) {
+                var shadowRenderC = entity.getComponent(ComponentType.ShadowRender) as ShadowRenderComponent
+                sr.begin(ShapeType.Filled)
+                sr.color = Color(0f, 0f, 0f, 0.2f)
+                sr.ellipse(pos.x, pos.y, shadowRenderC.width, shadowRenderC.height + shadowRenderC.offsetY)
+                sr.end()
+            }
+
+            if (entity.hasComponent(ComponentType.Sprite) || entity.hasComponent(ComponentType.AnimatedSprite)) {
+                var y = pos.y
+
+                // Handle bouncing animation rendering
+                if (entity.hasComponent(ComponentType.BouncingRender))
+                    y += (entity.getComponent(ComponentType.BouncingRender) as BouncingRenderComponent).offsetY
+
+                if (entity.hasComponent(ComponentType.Sprite))
+                    render(sb, entity.getComponent(ComponentType.Sprite) as SpriteComponent, pos.x, y)
+                if (entity.hasComponent(ComponentType.AnimatedSprite))
+                    render(sb, entity.getComponent(ComponentType.AnimatedSprite) as AnimatedSpriteComponent, pos.x, y)
+            }
 
             if (entity.hasComponent(ComponentType.Tag)) {
-                val tag = (entity.getComponent(ComponentType.Tag) as TagComponent).tag ?: continue
+                val tag = (entity.getComponent(ComponentType.Tag) as TagComponent).tag ?: return
 
                 // Render snake head
-                if(tag == TagComponent.EntityTagType.SnakeHead) {
-                    sr.begin(ShapeType.Filled)
-                    //sr.color = Color.FOREST
-                    //sr.circle(pos.x, pos.y, SNAKE_RADIUS * 1.5f)
+                if (tag == TagComponent.EntityTagType.SnakeHead) {
                     renderSnake(sb, em, entity, sr)
-                    sr.end()
-                }
-                else if (tag == TagComponent.EntityTagType.SnakeBody) {
-
-                }
-                else {
-                    // Temporary render
-                    sr.begin(ShapeRenderer.ShapeType.Filled)
-                    sr.color = Color.YELLOW
+                } else if (tag == TagComponent.EntityTagType.SnakeBody) {
+                } else if (tag == TagComponent.EntityTagType.Fireball){
+                    sr.begin(ShapeType.Filled)
+                    sr.color = Color.RED
                     sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
                     sr.end()
-
-                    debugFont.draw(sb, "TEST STRING", 0f, 0f)
-                    debugFont.draw(sb, tag.typeString, pos.x, pos.y)
                 }
             } else {
                 // Temporary render
-                sr.begin(ShapeRenderer.ShapeType.Filled)
+                sr.begin(ShapeType.Filled)
                 sr.color = Color.RED
+                if (entity.getComponent(ComponentType.Tag) != null)
+                    sr.color = Color.ORANGE
                 sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
                 sr.end()
             }
         }
-
-        sr.end()
     }
 
     /**
      * Handles rendering of a SpriteComponent at the given position.
      */
     private fun render(sb: SpriteBatch, spriteComponent: SpriteComponent, x: Float, y: Float) {
+        sb.begin()
         sb.draw(spriteComponent.sprite, x, y, spriteComponent.renderWidth, spriteComponent.renderHeight)
+        sb.end()
     }
 
     /**
      * Handles rendering of an AnimatedSpriteComponent at the given position.
      */
     private fun render(sb: SpriteBatch, animComponent: AnimatedSpriteComponent, x: Float, y: Float) {
+        sb.begin()
         // Draw the current frame of this animation
         sb.draw(animComponent.getCurrentFrame(), x, y, animComponent.renderWidth, animComponent.renderHeight)
+        sb.end()
     }
 
     /**
@@ -121,44 +132,93 @@ object RenderingSystem : System(ComponentType.Position) {
      * @param snakeHead the first snake piece
      */
     private fun renderSnake(sb: SpriteBatch, em: EntityManager, snakeHead: Entity, shapeRenderer: ShapeRenderer) {
-        val snakePoints: ArrayList<Vector2> = ArrayList()
+        var playerComponent = snakeHead.getComponent(ComponentType.Player) as PlayerComponent
+
+        // Stop rendering the snake once it is dead and decayed
+        if (!playerComponent.alive && !playerComponent.decaying)
+            return
+
         var pieceId = (snakeHead.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
+        var headPosition = snakeHead.getComponent(ComponentType.Position) as PositionComponent
 
-        var time = java.lang.System.nanoTime()
+        val snakePoints: ArrayList<Vector2> = ArrayList()
+        // Add the head position twice to force the CatmullRomSpline to start there
+        snakePoints.add(Vector2(headPosition.x, headPosition.y))
+        snakePoints.add(Vector2(headPosition.x, headPosition.y))
 
-        while(pieceId != null) {
+        var pos: PositionComponent? = null
+        while (pieceId != null) {
+            if (!em.hasEntity(pieceId))
+                break
             var entity = em.getEntity(pieceId)!!
-            val pos = entity.getComponent(ComponentType.Position) as PositionComponent
+            pos = entity.getComponent(ComponentType.Position) as PositionComponent
             pieceId = (entity.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
             snakePoints.add(Vector2(pos.x, pos.y))
         }
 
-        val startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
-        val endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
+        // Add the last position twice to force the CatmullRomSpline to end there
+        if (pos != null)
+            snakePoints.add(Vector2(pos.x, pos.y))
+
+        var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
+        var endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
+
+        // Handle blinding during decay
+        var alpha = 1.0f
+        if (!playerComponent.alive && playerComponent.decaying) {
+            val blinkTicks = 30f
+            var t = (RenderingConstants.SNAKE_DECAYING_TICKS - playerComponent.remainingDecayTicks) / blinkTicks.toFloat()
+            t = t.pow(1.25f) // makes bounces faster and faster
+            alpha = 1f - max(0f, sin(2f*Math.PI * (t - 0.5f)).toFloat())
+            startColor = Color(0.2f, 0.2f, 0.2f, alpha)
+            endColor = Color(0.12f, 0.12f, 0.12f, alpha)
+        }
 
         // number of points used for rendering the spline
-        var k = snakePoints.size * 5
+        var pointsDensity = 5
+        var k = if (snakePoints.size > 2) snakePoints.size * pointsDensity else 1
 
         val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
         var points = ArrayList<Vector2>()
+        var alphas = ArrayList<Float>()
 
-        for(i in 0 until k) {
+        for (i in 0 until k) {
             var pt = Vector2()
-            spline.valueAt(pt, i / k.toFloat())
+            spline.valueAt(pt, i / (k - 1).toFloat())
             points.add(pt)
+            alphas.add(alpha)
         }
+
+        // In invisible mode, set the first alphas to 0 and then fade to 1
+        if (playerComponent.invisible && playerComponent.alive) {
+            var invisibilityLength = 4 * pointsDensity
+            for (i in 0 until min(invisibilityLength, alphas.size))
+                alphas[i] = 0f
+            for (i in invisibilityLength until min(invisibilityLength * 2, alphas.size))
+                alphas[i] = (i - invisibilityLength) / invisibilityLength.toFloat()
+
+            // If the invisible player is the local player, set a minimum opacity of 0.1
+            if (playerComponent.playerId == SnakeECSEngine.localPlayerId) {
+                for (i in 0 until min(invisibilityLength * 2, alphas.size))
+                    alphas[i] = max(alphas[i], 0.2f)
+            }
+        }
+
+        shapeRenderer.begin(ShapeType.Filled)
 
         // Draw shadow
-        shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f))
-        for(i in 0 until points.size)
-            shapeRenderer.circle(points[i].x, points[i].y - 2, SNAKE_RADIUS)
-
-        // Draw colored snake
-        for(i in 0 until points.size) {
-            shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
-            shapeRenderer.circle(points[i].x, points[i].y, SNAKE_RADIUS)
+        for (i in 0 until points.size) {
+            shapeRenderer.color.set(Color(0f, 0f, 0f, 0.1f*alphas[i]))
+            shapeRenderer.circle(points[i].x, points[i].y - 2, RenderingConstants.SNAKE_CIRCLE_RADIUS)
         }
 
-        //Gdx.app.log("snake_render", "rendering time=" + ((java.lang.System.nanoTime() - time) / 1000000f).toString())
+        // Draw colored snake
+        for (i in 0 until points.size) {
+            shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
+            shapeRenderer.color.a = alphas[i]
+            shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS)
+        }
+
+        shapeRenderer.end()
     }
 }

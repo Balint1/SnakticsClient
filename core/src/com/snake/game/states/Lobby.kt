@@ -16,13 +16,15 @@ import org.json.JSONObject
 
 class Lobby(
     private val roomId: String,
-    players: MutableList<Player>
+    private var players: MutableList<Player>
 ) : MenuBaseState() {
     private val playerId: String = SocketService.socket.id()
     private val playersList = Table()
 
+    // Store state updates that may have been received while in the lobby so the GameState can process them when it is ready
+    private val updatesBuffer = ArrayList<Array<Any>>()
+
     init {
-        addListeners()
         setTitle("Lobby")
 
         createScrollPane(playersList, ELEMENT_WIDTH * 2 / 3).apply {
@@ -43,16 +45,22 @@ class Lobby(
         addElements(leaveBtn, playBtn, spacing = SPACING)
     }
 
+    override fun activated() {
+        super.activated()
+        addListeners()
+    }
+
     /**
      * Called when the player success or fails to to start the game
      *
-     * @param response response fom create room http request
+     * @param response response from start game http request
      */
     private fun onStartGame(response: SimpleResponse) {
-        Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
+        Gdx.app.debug("UI", "(Lobby::onStartGame(%b)".format(response.success))
         hideDialog()
         if (response.success) {
-            StateManager.push(GameState(roomId, playerId))
+            StateManager.push(GameState(playerId, players, updatesBuffer))
+            updatesBuffer.clear()
         } else {
             showButtonDialog(response.message, "Ok")
         }
@@ -61,10 +69,10 @@ class Lobby(
     /**
      * Called when the player success or fails to to leave the room
      *
-     * @param response response fom create room http request
+     * @param response response from create room http request
      */
     private fun onLeaveRoom(response: SimpleResponse) {
-        Gdx.app.debug("UI", "Lobby::onStartGame(%b)".format(response.success))
+        Gdx.app.debug("UI", "Lobby::onLeaveRoom(%b)".format(response.success))
         hideDialog()
         if (response.success) {
             cancelListeners()
@@ -90,18 +98,24 @@ class Lobby(
             val data: JSONObject = args[0] as JSONObject
             val player: Player = Gson().fromJson(data.toString(), Player::class.java)
             Gdx.app.postRunnable {
+                this.players.add(player)
                 insertPlayer(player)
             }
         }.on(Events.PLAYER_LEFT_ROOM.value) { args ->
             val data: JSONObject = args[0] as JSONObject
             val updatedList: UpdatedList = Gson().fromJson(data.toString(), UpdatedList::class.java)
             Gdx.app.postRunnable {
+                this.players = updatedList.players.toMutableList()
                 initializePlayersList(updatedList.players)
             }
         }.on(Events.START_GAME.value) {
             Gdx.app.postRunnable {
-                StateManager.push(GameState(roomId, playerId))
+                StateManager.push(GameState(playerId, players, updatesBuffer))
+                updatesBuffer.clear()
             }
+        }.on(Events.UPDATE.value) { args ->
+            // Store the update (will be given to the GameState when it is ready)
+            updatesBuffer.add(args)
         }
     }
 

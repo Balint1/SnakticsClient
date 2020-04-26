@@ -4,30 +4,23 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
-import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable
-import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.snake.game.controls.SwipeDetector
 
-abstract class BaseState() : IState {
-    protected val stage = Stage(ExtendViewport(BaseState.VIRTUAL_WIDTH, BaseState.VIRTUAL_HEIGHT))
+abstract class BaseState(protected val stage: Stage) : IState {
     protected val multiplexer = InputMultiplexer()
-
-    protected val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
-
     var dialog: Dialog? = null
 
     override fun activated() {
+        val multiplexer = InputMultiplexer()
         multiplexer.addProcessor(SwipeDetector)
         multiplexer.addProcessor(stage)
         Gdx.input.inputProcessor = multiplexer
@@ -99,7 +92,7 @@ abstract class BaseState() : IState {
      * @param buttons The text on the buttons
      * @param onResult Function called when the button is clicked. The parameter is set to the index of the button that was clicked
      */
-    protected fun showButtonDialog(text: String, vararg buttons: String, onResult: (Int) -> Unit = {}) {
+    protected fun showButtonDialog(text: String, vararg buttons: String = arrayOf("Ok"), onResult: (Int) -> Unit = {}) {
         dialog = (object : Dialog("", skin, "default") {
             override fun result(result: Any) {
                 if (result is Int)
@@ -167,7 +160,7 @@ abstract class BaseState() : IState {
         addElement(table, padTop, parent)
     }
 
-    protected fun creteImageButton(texture: Texture, width: Float = BaseState.ELEMENT_WIDTH, height: Float = BaseState.ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
+    protected fun createImageButton(texture: Texture, width: Float = BaseState.ELEMENT_WIDTH, height: Float = BaseState.ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
         val drawable: Drawable = TextureRegionDrawable(TextureRegion(texture))
         val button = ImageButton(drawable)
         button.setSize(width, height)
@@ -192,5 +185,6 @@ abstract class BaseState() : IState {
         const val SPACING = ELEMENT_WIDTH / 10f
 
         const val ICON_WIDTH = ELEMENT_WIDTH / 25
+        val skin = Skin(Gdx.files.internal("skins/comic/comic-ui.json"))
     }
 }
