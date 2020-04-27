@@ -3,7 +3,6 @@ package com.snake.game.ecs.system
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.GL20.*
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -165,8 +164,8 @@ object RenderingSystem : System(ComponentType.Position) {
      * @param snakeHead the first snake piece
      */
     private fun renderSnake(em: EntityManager, snakeHead: Entity, shapeRenderer: ShapeRenderer) {
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         var playerComponent = snakeHead.getComponent(ComponentType.Player) as PlayerComponent
 
@@ -194,11 +193,10 @@ object RenderingSystem : System(ComponentType.Position) {
         var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
         var endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
 
-        if(playerComponent.color == "BlueSnake"){
+        if (playerComponent.color == "BlueSnake") {
             startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
             endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
-        }
-        else if(playerComponent.color == "GreenSnake"){
+        } else if (playerComponent.color == "GreenSnake") {
             startColor = Color(0.235f, 0.980f, 0f, 1.0f)
             endColor = Color(0.552f, 0.886f, 0.678f, 1.0f)
         }
@@ -222,10 +220,10 @@ object RenderingSystem : System(ComponentType.Position) {
         var currentSplinePoints: ArrayList<Vector2> = ArrayList()
         currentSplinePoints.add(snakePoints[0])
 
-        for(i in 1 until snakePoints.size) {
-            var pre = snakePoints[i-1]
+        for (i in 1 until snakePoints.size) {
+            var pre = snakePoints[i - 1]
             var p = snakePoints[i]
-            if((p.x - pre.x).pow(2) + (p.y - pre.y).pow(2) > (RenderingConstants.SNAKE_CIRCLE_RADIUS * 4).pow(2)) {
+            if ((p.x - pre.x).pow(2) + (p.y - pre.y).pow(2) > (RenderingConstants.SNAKE_CIRCLE_RADIUS * 4).pow(2)) {
                 currentSplinePoints.add(pre) // force the spline to go all the way to the last point
                 splines.add(CatmullRomSpline<Vector2>(currentSplinePoints.toTypedArray(), false))
                 currentSplinePoints.clear()
@@ -238,13 +236,12 @@ object RenderingSystem : System(ComponentType.Position) {
 
         // Use the splines to interpolate an a list of points
         var points = ArrayList<Vector2>()
-        for(s in splines) {
+        for (s in splines) {
             var k = if (s.controlPoints.size > 2) s.controlPoints.size * pointsDensity else 0
-            if(s.controlPoints.size <= 2) {
-                for(p in s.controlPoints)
+            if (s.controlPoints.size <= 2) {
+                for (p in s.controlPoints)
                     points.add(p)
-            }
-            else {
+            } else {
                 for (i in 0 until k) {
                     var pt = Vector2()
                     s.valueAt(pt, i / (k - 1).toFloat())
@@ -253,9 +250,8 @@ object RenderingSystem : System(ComponentType.Position) {
             }
         }
 
-
         var alphas = ArrayList<Float>()
-        for(i in 0 until points.size)
+        for (i in 0 until points.size)
             alphas.add(alpha)
 
         // In invisible mode, set the first alphas to 0 and then fade to 1

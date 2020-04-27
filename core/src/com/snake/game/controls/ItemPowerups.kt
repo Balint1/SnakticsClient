@@ -99,6 +99,6 @@ class ItemPowerups(width: Float, height: Float) {
     }
 
     private fun activateThroughWalls() {
-        SocketService.socket.emit(Events.USE_POWERUP.value, Data.USE_POWEUP("through-walls"))
+        SocketService.socket.emit(Events.USE_POWERUP.value, Data.USE_POWEUP(TagComponent.EntityTagType.Wall.typeString))
     }
 }

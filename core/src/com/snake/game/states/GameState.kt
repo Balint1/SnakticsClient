@@ -1,21 +1,16 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.badlogic.gdx.utils.viewport.Viewport
 import com.google.gson.Gson
 import com.snake.game.backend.Player
 import com.snake.game.backend.SocketService
@@ -41,8 +36,8 @@ class GameState(
 ) : BaseState(Stage(ScreenViewport())) {
 
     // TODO It would be cleaner to get these dimensions from the server
-    private val FIELD_WIDTH: Float = 500f
-    private val FIELD_HEIGHT: Float = 300f
+    private val FIELD_WIDTH: Float = 800f
+    private val FIELD_HEIGHT: Float = 480f
 
     private val SIDE_PANEL_SIZE = 0.2f
 
@@ -108,6 +103,11 @@ class GameState(
         }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
             Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
             leaveToLobby(args)
+        }.on(Events.END_GAME.value) { args ->
+            Gdx.app.log("SocketIO", "END_GAME")
+            val data: JSONObject = args[0] as JSONObject
+            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
+            displayWinner(response.id)
         }
     }
 
@@ -125,7 +125,8 @@ class GameState(
                 val componentData = state.getJSONObject(i)
                 val id: String = componentData.getString("entityId")
                 val componentTypeName = componentData.getString("componentType")
-                val componentType: ComponentType? = ComponentType.fromName(componentTypeName) ?: continue // skip if component type doesn't exist
+                val componentType: ComponentType? = ComponentType.fromName(componentTypeName)
+                        ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
                 if (!ecs.entityManager.hasEntity(id))
@@ -147,7 +148,6 @@ class GameState(
 
     private fun updatePlayersList() {
         playersList.clear()
-
         var playersEntities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
         var playersComponents = mutableListOf<PlayerComponent>()
 
@@ -171,7 +171,7 @@ class GameState(
 
     private fun insertPlayer(player: Player, alive: Boolean, invisible: Boolean = false) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, BaseState.ELEMENT_HEIGHT / 2)
+            setSize(ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, ELEMENT_HEIGHT / 2)
         }
 
         val table = Table()
@@ -180,7 +180,7 @@ class GameState(
 
         if (!alive) {
             val aliveIcon = Image(Texture("indicators/dead-red.png")).apply {
-                width = BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
+                width = ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
@@ -191,7 +191,7 @@ class GameState(
 
         if (invisible) {
             val invisibleIcon = Image(Texture("powerup-sprites/powerup-invisible.png")).apply {
-                width = BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
+                width = ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
@@ -203,7 +203,7 @@ class GameState(
         table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
         widthTotal += nicknameLabel.width
         heightTotal += heightTotal.coerceAtLeast(nicknameLabel.height)
-        table.setSize(BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, BaseState.ELEMENT_HEIGHT / 2)
+        table.setSize(ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, ELEMENT_HEIGHT / 2)
         playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height / 3f).expandX()
         playersList.row()
     }
@@ -220,6 +220,26 @@ class GameState(
                 ?: return
         itemPowerups.updateFb(player.fireballCount)
         itemPowerups.updateTw(player.throughWallsCount)
+    }
+
+    private fun displayWinner(playerId: String) {
+        val winner = players.find { p -> p.id == playerId }
+
+        if (playerId == ecs.localPlayerId) {
+            showButtonDialog("You won the game", "Ok") {
+                if (it == 0) {
+                    ecs.entityManager.clearEntities()
+                    StateManager.pop()
+                }
+            }
+        } else {
+            showButtonDialog("${winner?.nickname} won the game", "Ok") {
+                if (it == 0) {
+                    ecs.entityManager.clearEntities()
+                    StateManager.pop()
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -277,8 +297,8 @@ class GameState(
 
     override fun render(sb: SpriteBatch) {
         // Enable transparency
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         gameWidget.render()
         super.render(sb)

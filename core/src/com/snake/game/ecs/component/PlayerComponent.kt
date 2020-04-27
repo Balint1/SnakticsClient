@@ -38,7 +38,7 @@ class PlayerComponent() : Component(ComponentType.Player) {
                 if (powerup.activationStatus != "used") {
                     if (powerup.type == TagComponent.EntityTagType.Fireball.typeString) {
                         fireballCount ++
-                    } else if (powerup.type == TagComponent.EntityTagType.ThroughWalls.typeString) {
+                    } else if (powerup.type == TagComponent.EntityTagType.Wall.typeString) {
                         throughWallsCount ++
                     }
                 }
