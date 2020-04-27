@@ -36,8 +36,8 @@ class GameState(
 ) : BaseState(Stage(ScreenViewport())) {
 
     // TODO It would be cleaner to get these dimensions from the server
-    private val FIELD_WIDTH: Float = 500f
-    private val FIELD_HEIGHT: Float = 300f
+    private val FIELD_WIDTH: Float = 800f
+    private val FIELD_HEIGHT: Float = 480f
 
     private val SIDE_PANEL_SIZE = 0.2f
 
