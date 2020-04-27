@@ -179,7 +179,7 @@ abstract class BaseState(protected val stage: Stage) : IState {
         addElement(table, padTop, parent)
     }
 
-    protected fun createImageButton(texture: Texture, width: Float = BaseState.ELEMENT_WIDTH, height: Float = BaseState.ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
+    protected fun createImageButton(texture: Texture, width: Float = ELEMENT_WIDTH, height: Float = ELEMENT_HEIGHT, isDisabled: Boolean = false, onClick: () -> Unit): ImageButton {
         val drawable: Drawable = TextureRegionDrawable(TextureRegion(texture))
         val button = ImageButton(drawable)
         button.setSize(width, height)

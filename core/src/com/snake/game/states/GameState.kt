@@ -2,6 +2,7 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -38,7 +39,8 @@ class GameState(
     var players: MutableList<Player>, // The player in the room
     updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
-    // TODO get from backend
+
+    // TODO It would be cleaner to get these dimensions from the server
     private val FIELD_WIDTH: Float = 500f
     private val FIELD_HEIGHT: Float = 300f
 
@@ -109,9 +111,11 @@ class GameState(
         }
     }
 
+    /**
+     * Updates game component using data received from the server.
+     * @param args JSON data from the server.
+     */
     private fun onStateUpdate(args: Array<Any>) {
-        val em = ecs.entityManager
-
         val data: JSONObject = args[0] as JSONObject
         try {
             val state = data.getJSONArray("state")
@@ -121,22 +125,20 @@ class GameState(
                 val componentData = state.getJSONObject(i)
                 val id: String = componentData.getString("entityId")
                 val componentTypeName = componentData.getString("componentType")
-
-                val componentType: ComponentType? = ComponentType.fromName(componentTypeName)
-                        ?: continue // skip if component type doesn't exist
+                val componentType: ComponentType? = ComponentType.fromName(componentTypeName) ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
-                if (!em.hasEntity(id))
-                    Entity(id, em)
+                if (!ecs.entityManager.hasEntity(id))
+                    Entity(id, ecs.entityManager)
 
-                val entity = em.getEntity(id)!!
+                val entity = ecs.entityManager.getEntity(id)!!
 
                 // Create the component if necessary
                 if (!entity.hasComponent(componentType!!))
                     entity.addComponent(ComponentType.createComponent(componentType))
 
-                val component = entity.getComponent(componentType)!!
-                component.updateFromJSON(componentData)
+                // Update the component from the JSON data
+                entity.getComponent(componentType)!!.updateFromJSON(componentData)
             }
         } catch (e: JSONException) {
             Gdx.app.log("SocketIO", "Error getting attributes: $e")
@@ -243,7 +245,6 @@ class GameState(
 
     private fun playerLeftGame(id: String) {
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
-        // TODO Stop rendering 'response.id' player.
     }
 
     private fun deleteEntities(args: Array<Any>) {
@@ -275,6 +276,10 @@ class GameState(
     }
 
     override fun render(sb: SpriteBatch) {
+        // Enable transparency
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         gameWidget.render()
         super.render(sb)
     }
@@ -283,48 +288,5 @@ class GameState(
         super.resize(width, height)
         gameWidget.width = width * (1.0f - SIDE_PANEL_SIZE)
         gameWidget.height = height.toFloat()
-    }
-}
-
-class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float,
-    private val standardViewport: Viewport
-) : Widget() {
-
-    // private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)
-    private val viewport = FitViewport(fieldWidth, fieldHeight)
-
-    // The SpriteBatch used for rendering the game
-    private val sb = SpriteBatch()
-
-    init {
-    }
-
-    private fun updateSize() {
-        // Gdx.app.log("debug", "x=$x, w=$width, h=$height")
-
-        viewport.update(width.toInt(), height.toInt())
-        viewport.screenX = Gdx.graphics.width - width.toInt()
-    }
-
-    fun render() {
-        // TODO Would be better to only update size when necessary, but for some reason it doesn't work too well
-        updateSize()
-
-        viewport.apply(true)
-        sb.projectionMatrix = viewport.camera.combined
-
-        ecs.render(sb, fieldWidth, fieldHeight)
-
-        val sr = ShapeRenderer()
-        sr.projectionMatrix = sb.projectionMatrix
-        sr.begin(ShapeRenderer.ShapeType.Line)
-        sr.color = Color.RED
-        sr.rect(5f, 5f, fieldWidth - 10, fieldHeight - 10)
-        sr.end()
-
-        standardViewport.apply(true)
     }
 }
