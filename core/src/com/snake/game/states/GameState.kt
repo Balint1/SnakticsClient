@@ -2,6 +2,7 @@ package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
@@ -306,6 +307,10 @@ class GameState(
     }
 
     override fun render(sb: SpriteBatch) {
+        // Enable transparency
+        Gdx.gl.glEnable(GL20.GL_BLEND);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+
         gameWidget.render()
         super.render(sb)
     }
@@ -348,13 +353,6 @@ class GameWidget(
         sb.projectionMatrix = viewport.camera.combined
 
         ecs.render(sb, fieldWidth, fieldHeight)
-
-        val sr = ShapeRenderer()
-        sr.projectionMatrix = sb.projectionMatrix
-        sr.begin(ShapeRenderer.ShapeType.Line)
-        sr.color = Color.RED
-        sr.rect(5f, 5f, fieldWidth - 10, fieldHeight - 10)
-        sr.end()
 
         standardViewport.apply(true)
     }
