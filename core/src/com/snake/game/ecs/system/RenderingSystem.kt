@@ -191,24 +191,58 @@ object RenderingSystem : System(ComponentType.Position) {
             var t = (RenderingConstants.SNAKE_DECAYING_TICKS - playerComponent.remainingDecayTicks) / blinkTicks.toFloat()
             t = t.pow(1.25f) // makes bounces faster and faster
             alpha = 1f - max(0f, sin(2f*Math.PI * (t - 0.5f)).toFloat())
-            startColor = Color(0.2f, 0.2f, 0.2f, alpha)
-            endColor = Color(0.12f, 0.12f, 0.12f, alpha)
+            startColor = Color(0.8f, 0.2f, 0.2f, alpha)
+            endColor = Color(0.6f, 0.12f, 0.12f, alpha)
         }
 
         // number of points used for rendering the spline
-        var pointsDensity = 5
-        var k = if (snakePoints.size > 2) snakePoints.size * pointsDensity else 1
+        var pointsDensity = 3
+        //var k = if (snakePoints.size > 2) snakePoints.size * pointsDensity else 1
 
-        val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
+        // Group points into array of close points (prevents issues when one side of the snake is on the other side of the board)
+        var splines: ArrayList<CatmullRomSpline<Vector2>> = ArrayList()
+        var currentSplinePoints: ArrayList<Vector2> = ArrayList()
+        currentSplinePoints.add(snakePoints[0])
+
+        for(i in 1 until snakePoints.size) {
+            var pre = snakePoints[i-1]
+            var p = snakePoints[i]
+            if((p.x - pre.x).pow(2) + (p.y - pre.y).pow(2) > (RenderingConstants.SNAKE_CIRCLE_RADIUS * 4).pow(2)) {
+                splines.add(CatmullRomSpline<Vector2>(currentSplinePoints.toTypedArray(), false))
+                currentSplinePoints.clear()
+            }
+            currentSplinePoints.add(p)
+        }
+        splines.add(CatmullRomSpline<Vector2>(currentSplinePoints.toTypedArray(), false))
+
         var points = ArrayList<Vector2>()
-        var alphas = ArrayList<Float>()
 
+        /*val spline = CatmullRomSpline<Vector2>(snakePoints.toTypedArray(), false)
         for (i in 0 until k) {
             var pt = Vector2()
             spline.valueAt(pt, i / (k - 1).toFloat())
             points.add(pt)
-            alphas.add(alpha)
+        }*/
+
+        for(s in splines) {
+            var k = if (s.controlPoints.size > 2) s.controlPoints.size * pointsDensity else 0
+            if(s.controlPoints.size <= 2) {
+                for(p in s.controlPoints)
+                    points.add(p)
+            }
+            else {
+                for (i in 0 until k) {
+                    var pt = Vector2()
+                    s.valueAt(pt, i / (k - 1).toFloat())
+                    points.add(pt)
+                }
+            }
         }
+
+
+        var alphas = ArrayList<Float>()
+        for(i in 0 until points.size)
+            alphas.add(alpha)
 
         // In invisible mode, set the first alphas to 0 and then fade to 1
         if (playerComponent.invisible && playerComponent.alive) {
@@ -233,7 +267,16 @@ object RenderingSystem : System(ComponentType.Position) {
             shapeRenderer.circle(points[i].x, points[i].y - 2, RenderingConstants.SNAKE_CIRCLE_RADIUS)
         }
 
-        // Draw colored snake
+        // Draw border around local snake
+        if (playerComponent.playerId == SnakeECSEngine.localPlayerId) {
+            shapeRenderer.color = Color(0.83f, 0.69f, 0.22f, 1f)
+            for (i in 0 until points.size - 1) {
+                shapeRenderer.color.a = alphas[i]
+                shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS + 1f)
+            }
+        }
+
+        // Draw the snake
         for (i in 0 until points.size) {
             shapeRenderer.color.set(startColor).lerp(endColor, i / points.size.toFloat())
             shapeRenderer.color.a = alphas[i]
