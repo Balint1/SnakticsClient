@@ -7,7 +7,7 @@ object MusicPlayer{
     val music: Music = Gdx.audio.newMusic(Gdx.files.internal(Config.MUSIC_PATH));
 
     init{
-        music.volume = 0.5f;
+        music.volume = Preferences.volume;
         music.isLooping = true;
         music.play();
     }
