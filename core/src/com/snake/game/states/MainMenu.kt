@@ -28,6 +28,13 @@ class MainMenu : MenuBaseState() {
             }.apply {
                 addElement(this)
             }
+
+            createTextButton("Quit") {
+                Gdx.app.exit();
+            }.apply {
+                addElement(this)
+            }
+
         }
     }
 
@@ -55,6 +62,12 @@ class MainMenu : MenuBaseState() {
 
             createTextButton("Settings") {
                 StateManager.push(Settings())
+            }.apply {
+                addElement(this)
+            }
+
+            createTextButton("Quit") {
+                Gdx.app.exit();
             }.apply {
                 addElement(this)
             }
