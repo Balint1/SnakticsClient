@@ -7,7 +7,9 @@ enum class PowerUpType(val internalName: String, val spriteFile: String?, val sp
     SpeedDebuff("speedDebuff", PowerUpType.SPRITES_LOCATION + "powerup-slow-v2.png"),
     InvisibleAbility("invisibleAbility", PowerUpType.SPRITES_LOCATION + "powerup-invisible.png"),
     Fireball("Fireball", PowerUpType.SPRITES_LOCATION + "powerup-fire-ball-32bits.png"),
-    ColorSwap("ColorSwap", PowerUpType.SPRITES_LOCATION + "powerup-colorswap-v1.png");
+    ColorSwap("ColorSwap", PowerUpType.SPRITES_LOCATION + "powerup-colorswap-v1.png"),
+    Wall("Wall", PowerUpType.SPRITES_LOCATION + "powerup-tw-32bits.png");
+
 
     constructor(internalName: String) : this(internalName, null, 0f)
     constructor(internalName: String, spriteFile: String) : this(internalName, spriteFile, RenderingConstants.POWERUP_SPRITE_SIZE)
