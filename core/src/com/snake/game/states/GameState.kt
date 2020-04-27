@@ -10,10 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Image
-import com.badlogic.gdx.scenes.scene2d.ui.Widget
-import com.badlogic.gdx.utils.viewport.FitViewport
 import com.badlogic.gdx.utils.viewport.ScreenViewport
-import com.badlogic.gdx.utils.viewport.Viewport
 import com.google.gson.Gson
 import com.snake.game.backend.Player
 import com.snake.game.backend.SocketService
@@ -107,6 +104,11 @@ class GameState(
         }.on(Events.LEAVE_TO_LOBBY_RESPONSE.value) { args ->
             Gdx.app.log("SocketIO", "LEAVE_TO_LOBBY_RESPONSE")
             leaveToLobby(args)
+        }.on(Events.END_GAME.value) { args ->
+            Gdx.app.log("SocketIO", "END_GAME")
+            val data: JSONObject = args[0] as JSONObject
+            val response: PlayerEvent = Gson().fromJson(data.toString(), PlayerEvent::class.java)
+            displayWinner(response.id)
         }
     }
 
@@ -124,7 +126,8 @@ class GameState(
                 val componentData = state.getJSONObject(i)
                 val id: String = componentData.getString("entityId")
                 val componentTypeName = componentData.getString("componentType")
-                val componentType: ComponentType? = ComponentType.fromName(componentTypeName) ?: continue // skip if component type doesn't exist
+                val componentType: ComponentType? = ComponentType.fromName(componentTypeName)
+                        ?: continue // skip if component type doesn't exist
 
                 // Create the entity if necessary
                 if (!ecs.entityManager.hasEntity(id))
@@ -169,7 +172,7 @@ class GameState(
 
     private fun insertPlayer(player: Player, alive: Boolean, invisible: Boolean = false) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, ELEMENT_HEIGHT / 2)
+            setSize(ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, ELEMENT_HEIGHT / 2)
         }
 
         val table = Table()
@@ -220,41 +223,21 @@ class GameState(
         itemPowerups.updateTw(player.throughWallsCount)
     }
 
-    private fun checkWinner() {
-        var alivePlayers = 0
-        var deadPlayers = 0
+    private fun displayWinner(playerId: String) {
+        val winner = players.find { p -> p.id == playerId }
 
-        val playersEntities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
-        val playersComponents = mutableListOf<PlayerComponent>()
-
-        for (p: Entity in playersEntities) {
-            if (p.getComponent(ComponentType.Player) != null)
-                playersComponents.add(p.getComponent(ComponentType.Player) as PlayerComponent)
-        }
-        for (p: PlayerComponent in playersComponents) {
-            if (p.alive) {
-                alivePlayers++
-            } else {
-                deadPlayers++
-            }
-        }
-        val player = playersComponents.find { player -> player.playerId == ecs.localPlayerId }
-                ?: return
-        if (deadPlayers > 0 && alivePlayers == 1) {
-            if (player.alive) {
-                showButtonDialog("You won the game", "Ok"){
-                    if (it == 0){
-                        ecs.entityManager.clearEntities()
-                        StateManager.pop()
-                    }
+        if (playerId == ecs.localPlayerId) {
+            showButtonDialog("You won the game", "Ok") {
+                if (it == 0) {
+                    ecs.entityManager.clearEntities()
+                    StateManager.pop()
                 }
-            }else{
-               val winner=  players.find { p -> p.id == player.playerId  }
-                showButtonDialog("${winner?.nickname} won the game", "Ok"){
-                    if (it == 0){
-                        ecs.entityManager.clearEntities()
-                        StateManager.pop()
-                    }
+            }
+        } else {
+            showButtonDialog("${winner?.nickname} won the game", "Ok") {
+                if (it == 0) {
+                    ecs.entityManager.clearEntities()
+                    StateManager.pop()
                 }
             }
         }
@@ -311,7 +294,6 @@ class GameState(
         ecs.update(dt)
         updatePlayersList()
         checkPowerups()
-        checkWinner()
     }
 
     override fun render(sb: SpriteBatch) {
