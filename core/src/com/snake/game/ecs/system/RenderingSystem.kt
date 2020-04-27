@@ -185,8 +185,10 @@ object RenderingSystem : System(ComponentType.Position) {
                 break
             var entity = em.getEntity(pieceId)!!
             var pos = entity.getComponent(ComponentType.Position) as PositionComponent
-            pieceId = (entity.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
             snakePoints.add(Vector2(pos.x, pos.y))
+            if(!entity.hasComponent(ComponentType.Snake))
+                break
+            pieceId = (entity.getComponent(ComponentType.Snake) as SnakeComponent).nextPieceId
         }
 
         var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
