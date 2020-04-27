@@ -2,6 +2,7 @@ package com.snake.game.states
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.Slider
+import com.snake.game.MusicPlayer
 import com.snake.game.Preferences
 
 class Settings : MenuBaseState() {
@@ -18,6 +19,7 @@ class Settings : MenuBaseState() {
             value = Preferences.volume
             addListener {
                 Preferences.volume = value
+                MusicPlayer.updateVolume()
                 false
             }
         }

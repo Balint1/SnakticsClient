@@ -242,7 +242,6 @@ class GameState(
 
     private fun playerLeftGame(id: String) {
         Gdx.app.debug("UI", "GameState::playerLeftGame(%s)".format(id))
-        // TODO: remove the player from the player list for the side panel, and update the player list in the side panel
         // TODO Stop rendering 'response.id' player.
     }
 
