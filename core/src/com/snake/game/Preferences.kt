@@ -2,7 +2,8 @@ package com.snake.game
 
 object Preferences {
     var volume: Float = 0.5f
-
+    var FIELD_WIDTH: Float = 500f
+    var FIELD_HEIGHT: Float = 300f
     var speed = 0.5f
     var snakeLength = "normal"
     var colorsDisabled = false

@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.viewport.ScreenViewport
 import com.google.gson.Gson
+import com.snake.game.Preferences
 import com.snake.game.backend.Player
 import com.snake.game.backend.SocketService
 import com.snake.game.backend.Events
@@ -30,20 +31,18 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-    playerId: String, // The ID of the local player
-    var players: MutableList<Player>, // The player in the room
-    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+        playerId: String, // The ID of the local player
+        var players: MutableList<Player>, // The player in the room
+        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
 
     // TODO It would be cleaner to get these dimensions from the server
-    private val FIELD_WIDTH: Float = 500f
-    private val FIELD_HEIGHT: Float = 300f
 
     private val SIDE_PANEL_SIZE = 0.2f
 
     private val ecs = SnakeECSEngine
     private val swipeDetector = SwipeDetector
-    private val gameWidget = GameWidget(ecs, FIELD_WIDTH, FIELD_HEIGHT, getViewport())
+    private val gameWidget = GameWidget(ecs, Preferences.FIELD_WIDTH, Preferences.FIELD_HEIGHT, getViewport())
     private val splitPane: SplitPane
     private val playersList = Table()
     private var infoPane: InfoPane
@@ -225,7 +224,14 @@ class GameState(
     private fun displayWinner(playerId: String) {
         val winner = players.find { p -> p.id == playerId }
 
-        if (playerId == ecs.localPlayerId) {
+        if (playerId == "draw") {
+            showButtonDialog("Game ended in a draw", "Ok") {
+                if (it == 0) {
+                    ecs.entityManager.clearEntities()
+                    StateManager.pop()
+                }
+            }
+        } else if (playerId == ecs.localPlayerId) {
             showButtonDialog("You won the game", "Ok") {
                 if (it == 0) {
                     ecs.entityManager.clearEntities()

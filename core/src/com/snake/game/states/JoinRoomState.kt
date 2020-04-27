@@ -1,10 +1,12 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.snake.game.Preferences
 import com.google.gson.Gson
 import com.snake.game.backend.Events
 import com.snake.game.backend.JoinResponse
 import com.snake.game.backend.SocketService
+
 import org.json.JSONObject
 
 class JoinRoomState(
@@ -49,6 +51,9 @@ class JoinRoomState(
         Gdx.app.debug("UI", "JoinRoomState::onRoomJoined(${response.roomId}, %b)".format(response.success))
         hideDialog()
         if (response.success) {
+            Preferences.FIELD_HEIGHT = response.fieldHeight.toFloat()
+            Preferences.FIELD_WIDTH = response.fieldWidth.toFloat()
+
             StateManager.push(Lobby(response.roomId, response.players))
         } else {
             showButtonDialog(response.message, "Ok") {
