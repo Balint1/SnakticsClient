@@ -8,6 +8,7 @@ class PlayerComponent() : Component(ComponentType.Player) {
     var decaying: Boolean = false
     var remainingDecayTicks: Int = 0
     var invisible: Boolean = false
+    var color: String = ""
 
     override fun updateFromJSON(data: JSONObject) {
         playerId = data.getString("playerId")
@@ -19,5 +20,6 @@ class PlayerComponent() : Component(ComponentType.Player) {
             remainingDecayTicks = data.getInt("remainingDecayTicks")
 
         invisible = data.getBoolean("invisible")
+        color = data.getString("color")
     }
 }

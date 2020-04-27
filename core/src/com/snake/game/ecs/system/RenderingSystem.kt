@@ -174,6 +174,16 @@ object RenderingSystem : System(ComponentType.Position) {
         var startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
         var endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
 
+        if(playerComponent.color == "BlueSnake"){
+            startColor = Color(0.3f, 0.75f, 0.8f, 1.0f)
+            endColor = Color(0.20f, 0.45f, 0.7f, 1.0f)
+        }
+
+        if(playerComponent.color == "GreenSnake"){
+            startColor = Color(0.235f, 0.980f, 0f, 1.0f)
+            endColor = Color(0.552f, 0.886f, 0.678f, 1.0f)
+        }
+
         // Handle blinding during decay
         var alpha = 1.0f
         if (!playerComponent.alive && playerComponent.decaying) {

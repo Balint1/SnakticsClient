@@ -3,8 +3,8 @@ package com.snake.game.ecs.component
 import com.snake.game.RenderingConstants
 
 enum class PowerUpType(val internalName: String, val spriteFile: String?, val spriteSize: Float) {
-    SpeedBooster("speedBooster", PowerUpType.SPRITES_LOCATION + "powerup-slow-v2.png"),
-    SpeedDebuff("speedDebuff", PowerUpType.SPRITES_LOCATION + "powerup-speed-v1.png"),
+    SpeedBooster("speedBooster", PowerUpType.SPRITES_LOCATION + "powerup-speed-v1.png"),
+    SpeedDebuff("speedDebuff", PowerUpType.SPRITES_LOCATION + "powerup-slow-v2.png"),
     InvisibleAbility("invisibleAbility", PowerUpType.SPRITES_LOCATION + "powerup-invisible.png"),
     Fireball("Fireball", PowerUpType.SPRITES_LOCATION + "powerup-fire-ball-32bits.png");
 
