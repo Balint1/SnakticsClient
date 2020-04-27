@@ -228,6 +228,7 @@ class GameState(
     }
 
     private fun leaveToLobby(args: Array<Any>) {
+        ecs.entityManager.clearEntities()
         val data: JSONObject = args[0] as JSONObject
         val response: SimpleResponse = Gson().fromJson(data.toString(), SimpleResponse::class.java)
         Gdx.app.debug("UI", "GameState::leaveToLobby(%b)".format(response.success))
