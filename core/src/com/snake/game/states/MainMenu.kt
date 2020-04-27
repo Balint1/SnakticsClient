@@ -1,9 +1,25 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Texture
 import com.snake.game.backend.SocketService
 
 class MainMenu : MenuBaseState() {
+    private val creteBtn = createTextButton("Create room") {
+        StateManager.push(CreateRoom())
+    }
+    private val joinBtn = createTextButton("Join room") {
+        StateManager.push(RoomList())
+    }
+    private val generalSettingsTexture = Texture("buttons/vol-settings.png")
+    private val generalSettings = createImageButton(generalSettingsTexture, ELEMENT_HEIGHT) {
+        StateManager.push(Settings())
+    }
+
+    private val exitTexture = Texture("buttons/exit.png")
+    private val exitButton = createImageButton(exitTexture, ELEMENT_HEIGHT) {
+        onBackPressed()
+    }
 
     init {
         if (!SocketService.socket.connected()) {
@@ -11,23 +27,9 @@ class MainMenu : MenuBaseState() {
             SocketService.addListeners(::onSocketConnect)
         } else {
             setTitle("Snaktics")
-            createTextButton("Create room") {
-                StateManager.push(CreateRoom())
-            }.apply {
-                addElement(this)
-            }
-
-            createTextButton("Join room") {
-                StateManager.push(RoomList())
-            }.apply {
-                addElement(this)
-            }
-
-            createTextButton("Settings") {
-                StateManager.push(Settings())
-            }.apply {
-                addElement(this)
-            }
+            addElement(creteBtn)
+            addElement(joinBtn)
+            addElements(exitButton, generalSettings, spacing = ELEMENT_WIDTH/2)
         }
     }
 
@@ -41,23 +43,9 @@ class MainMenu : MenuBaseState() {
         hideDialog()
         if (success) {
             setTitle("Snaktics")
-            createTextButton("Create room") {
-                StateManager.push(CreateRoom())
-            }.apply {
-                addElement(this)
-            }
-
-            createTextButton("Join room") {
-                StateManager.push(RoomList())
-            }.apply {
-                addElement(this)
-            }
-
-            createTextButton("Settings") {
-                StateManager.push(Settings())
-            }.apply {
-                addElement(this)
-            }
+            addElement(creteBtn)
+            addElement(joinBtn)
+            addElements(exitButton, generalSettings, spacing = ELEMENT_WIDTH/2)
         } else {
             showButtonDialog(message, "Ok")
         }
