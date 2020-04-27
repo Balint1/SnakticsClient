@@ -8,10 +8,10 @@ import com.badlogic.gdx.utils.viewport.Viewport
 import com.snake.game.ecs.SnakeECSEngine
 
 class GameWidget(
-        val ecs: SnakeECSEngine,
-        private val fieldWidth: Float,
-        private val fieldHeight: Float,
-        private val standardViewport: Viewport
+    val ecs: SnakeECSEngine,
+    private val fieldWidth: Float,
+    private val fieldHeight: Float,
+    private val standardViewport: Viewport
 ) : Widget() {
 
     // private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)

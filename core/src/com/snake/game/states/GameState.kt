@@ -30,9 +30,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-        playerId: String, // The ID of the local player
-        var players: MutableList<Player>, // The player in the room
-        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+    playerId: String, // The ID of the local player
+    var players: MutableList<Player>, // The player in the room
+    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
 
     // TODO It would be cleaner to get these dimensions from the server
@@ -48,7 +48,6 @@ class GameState(
     private val playersList = Table()
     private var infoPane: InfoPane
     private var itemPowerups: ItemPowerups
-
 
     init {
         ecs.localPlayerId = playerId
@@ -298,8 +297,8 @@ class GameState(
 
     override fun render(sb: SpriteBatch) {
         // Enable transparency
-        Gdx.gl.glEnable(GL20.GL_BLEND);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glEnable(GL20.GL_BLEND)
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
 
         gameWidget.render()
         super.render(sb)

@@ -29,7 +29,7 @@ class MainMenu : MenuBaseState() {
             setTitle("Snaktics")
             addElement(creteBtn)
             addElement(joinBtn)
-            addElements(exitButton, generalSettings, spacing = ELEMENT_WIDTH/2)
+            addElements(exitButton, generalSettings, spacing = ELEMENT_WIDTH / 2)
         }
     }
 
@@ -45,7 +45,7 @@ class MainMenu : MenuBaseState() {
             setTitle("Snaktics")
             addElement(creteBtn)
             addElement(joinBtn)
-            addElements(exitButton, generalSettings, spacing = ELEMENT_WIDTH/2)
+            addElements(exitButton, generalSettings, spacing = ELEMENT_WIDTH / 2)
         } else {
             showButtonDialog(message, "Ok")
         }
