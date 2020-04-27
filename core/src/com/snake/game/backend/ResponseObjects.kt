@@ -43,7 +43,9 @@ data class JoinResponse(
     var success: Boolean,
     var roomId: String,
     var message: String,
-    var players: MutableList<Player>
+    var players: MutableList<Player>,
+    var fieldWidth: Int,
+    var fieldHeight: Int
 )
 
 data class PlayerEvent(
