@@ -281,7 +281,7 @@ object RenderingSystem : System(ComponentType.Position) {
             shapeRenderer.color = Color(0.83f, 0.69f, 0.22f, 1f)
             for (i in 0 until points.size - 1) {
                 shapeRenderer.color.a = alphas[i] * 0.5f
-                shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS + 0.6f)
+                shapeRenderer.circle(points[i].x, points[i].y, RenderingConstants.SNAKE_CIRCLE_RADIUS + 2.7f)
             }
             shapeRenderer.end()
         }
