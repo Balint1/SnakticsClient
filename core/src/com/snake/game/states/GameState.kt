@@ -36,8 +36,6 @@ class GameState(
         updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
 
-    // TODO It would be cleaner to get these dimensions from the server
-
     private val SIDE_PANEL_SIZE = 0.2f
 
     private val ecs = SnakeECSEngine
