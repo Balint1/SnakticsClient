@@ -231,6 +231,7 @@ object RenderingSystem : System(ComponentType.Position) {
             }
             currentSplinePoints.add(p)
         }
+        currentSplinePoints.add(snakePoints[snakePoints.size - 1])
         splines.add(CatmullRomSpline<Vector2>(currentSplinePoints.toTypedArray(), false))
 
         // Use the splines to interpolate an a list of points
