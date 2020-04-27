@@ -34,9 +34,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 class GameState(
-    playerId: String, // The ID of the local player
-    var players: MutableList<Player>, // The player in the room
-    updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
+        playerId: String, // The ID of the local player
+        var players: MutableList<Player>, // The player in the room
+        updatesBuffer: ArrayList<Array<Any>> // List of state updates received by the lobby
 ) : BaseState(Stage(ScreenViewport())) {
     // TODO get from backend
     private val FIELD_WIDTH: Float = 500f
@@ -51,6 +51,7 @@ class GameState(
     private val playersList = Table()
     private var infoPane: InfoPane
     private var itemPowerups: ItemPowerups
+
 
     init {
         ecs.localPlayerId = playerId
@@ -145,7 +146,6 @@ class GameState(
 
     private fun updatePlayersList() {
         playersList.clear()
-
         var playersEntities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
         var playersComponents = mutableListOf<PlayerComponent>()
 
@@ -169,7 +169,7 @@ class GameState(
 
     private fun insertPlayer(player: Player, alive: Boolean, invisible: Boolean = false) {
         val nicknameLabel = Label(player.nickname, skin, "title").apply {
-            setSize(BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, BaseState.ELEMENT_HEIGHT / 2)
+            setSize(BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.4F, ELEMENT_HEIGHT / 2)
         }
 
         val table = Table()
@@ -178,7 +178,7 @@ class GameState(
 
         if (!alive) {
             val aliveIcon = Image(Texture("indicators/dead-red.png")).apply {
-                width = BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
+                width = ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
@@ -189,7 +189,7 @@ class GameState(
 
         if (invisible) {
             val invisibleIcon = Image(Texture("powerup-sprites/powerup-invisible.png")).apply {
-                width = BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
+                width = ELEMENT_WIDTH * splitPane.splitAmount * 0.15F
                 height = width
             }
 
@@ -201,7 +201,7 @@ class GameState(
         table.add(nicknameLabel).width(nicknameLabel.width).height(nicknameLabel.height)
         widthTotal += nicknameLabel.width
         heightTotal += heightTotal.coerceAtLeast(nicknameLabel.height)
-        table.setSize(BaseState.ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, BaseState.ELEMENT_HEIGHT / 2)
+        table.setSize(ELEMENT_WIDTH * splitPane.splitAmount * 0.5F, ELEMENT_HEIGHT / 2)
         playersList.add(table).width(table.width).height(table.height).padTop(nicknameLabel.height / 3f).expandX()
         playersList.row()
     }
@@ -218,6 +218,36 @@ class GameState(
                 ?: return
         itemPowerups.updateFb(player.fireballCount)
         itemPowerups.updateTw(player.throughWallsCount)
+    }
+
+    private fun checkWinner() {
+        var alivePlayers = 0
+        var deadPlayers = 0
+
+        val playersEntities = ecs.entityManager.getEntities(ComponentTypeTree(ComponentType.Player))
+        val playersComponents = mutableListOf<PlayerComponent>()
+
+        for (p: Entity in playersEntities) {
+            if (p.getComponent(ComponentType.Player) != null)
+                playersComponents.add(p.getComponent(ComponentType.Player) as PlayerComponent)
+        }
+        for (p: PlayerComponent in playersComponents) {
+            if (p.alive) {
+                alivePlayers++
+            } else {
+                deadPlayers++
+            }
+        }
+        val player = playersComponents.find { player -> player.playerId == ecs.localPlayerId }
+                ?: return
+        if (deadPlayers > 0 && alivePlayers == 1) {
+            if (player.alive) {
+                showButtonDialog("You won the game", "Ok"){
+                    if (it == 0)
+                        StateManager.pop()
+                }
+            }
+        }
     }
 
     override fun onBackPressed() {
@@ -272,6 +302,7 @@ class GameState(
         ecs.update(dt)
         updatePlayersList()
         checkPowerups()
+        checkWinner()
     }
 
     override fun render(sb: SpriteBatch) {
@@ -287,10 +318,10 @@ class GameState(
 }
 
 class GameWidget(
-    val ecs: SnakeECSEngine,
-    private val fieldWidth: Float,
-    private val fieldHeight: Float,
-    private val standardViewport: Viewport
+        val ecs: SnakeECSEngine,
+        private val fieldWidth: Float,
+        private val fieldHeight: Float,
+        private val standardViewport: Viewport
 ) : Widget() {
 
     // private val viewport = ExtendViewport(fieldWidth, fieldHeight, fieldWidth, fieldHeight, camera)
