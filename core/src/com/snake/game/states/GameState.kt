@@ -1,11 +1,9 @@
 package com.snake.game.states
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.SplitPane
@@ -244,8 +242,18 @@ class GameState(
         if (deadPlayers > 0 && alivePlayers == 1) {
             if (player.alive) {
                 showButtonDialog("You won the game", "Ok"){
-                    if (it == 0)
+                    if (it == 0){
+                        ecs.entityManager.clearEntities()
                         StateManager.pop()
+                    }
+                }
+            }else{
+               val winner=  players.find { p -> p.id == player.playerId  }
+                showButtonDialog("${winner?.nickname} won the game", "Ok"){
+                    if (it == 0){
+                        ecs.entityManager.clearEntities()
+                        StateManager.pop()
+                    }
                 }
             }
         }
