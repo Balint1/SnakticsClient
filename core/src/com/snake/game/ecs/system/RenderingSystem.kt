@@ -72,7 +72,7 @@ object RenderingSystem : System(ComponentType.Position) {
                 var shadowRenderC = entity.getComponent(ComponentType.ShadowRender) as ShadowRenderComponent
                 sr.begin(ShapeType.Filled)
                 sr.color = Color(0f, 0f, 0f, 0.2f)
-                sr.ellipse(pos.x, pos.y, shadowRenderC.width, shadowRenderC.height + shadowRenderC.offsetY)
+                sr.ellipse(pos.x-shadowRenderC.width/2, pos.y + shadowRenderC.offsetY, shadowRenderC.width, shadowRenderC.height)
                 sr.end()
             }
 
@@ -93,31 +93,12 @@ object RenderingSystem : System(ComponentType.Position) {
                 val tag = (entity.getComponent(ComponentType.Tag) as TagComponent).tag ?: return
 
                 when (tag) {
-                    TagComponent.EntityTagType.SnakeHead -> {
-                        /*sr.begin(ShapeType.Filled)
-                        sr.color = Color.RED
-                        sr.rect(pos.x - 2, pos.y - 2, 4f, 4f)
-                        sr.end()*/
-                        renderSnake(em, entity, sr)
-                    }
-                    TagComponent.EntityTagType.SnakeBody -> {
-                        /*sr.begin(ShapeType.Filled)
-                        sr.color = Color.YELLOW
-                        sr.rect(pos.x - 2, pos.y - 2, 4f, 4f)
-                        sr.end()*/
-                    }
-                    TagComponent.EntityTagType.Fireball -> {
-                        sr.begin(ShapeType.Filled)
-                        sr.color = Color.RED
-                        sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
-                        sr.end()
-                    }
-                    TagComponent.EntityTagType.Food -> {
-                        sr.begin(ShapeType.Filled)
-                        sr.color = Color.GREEN
-                        sr.rect(pos.x - 10, pos.y - 10, 20f, 20f)
-                        sr.end()
-                    }
+                    TagComponent.EntityTagType.SnakeHead -> {renderSnake(em, entity, sr) }
+                    TagComponent.EntityTagType.SnakeBody -> {}
+                    TagComponent.EntityTagType.Fireball -> {}
+                    TagComponent.EntityTagType.Food -> {}
+                    TagComponent.EntityTagType.Powerup -> {}
+                    TagComponent.EntityTagType.Wall -> {}
                 }
             } else {
                 // Temporary render
@@ -143,7 +124,8 @@ object RenderingSystem : System(ComponentType.Position) {
      */
     private fun render(sb: SpriteBatch, spriteComponent: SpriteComponent, x: Float, y: Float) {
         sb.begin()
-        sb.draw(spriteComponent.sprite, x, y, spriteComponent.renderWidth, spriteComponent.renderHeight)
+        sb.draw(spriteComponent.sprite, x-spriteComponent.renderWidth/2, y-spriteComponent.renderHeight/2,
+                spriteComponent.renderWidth, spriteComponent.renderHeight)
         sb.end()
     }
 
@@ -153,7 +135,8 @@ object RenderingSystem : System(ComponentType.Position) {
     private fun render(sb: SpriteBatch, animComponent: AnimatedSpriteComponent, x: Float, y: Float) {
         sb.begin()
         // Draw the current frame of this animation
-        sb.draw(animComponent.getCurrentFrame(), x, y, animComponent.renderWidth, animComponent.renderHeight)
+        sb.draw(animComponent.getCurrentFrame(), x - animComponent.renderWidth/2, y - animComponent.renderHeight/2,
+                animComponent.renderWidth, animComponent.renderHeight)
         sb.end()
     }
 

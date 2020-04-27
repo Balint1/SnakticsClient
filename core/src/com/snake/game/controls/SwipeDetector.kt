@@ -4,15 +4,14 @@ import com.badlogic.gdx.input.GestureDetector
 import com.snake.game.backend.Data
 import com.snake.game.backend.Events
 import com.snake.game.backend.SocketService
+import kotlin.math.abs
 
 
-/*
-object that detect swipe
-And send the swipe event to the server if activated (input-system.ts)
-(based on the location of the mouse at the beginning and the and of the "mouse down" or touch)
-to implement it a multiplexer as to be used (because the game use also inputs in stage)
-multiplexer is possible because true is never send after input event therefore the next elements in
-the multiplexer will receive them as if the swipeDetector does not exist
+/**
+ * Detects swipes and sends swipe events to the server if activated (input-system.ts)
+ * To implement it, a multiplexer has to be used (multiplexer is possible because true is never
+ * sent after input event therefore the next elements in the multiplexer will receive them as
+ * if the swipeDetector does not exist.
  */
 object SwipeDetector : GestureDetector(DirectionGestureListener()) {
     var active: Boolean = false
@@ -38,7 +37,7 @@ object SwipeDetector : GestureDetector(DirectionGestureListener()) {
     }
     private class DirectionGestureListener() : GestureAdapter() {
         override fun fling(velocityX: Float, velocityY: Float, button: Int): Boolean {
-            if (Math.abs(velocityX) > Math.abs(velocityY)) {
+            if (abs(velocityX) > abs(velocityY)) {
                 if (velocityX > 0) {
                     SwipeDetector.right()
                 } else {
